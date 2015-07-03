@@ -1,0 +1,124 @@
+'--- to do:
+'---  • ways to detect collisions and enemy removing
+'---      (try a kind of 'Space Invaders'?)
+'---  • better and more wave attacks
+
+'vt=time,vk$=kind,vc=amount,vw=wave,vl=layer,vf=flag
+  dim vt[32],vk$[32],vc[32],vw[32],vl[32],vf[32]
+for i=0 to 31
+  vt[i]=0:vk$[i]="":vc[i]=0:vw[i]=0:vl[i]=0:vf[i]=0:next
+vt[0]=002 :vk$[0]="B" :vc[0]=4 :vw[0]=1 :vl[0]=0
+vt[1]=006 :vk$[1]="M" :vc[1]=4 :vw[1]=2 :vl[1]=8
+vt[2]=008 :vk$[2]="R" :vc[2]=4 :vw[2]=5 :vl[2]=16
+'--- ?????
+vt[3]=010 :vk$[3]="M" :vc[3]=4 :vw[3]=2 :vl[3]=24
+vt[4]=012 :vk$[4]="B" :vc[4]=4 :vw[4]=1 :vl[4]=0
+vt[5]=016 :vk$[5]="M" :vc[5]=4 :vw[5]=3 :vl[5]=8
+vt[6]=018 :vk$[6]="M" :vc[6]=4 :vw[6]=3 :vl[6]=16
+vt[7]=020 :vk$[7]="M" :vc[7]=4 :vw[7]=2 :vl[7]=24
+vt[8]=022 :vk$[8]="M" :vc[8]=4 :vw[8]=3 :vl[8]=0
+vt[9]=025 :vk$[9]="R" :vc[9]=4 :vw[9]=5 :vl[9]=8
+vt[10]=028:vk$[10]="M":vc[10]=4:vw[10]=2:vl[10]=16
+vt[11]=029:vk$[11]="B":vc[11]=4:vw[11]=1:vl[11]=24
+vt[12]=031:vk$[12]="M":vc[12]=4:vw[12]=2:vl[12]=0
+vt[13]=036:vk$[13]="M":vc[13]=4:vw[13]=2:vl[13]=8
+vt[14]=037:vk$[14]="M":vc[14]=4:vw[14]=2:vl[14]=16
+vt[15]=040:vk$[15]="M":vc[15]=4:vw[15]=2:vl[15]=24
+vt[16]=043:vk$[16]="B":vc[16]=4:vw[16]=1:vl[16]=0
+vt[17]=044:vk$[17]="M":vc[17]=4:vw[17]=4:vl[17]=8
+vt[18]=046:vk$[18]="M":vc[18]=4:vw[18]=4:vl[18]=16
+vt[19]=047:vk$[19]="B":vc[19]=4:vw[19]=1:vl[19]=24
+
+function bgroup(v,p,s)
+   mk=((2^s)-1)*(2^p)
+   bgroup=bitwiseand(v,mk)/(2^p)
+ end function
+Function ByteFromWord(value,byteadr)
+    xpn=2^(byteadr*8)
+    flag=255*xpn
+    tmpr=(bitwiseand(value,flag))/xpn
+    ByteFromWord=tmpr
+ end function
+function cntr(t,f)
+     tmpr=0
+   if t>(f*32) then:tmpr=t-(f*32):end if
+     cntr=tmpr
+ end function
+function spx(w,c,n)
+   if w=1 then
+      tmpr=((1-(bitwiseand(n,2)/2))*48)+((bitwiseand(n,1))*128)+32
+    end if
+   if w=2 then:tmpr=128+(96*sin((c/8)-(n/4))):end if
+   if w=3 then:tmpr=128+(96*sin((c/8)-(n/4))):end if
+   if w=4 then:tmpr=128+(96*sin((c/8)-(n/4))):end if
+   if w=5 then
+      tmpr=((1-(bitwiseand(n,2)/2))*48)+((bitwiseand(n,1))*128)+32
+    end if
+      spx=tmpr
+ end function
+function spy(w,c,n)
+   if w=1 then:tmpr=c-(n*32):end if
+   if w=2 then:tmpr=(c*2)-(n*2):end if
+   if w=3 then:tmpr=(c*2)-(n*2):end if
+   if w=4 then:tmpr=(c*2)-(n*2):end if
+   if w=5 then:tmpr=c-(n*32):end if
+     spy=tmpr
+ end function
+function enmnd(a$,t)
+      tmpr=0
+   if a$="B" then:tmpr=21+((t/4)mod 2):end if
+   if a$="M" then:tmpr=17+((t/4)mod 2):end if
+   if a$="R" then:tmpr=23+((t/4)mod 2):end if
+      enmnd=tmpr
+ end function
+
+dim tkst$[4]:clntim=0
+
+windowed=0
+  setdisplay(256,192,16,windowed): autoback(0):mousehide()
+  paper(0x004400):ink(0):pen(0):cls
+
+dim xpos[8],ypos[8]
+
+   ScreenOpen (1,256,192,0,0,0,0,0)
+ Loadimage("sprites.png",1): pasteicon(0,0,1): Screen(1)
+    For y=0 To 5: For x=0 To 15
+       k=(y*16)+x: grab(1+k,x*16,y*16,16,16)
+     Next : Next
+
+  screen(0)
+while(0=0)
+  tikcr=ticks
+  tikc0=bgroup(tikcr,0,6):tikc1=bgroup(tikcr,6,5)
+  tikc2=bgroup(tikcr,11,11):tik1b=bgroup(tikcr,6,16)
+
+'--- 1sec =ticks/1024
+'--- 32frmsec =ticks/32
+'--- 64frmsec =ticks/16
+
+for zm=0 to 19:for zn=0 to 3
+    ct=cntr(tik1b,vt[zm])
+        if ct>0 then:vf[zm]=1:end if
+        if ct>512 then:vf[zm]=2:end if
+      if vf[zm]=1 then
+         wva=vw[zm]
+         ek=enmnd(vk$[zm],tikc1)
+         sprx=spx(wva,ct,zn):spry=spy(wva,ct,zn)
+           bob(vl[zm]+(zn*2)+1,sprx,spry-32,ek)
+'--- sombra - criar matriz primeiro
+if vk$[zm]="M" then
+    bob(vl[zm]+(zn*2)+2,sprx,spry-24,13)
+ end if
+       end if
+ next: next
+    locate (2,0): prints( str$(tikc0)+"  ")
+    locate (2,1): prints( str$(tikc1)+"  ")
+    locate (2,2): prints( str$(tikc2)+"  ")
+      screenswap()
+      if key(27) then : end :end if
+
+      if tikc2=58 then: end :end if
+ 
+end while
+
+

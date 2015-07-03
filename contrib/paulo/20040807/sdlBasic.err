@@ -1,0 +1,3 @@
+Runtime error on line number 62 of C:\devel\basic\sdlBasic\contrib\paulo\20040807\3dDrawingDemo_05.sdlbas
+Division by zero
+     pitag=val(pitagstg$)

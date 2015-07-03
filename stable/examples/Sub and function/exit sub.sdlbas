@@ -1,0 +1,20 @@
+'
+' sdlBasic example  Sub and function:exit sub
+'
+'   Name:      exit sub.sdlbas
+'   Purpose:    break a subrutine
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+sub example(a)
+	if a>5 then
+		exit sub
+	else
+		prints(a)
+	end if
+end sub
+
+for i= 0 to 10
+	example(i)
+next

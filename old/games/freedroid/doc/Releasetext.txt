@@ -1,0 +1,94 @@
+1.0.2 
+* fixed highscore-bug when completing game (score was reset->0 when restarting mission)
+* allowed full scalability with "-r <scale>" for playing on Sharp Zaurus etc
+* fixed crash bug on 16-bit architectures (->Zaurus?)
+* fixed crash bug when playing without Vorbis support
+* removed non-portable code (random(), strsep(), $HOME..) to increase portability (->Win32)
+* adapted configure and code to allow cross-compilation for Win32 (using mingw32)
+
+1.0.1
+
+* 3D rotating droid pics in Console
+* adjusted game-parameters to be closer to the original 'paradroid'
+* dynamic "Theme" detection allows simple adding of new graphics themes
+* added original "Alert" feature
+* added low-energy fading and takeover-mode coloring 
+* added partial map visibility and droid-'ashes' as extended features
+* added 'legacy' C64-game mod-songs as background music
+* improved sounds
+* added "white-noise" effect for GameOver
+* added highscore list which is loaded&saved to disk
+* better mouse+mouse-wheel support
+* added Mac OSX ProjectBuilder files
+* fixed tons of bugs, and memory-leaks
+
+
+0.8.3
+
+* New theme thanks to lanzz
+* Highscore list added
+* Themes now can be changed in-game from the options menu
+* New droids renderings thanks to Bastian, especially 329, 420 and 476
+* New background for the console menu thanks to Bastian
+* New console menu for the console menu thanks to Lanzz
+* Added a function to check for safty-check for leading -1 wp connection entries
+* Added dynamic rotation for bullets
+* Level name can be changed from the level editor
+* Droid speech can now be controled very detailed from the options menu
+* Door animation speed now independent of the framerate
+* Acceleration of droids now independent of the framerate (mostly)
+* Difficulty of 'The Outbreak' mission enhanced
+* A lot more initial values are now defined in external text file 'game.dat'.
+* Many new levels and elevator connections established
+* Several bugs fixed
+
+
+0.8.4 (planned)
+
+Graphics:
+* Classic theme completely refined and smoothed thanks to Lanzz
+* Teleporter animation thanks to Lanzz
+* Improved Freedroid Font thanks to Lanzz
+* Resizing of combat window possible from the options menu
+* Improved the speed of the scolling text
+	
+Sound:
+* Allow for mod files for the background music
+* Allow to specify background music for each deck individually via the maps file
+* Allow to specify background music for briefing/debriefing in the mission files
+
+Game:
+* New takeover rule:  Resistance of controled unit depends on details of takeover game
+* Extra Manual section on how to play and how to control
+* Communication with friendly droids:  Dialog upon establishing 'takeover' contact with them
+* More variables under control of the maps file
+* Influ now can comment on any new level he enters
+* Influs comments on the level can be specified from the level editor
+* Shipname is now under control of the maps files
+* Some friendly droids can be commanded to follow and stay via the chat interface.
+* Status of friendly droids can be requested via the chat interface
+* Friendly droids will follow the influencer to other levels as well
+* Friendly droids with weapons will participate in the fighting
+
+To be done still:
+* Extra In-game Manual or Tutorial on how to play
+* Saving of options in the users home directory
+* Improved new missions and new maps?
+* Saving of high scores in the temp directory
+* Allow for robot parts, that drop out after the robots destruction from time
+  to time an can be fitted after talking to an engeneer bot on an engeneer deck
+* Allow for shops, where you can buy various parts for different droids via
+  talking to the shopkeeper droid
+
+0.8.5 (planned)
+
+* Teleporter jumps of Influencer allowed as well as animation provided for the
+  dissovling/reassembling of the droid
+* Hunting behaviour for (enemy) droids
+* Scripts with movie-like sequences and dialogs of droids at certain points
+* Allow for a robot party, that will accompany the influencer on his travels
+* Droids are visible/invisible dependant on whether the current host has radar or not.
+* Add more droids and MS bots.
+
+
+

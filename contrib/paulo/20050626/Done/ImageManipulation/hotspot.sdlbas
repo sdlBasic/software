@@ -1,0 +1,13 @@
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+screenopen(7,80,80,0,0,0,0,0)
+   paper(8^8-1):ink(0):pen(0):cls:setcolorkey(8^8-1)
+    line(0,0,32,32):line(32,0,0,32):grab(1,0,0,32,32)
+ screenclose(7)
+   x1=0:y1=0
+while key(27)=0
+   x1=x1-1:if x1<0 then:x1=64:end if
+   y1=y1-.2:if y1<0 then:y1=64:end if
+   hotspot(1,x1,y1)
+   sprite(1,xmouse,ymouse,1)
+   waitvbl
+ end while

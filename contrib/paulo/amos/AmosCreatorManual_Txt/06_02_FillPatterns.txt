@@ -1,0 +1,19 @@
+Rem ************************************ 
+Rem *        AMOS Example 6.2          * 
+Rem *         Fill patterns            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Do 
+   Locate 0,0 : Input "Choose the Ink Colour   [0-15]";I
+   Locate 0,1 : Input "Choose the Paper colour [0-15]";P
+   Locate 0,2 : Input "Choose a fill pattern   [0-34]";F
+   Ink I,P
+   Set Pattern F
+   Locate 0,4 : Centre "<Fill Pattern selected>"
+   Bar 0,50 To 320,190
+   Locate 0,24 : Input "Another go? [y,n]";Y$
+   Exit If Y$="n"
+   Exit If Y$="N"
+   Clw 
+Loop : Edit 

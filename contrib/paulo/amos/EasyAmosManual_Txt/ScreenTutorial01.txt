@@ -1,0 +1,20 @@
+'
+'      Screen tutorial #01 - Screen to Front demo    
+'
+For A=0 To 7
+   Screen Open A,320,40,16,Lowres
+   Flash Off 
+   Palette 0,$BBB,$B00,$B0,$B,$BB,$B0B,$BB0,$BBB,$B00
+   Screen Display A,,50+A*16,,
+   Screen A
+   Cls A+2 : Paper A+2 : Pen A+1
+   Print "Screen ";A
+Next A
+Do 
+   Input "Which screen next (0-7)?";S
+   If S>-1 and(S<8)
+      Screen To Front S
+      Screen S
+      Print : Print "Welcome to screen";S
+   End If 
+Loop 

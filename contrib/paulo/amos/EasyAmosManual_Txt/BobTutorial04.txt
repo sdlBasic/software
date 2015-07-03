@@ -1,0 +1,22 @@
+'
+'      Bob tutorial #04 - Bobs moving over background graphics     
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Double Buffer 
+Cls 0
+'
+'This loop draws a sequence of lines over which Bobs 1 and 2 move over 
+'and don't effect. 
+'
+For X=0 To 320 Step 10
+   Plot X,0
+   Draw To 320-X,200
+Next X
+'
+For X=200 To 100 Step -1
+   Bob 1,X,130,6
+   Bob 2,300-X,130,5
+Wait Vbl 
+Next X

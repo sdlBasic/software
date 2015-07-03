@@ -1,0 +1,8 @@
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+for a=1 to 30
+    b=rnd(10):c=rnd(10)
+  if (b<5) and (c>5) then
+     prints(str$(b)+","+str$(c)+": b is smaller than 5, and c is greater than 5")
+   end if
+ next
+waitkey

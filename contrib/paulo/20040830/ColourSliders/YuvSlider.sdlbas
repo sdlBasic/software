@@ -1,0 +1,37 @@
+'-- YUV is a colour space used on rf television formats
+'--   (ntsc, secam, pal...)
+'-- also used on msx2+ screen modes 
+'-- Y is the luminance and UV the crominance axis
+'-- i'm not sure if YUV and YJK are the same and
+'--   if the algorythm is accuraced 
+
+xedge=200:yedge=80
+   setdisplay(xedge,yedge,32,1)
+   paper (0xffffff):ink (0x000000): pen (0x000000):cls
+  include "interface_040514.sdlblib"
+   paper(0xAAAAAA):cls
+  setnew(0,slider,14,40,8,100,10,50)
+   setnew(1,slider,14,40,24,100,10,50)
+   setnew(2,slider,14,40,40,100,10,50)
+  ink (0x777777)
+   bar (8,8,72,72)
+
+draw
+while(0=0)
+  waitevent(0)
+  if key(27)=1 then:end:end if
+  setparam(17,_value,getparam(15,_value))
+   drawobject(17)
+  y=(getparam(0,_value))*255/100
+   u=((getparam(1,_value))*511/100)-256
+   v=((getparam(2,_value))*511/100)-256
+  g=y-u:b=y-v:r=(y-((b/2)+(g/8)))*4
+  if r<0 then:r=0:end if
+   if g<0 then:g=0:end if
+   if b<0 then:b=0:end if
+  if r>255 then:r=255:end if
+   if g>255 then:g=255:end if
+   if b>255 then:b=255:end if
+  ink (rgb(r,g,b))
+   bar (8,8,72,72)
+ wend

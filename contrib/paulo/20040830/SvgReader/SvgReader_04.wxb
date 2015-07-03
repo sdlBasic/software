@@ -1,0 +1,152 @@
+  fnm$="tiger.svg"
+  dim xp0,yp0,xp1,yp1,xp2,yp2,xp3,yp3
+  dim xmin,xmax,xvl,ymin,ymax,yvl
+   dim xcs=512, ycs=512
+function lstinf$(a$,b$,c$)
+    adra=1:adrb=1:blngt=len(b$):d$=""
+  while adrb<=blngt
+     if mid$ (a$,adra,1)=mid$ (b$,adrb,1) then:adrb+=1:end if
+     adra+=1
+   end while
+  while mid$(a$,adra,1)<>left$(c$,1)
+     d$=d$+mid$(a$,adra,1):adra+=1
+   end while
+     lstinf$=d$
+ end function
+function thz(cnv,vmn,vmx,vlr)
+   vdf=vmx-vmn:thz=(((vlr-vmn)*cnv)/vdf)
+ end function
+'______________________________________________________________________________
+'__ analysing .svg text line sizes (reader stop if over 250)
+print "analysing .svg text line sizes..."
+  lsz=0:lsflg=0
+  open fnm$ for input as #1
+while eof(1)=0
+  a=ReadByte(1)
+      lsz+=1
+    if ((a=0x0A) or (a=0x0D)) then:lsz=0:end if
+    if lsz>250 then
+       print "please break the .svg text lines before converting"
+       print "each line should have less than 250 characters"
+       print "each path command (L, C or M) must be at line start"
+       print "maybe this converter will crash now"
+       lsflg=1
+     end if
+ end while
+    if lsflg=0 then:print "ok":print:end if
+  close #1
+'____________
+'__ looking for first coordinate (for finding coordinate edges)
+print "looking for first coordinate ..."
+  fnd=0
+  open fnm$ for input as #1
+while fnd=0
+  line input #1,text$:text$=ltrim$(text$)+"   ":frst$=left$(text$,1)
+    if (frst$="M") or (frst$="C") or (frst$="L") then 
+       xvl=val(lstinf$(text$," "," ")):yvl=val(lstinf$(text$,"  "," "))
+       fnd=1: print "found":print xvl;" , ";yvl:print
+     end if
+ end while
+   xmin=xvl:xmax=xvl:ymin=yvl:ymax=yvl
+  close #1
+'____________
+'__ analysing coordinate edges (for fitting drawing into canvas)
+print "analysing coordinate edges ..."
+  open fnm$ for input as #1
+while eof(1)=0
+  line input #1, text$:text$=ltrim$(text$)+"   ":frst$=left$(text$,1)
+    if (frst$="M") or (frst$="L") or (frst$="C") then 
+       xvl=val(lstinf$(text$," "," ")):yvl=val(lstinf$(text$,"  "," "))
+         if xvl < xmin then:xmin=xvl:end if
+         if yvl < ymin then:ymin=yvl:end if
+         if xvl > xmax then:xmax=xvl:end if
+         if yvl > ymax then:ymax=yvl:end if
+     end if
+    if (frst$="C") then 
+       xvl=val(lstinf$(text$,"   "," ")):yvl=val(lstinf$(text$,"    "," "))
+         if xvl < xmin then:xmin=xvl:end if
+         if yvl < ymin then:ymin=yvl:end if
+         if xvl > xmax then:xmax=xvl:end if
+         if yvl > ymax then:ymax=yvl:end if
+       xvl=val(lstinf$(text$,"     "," ")):yvl=val(lstinf$(text$,"      "," "))
+         if xvl < xmin then:xmin=xvl:end if
+         if yvl < ymin then:ymin=yvl:end if
+         if xvl > xmax then:xmax=xvl:end if
+         if yvl > ymax then:ymax=yvl:end if
+     end if
+ end while
+  close #1
+       print xmin;" , ";xmax:print ymin;" , ";ymax:print
+       xs=xmax-xmin:ys=ymax-ymin
+       print "drawing size:":print xs;" , ";ys:print
+
+'____________
+'__ ajusting aspect ratio to canvas size
+print "ajusting aspect ratio to canvas size ..."
+  rs=xs/ys
+  if xs>ys then:ycs=xcs/(xs/ys):end if
+  if ys>xs then:xcs=ycs/(ys/xs):end if
+print int(xcs);" , ";int(ycs)
+print
+
+
+'____________
+'__ opening canvas dialog
+print "opening canvas dialog ..."
+   frame=new wxFrame(Null,-1,"svg reader",wxPoint(0,0),wxSize(xcs,ycs),wxSIMPLE_BORDER|wxCAPTION|wxSYSTEM_MENU)
+   frame.Centre() 
+Common bmp=wxEmptyBitmap(xcs,ycs) 
+   Common bmpDC=wxMemoryDC()
+   bmpDC.SelectObject(bmp)
+   bmpDC.SetBackground(wxBrush(wxColor(255,255,255),wxSOLID))
+   bmpDC.SetPen(wxPenFromColor(wxColor(0,0,0),1,wxSOLID))
+   bmpDC.Clear()
+sub DrawBezier(x0,y0,x1,y1,x2,y2,x3,y3)
+    For t=0 To 1 Step 0.05
+       xa=(x3)-(3*x2)+(3*x1)-(x0):ya=(y3)-(3*y2)+(3*y1)-(y0)
+       xb=(3*x2)-(6*x1)+(3*x0):yb=(3*y2)-(6*y1)+(3*y0)
+       xc=(3*x1)-(3*x0): yc=(3*y1)-(3*y0)
+       xm=(((((xa*t)+xb)*t)+xc)*t)+x0:ym=(((((ya*t)+yb)*t)+yc)*t)+y0
+         If t=0 Then:xo=xm:yo=ym:Else:bmpDC.DrawLine(xo,yo,xm,ym):xo=xm:yo=ym:End If
+     Next
+ end sub
+   print
+'____________
+'__ reading (looks for lines starting with M, C, and L)
+print "reading ..."
+  xp0=0:yp0=0
+  open fnm$ for input as #1
+while eof(1)=0
+  line input #1, text$:text$=ltrim$(text$)+"   ":frst$=left$(text$,1)
+    if (frst$="M") then 
+       xp0=val(lstinf$(text$," "," ")):yp0=val(lstinf$(text$,"  "," "))
+     end if
+    if (frst$="L") then 
+       xp1=val(lstinf$(text$," "," ")):yp1=val(lstinf$(text$,"  "," "))
+            xq0=thz(xcs,xmin,xmax,xp0):yq0=thz(ycs,ymin,ymax,yp0)
+            xq1=thz(xcs,xmin,xmax,xp1):yq1=thz(ycs,ymin,ymax,yp1)
+         bmpDC.DrawLine (xq0,yq0,xq1,yq1)
+       xp0=xp1:yp0=yp1
+     end if
+    if (frst$="C") then 
+       xp1=val(lstinf$(text$," "," ")):yp1=val(lstinf$(text$,"  "," "))
+       xp2=val(lstinf$(text$,"   "," ")):yp2=val(lstinf$(text$,"    "," "))
+       xp3=val(lstinf$(text$,"     "," ")):yp3=val(lstinf$(text$,"      "," "))
+            xq0=thz(xcs,xmin,xmax,xp0):yq0=thz(ycs,ymin,ymax,yp0)
+            xq1=thz(xcs,xmin,xmax,xp1):yq1=thz(ycs,ymin,ymax,yp1)
+            xq2=thz(xcs,xmin,xmax,xp2):yq2=thz(ycs,ymin,ymax,yp2)
+            xq3=thz(xcs,xmin,xmax,xp3):yq3=thz(ycs,ymin,ymax,yp3)
+        DrawBezier(xq0,yq0,xq1,yq1,xq2,yq2,xq3,yq3)
+       xp0=xp3:yp0=yp3       
+     end if
+ end while
+   close #1
+  print "ok"
+'____________
+Sub onPaint(event)
+   Dim dc 
+   dc=wxPaintDC(frame):dc.BeginDrawing():dc.Blit(0,0,xcs,ycs,bmpDC,0,0)
+   dc.EndDrawing() 
+ End Sub
+   Connect(frame,-1,wxEVT_PAINT,"onPaint" ) 
+frame.Show(True)

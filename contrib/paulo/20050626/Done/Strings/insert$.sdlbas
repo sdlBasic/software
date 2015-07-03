@@ -1,0 +1,8 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+a$="abcdefgh"
+prints("before insert$")
+prints("a$="+chr$(34)+a$+chr$(34))
+a$=insert$(a$,"*inserted*",5)
+prints("after insert$")
+prints("a$="+chr$(34)+a$+chr$(34))
+waitkey

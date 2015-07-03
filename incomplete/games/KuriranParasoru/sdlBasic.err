@@ -1,0 +1,4 @@
+Runtime error on line number 38 of /home/devel_linux/basic/sdlBasic/sdlBasicDevel/games/KuriranParasoru/stage1.sdlbas
+SDLengine Error 
+
+  loadmusic ("st1.mid"):playmusic(-1)

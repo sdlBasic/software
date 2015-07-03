@@ -1,0 +1,820 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                       STEP SEVEN: The final game 
+'----------------------------------------------------------------------------
+'
+' Pff, nearly there. 
+'  
+' We still need the sounds and music.  
+'
+' It would also be nice to have messages displayed in the center of the  
+' screen stating DEMO MODE, GOAL, GAME OVER or HALF-TIME.
+' This message is held in the MESS and DMESS variable, and is drawn  
+' using the DISPLAY_FIELD procedure  
+'
+' In this program, the GAME is fully finished. 
+'
+'----------------------------------------------------------------------------  
+Close Editor 
+Hide On 
+PATH$="Easy_Examples:"
+'
+' We have already seen these variables   
+Dim XP(1),YP(1),XDP(15),YDP(15),DB(1),DP(1),SP(1),IP(15,1),FL(1)
+Dim XR(1),YR(1)
+Dim XH(15),YH(15)
+Dim XHH(15),YHH(15)
+Dim CP(1),CB(1),CC(1),XC(1),YC(1)
+Dim BOUNCE(8,15)
+Dim ROBOT(1)
+Dim ROBOT$(1),WHERE$(1),CHECK$(1),AFTER$(1)
+Dim GX(1),GY(1),ODX(1),ODY(1)
+Dim ROBGOAL(1),ROBHIT(1),ROBWAIT(1),RPAR(1),BUMP(1)
+Dim ROBSPEED(1),ROBSP(1),ROBD(1)
+Dim ROBDIR(20)
+Dim XSCR(1),SCRE(1)
+Dim MXSP(1)
+'
+' Now, we'll make them global  
+Global XP(),YP(),XDP(),YDP(),DB(),DP(),SP(),IP(),FL()
+Global XR(),YR()
+Global P2BOB,BBP,BBB,PSIZE
+Global PLA
+Global XC(),YC()
+Global XH(),YH(),XHH(),YHH(),CP(),CB(),CC()
+Global P2BOB,BBP,BBB,PSIZE
+Global XB,YB,ZB
+Global DB,SB
+Global SZB
+Global ZBALL
+Global BBALL
+Global CPT,BOUNCE()
+Global YTOP,YBOTTOM,XCENTER,YCENTER
+Global GX,GY,GX(),GY(),ROBDIR(),ODX(),ODY()
+Global ROBOT$(),WHERE$(),CHECK$(),AFTER$()
+Global ROBGOAL(),ROBHIT(),ROBWAIT(),ROBOT(),RPAR(),ROBSPEED()
+Global ROBSP(),ROBD(),BUMP()
+Global GOAL
+Global XSCR(),YSCR,SCRE()
+Global MARK
+Global FINISH
+Global SEC,MNT
+Global MXSP(),FLAGCOL
+' ***
+' These variables handle the position and type of the message  
+Global DMESS,XMESS,YMESS,MESS
+' ***
+' Set some variables for the different sound-voices  
+Global VOI1,VOI2,VOI3,VOI4
+' ***
+' We now load the music and the samples
+Load PATH$+"Sounds/Tricycle_Music.Abk"
+Load PATH$+"Sounds/Tricycle_Samples.Abk"
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+Load PATH$+"Pictures/Tricycle_Screen.Abk",10
+Load PATH$+"Pictures/Tricycle_Playfield.Abk",11
+' ***
+' Let's call the demo! 
+GAME_DEMO
+'
+ALL_ERASE
+Edit 
+' ***
+' Some new procedures, to make things really clean!
+Procedure GAME_ONE_EASY
+   ' ***
+   ' Start a game for ONE player, not too difficult 
+   GOAL=0 : SEC=0 : MNT=2
+   '
+   GAME_INIT
+   ' ***
+   ' No message to display
+   DMESS=-2 : MESS=0
+   ' ***
+   ' EASY mode:  - does not want to hit the other 
+   '             - waits quite a lot
+   '             - slow!
+   P=1
+   ROBOT(1-P)=0 : ROBOT(P)=1
+   ROBWAIT(P)=50 : ROBHIT(P)=0 : ROBGOAL(P)=50 : ROBSPEED(P)=8
+   ' ***
+   ' Call the game! 
+   GAME
+End Proc
+Procedure GAME_ONE_DIFFICULT
+   ' ***
+   ' Same as before, but a little harder
+   GOAL=0 : SEC=0 : MNT=2
+   GAME_INIT
+   DMESS=-2 : MESS=0
+   ' ***
+   ' DIFFICULT:  - wants to smash in the other player 
+   '             - does not wait at all 
+   '             - fast, and wants to rush in the opponent's goal!
+   P=1 : ROBOT(P)=1 : ROBOT(1-P)=0 : ROBWAIT(P)=0 : ROBHIT(P)=50 : ROBGOAL(P)=100 : ROBSPEED(P)=18
+   '
+   GAME
+End Proc
+Procedure GAME_TWO
+   ' ***
+   ' Normal game, two players 
+   GOAL=0 : SEC=0 : MNT=2
+   GAME_INIT
+   DMESS=-2 : MESS=0
+   ' No robot at all! 
+   ROBOT(0)=0 : ROBOT(1)=0
+   GAME
+End Proc
+Procedure GAME_DEMO
+   ' ***
+   ' The demo: two robots on against the other! 
+   ' Only plays the second half, for 1 minute 
+   GOAL=1 : SEC=59 : MNT=0
+   '
+   GAME_INIT
+   ' ***
+   ' Default message= DEMO MODE 
+   DMESS=1 : MESS=DMESS
+   ' ***
+   ' Set up two robots, in DIFFICULT mode: more action! 
+   For P=0 To 1
+      ROBOT(P)=1 : ROBWAIT(P)=50
+      ROBHIT(P)=50 : ROBGOAL(P)=100 : ROBSPEED(P)=16
+   Next 
+   '  
+   GAME
+End Proc
+Procedure GAME
+   ' ***  
+   ' Now, we call the BRAVOS and music procedures!
+   TIM=51 : OSEC=SEC : OMIN=MNT
+   '
+   ' Main loop
+   Do 
+      ' Players's entering 
+      BRAVOS : NEW_BALL
+      ' Do a single half 
+      Do 
+         ' One goal loop
+         Repeat 
+            '
+            CPT=CPT+1
+            ' Erase bobs 
+            Bob Clear 
+            ' Perform animations 
+            BALL_ANIM
+            MOVE_PLAYER[0]
+            MOVE_PLAYER[1]
+            ' Draw the bobs at new positions 
+            Bob Draw 
+            ' And copy onto screen 
+            DISPLAY_FIELD
+            Screen Swap 
+            '
+            ' Game interrupted?
+            A$=Inkey$
+            If A$=Chr$(27) : Exit 3 : End If 
+            ' ***
+            ' If DMESS>0, we are in DEMO mode. Pressing
+            ' the joystick will exit the demo! 
+            If DMESS>0 : If Joy(1) : Exit 3 : End If : End If 
+            If A$=" " : Wait Key : Timer=0 : End If 
+            '
+            ' End of a half-time?
+            While Timer<3 : Wend 
+            TIME=TIME+Timer : Timer=0
+            If TIME>50
+               TIME=TIME-50 : SEC=SEC-1
+               If SEC<0
+                  SEC=59 : MNT=MNT-1
+                  If MNT<0 : MNT=0 : SEC=0 : FINISH=2 : End If 
+               End If 
+               DISPLAY_TIMER
+            End If 
+            '
+            ' If finish>0, then the timer WILL reach zero.   
+            FINISH=FINISH-1
+            ' If zero, the game is over!!! 
+         Until FINISH=0
+         '
+         ' No mark: So we're still waiting for a score. We'll therefore exit. 
+         If MARK<0 : Exit : End If 
+         '
+         ' It IS a goal: Make some noise! 
+         BRAVOS : Sam Play VOI1,3,8363 : Sam Play VOI2,2,9943 : Sam Loop On 
+         ' Display message "GOAL" 
+         MESS=2
+         ' Handle scoring 
+         If GOAL=0
+            P=1 : If MARK=2 : P=0 : End If 
+         Else 
+            P=0 : If MARK=2 : P=1 : End If 
+         End If 
+         SCRE(P)=SCRE(P)+1
+         ' Now move the players back to the center, under the applause! 
+         NEW_BALL
+         ' Stop the noise now,
+         Sam Loop Off 
+         '
+         ' If the robot is being beaten too much, let's accelerate him. ha! 
+         D=SCRE(0)-SCRE(1)
+         If D>0 : ROBSPEED=Min(ROBSPEED+D,18) : End If 
+         '
+      Loop 
+      '
+      ' End of half-time.  
+      ' If we're in the first half (GOAL=0), display a message   
+      If DMESS<0 : MESS=3+GOAL : End If 
+      ' Players go back to the showers 
+      BRAVOS : COME_BACK : CLR_DISPLAY
+      ' If second half-time, the game is over!!
+      If GOAL : Exit : End If 
+      ' A new half-time is about to begin  
+      GOAL=1 : SEC=OSEC : MNT=OMIN
+      MESS=0
+      ' Lets do it!
+   Loop 
+   ' ***
+   ' The game is now over, so we'll close the screens...
+   Screen Close 1
+   Screen Close 0
+   ' Stop the music 
+   Music Off 
+   '  
+End Proc
+'
+Procedure GAME_INIT
+   '
+   BBP=1 : P2BOB=10 : BBB=4
+   PSIZE=10
+   BBALL=3
+   ZBALL=30
+   YTOP=64*32 : YBOTTOM=432*32
+   XCENTER=128*32 : YCENTER=263*32
+   XSCR(0)=34 : XSCR(1)=258 : YSCR=169
+   SCRE(0)=0 : SCRE(1)=0
+   ' ***
+   ' Let's decide where to put the messages.  
+   BMESS=6 : XMESS=160-40 : YMESS=44
+   ' ***
+   ' Set some variables to define which sound channels to use.
+   ' I asked the musician to use two voices for the important part  
+   ' of the music (theme + bass). The two others can be halted  
+   ' without affecting the global quality of the music. 
+   ' I can now freely use voice 1 and 2 (VOI1 and VOI2). What's more, 
+   ' by using our variables, we can still change any voice for our    
+   ' sound effects. 
+   VOI1=1 : VOI2=2 : VOI3=4 : VOI4=8
+   '
+   Restore _DIRECTIONS
+   ANGLE#=Pi#/2.0 : A=32 : B=3 : S=8
+   For D=0 To 15
+      XDP(D)=S*Cos(ANGLE#) : YDP(D)=-S*Sin(ANGLE#)
+      XH(D)=A*Cos(ANGLE#) : YH(D)=-A*Sin(ANGLE#)
+      XHH(D)=B*Cos(ANGLE#-Pi#/2) : YHH(D)=-B*Sin(ANGLE#-Pi#/2)
+      ANGLE#=ANGLE#-Pi#/8.0
+      Read IP(D,0),IP(D,1)
+   Next 
+   '
+   Restore _BOUNCE
+   For Z=1 To 8
+      For B=0 To 15
+         Read BOUNCE(Z,B)
+      Next 
+   Next 
+   '
+   Restore _ROBOT
+   For D=0 To 19
+      Read ROBDIR(D)
+   Next 
+   '
+   Unpack 11 To 1
+   ' ***
+   ' Let's hide this big ugly screen! 
+   Screen Hide 1
+   Reserve Zone 10
+   Set Zone 1,21,0 To 223,24 : Set Zone 2,21,487 To 220,511
+   Set Zone 3,0,21 To 25,487 : Set Zone 4,220,24 To 256,487
+   Set Zone 5,0,0 To 21,24 : Set Zone 6,220,0 To 256,24
+   Set Zone 7,0,486 To 24,511 : Set Zone 8,220,487 To 256,511
+   Limit Bob 16,8 To 240,504
+   Pen 15 : Paper 0
+   '
+   Unpack 10 To 0
+   Get Palette 1
+   Screen Display 0,,,,200
+   Double Buffer 
+   Bob Update Off 
+   Autoback 1
+   ' ***
+   ' We'll grab a small block: We will need it to erase the message 
+   Get Block 1,158,YMESS,4,56
+   '
+   CLR_DISPLAY
+   DISPLAY_SCORE
+   ' ***
+   ' Set the initial positions of player
+   D=16*32
+   P=GOAL : YP(P)=YCENTER-D : DP(P)=8
+   P=1-GOAL : YP(P)=YCENTER+D : DP(P)=0
+   For P=0 To 1
+      DB(P)=4 : DP(P)=4 : SP(P)=0
+      XP(P)=-64*32
+   Next 
+   '
+   Screen 1
+   '
+   Pop Proc
+   '
+   _DIRECTIONS:
+   Data 1,2
+   Data 3,4
+   Data 5,6
+   Data 7,8
+   Data 9,10
+   Data Vrev(7),Vrev(8)
+   Data Vrev(5),Vrev(6)
+   Data Vrev(3),Vrev(4)
+   Data Vrev(1),Vrev(2)
+   Data Rev(3),Rev(4)
+   Data Rev(5),Rev(6)
+   Data Rev(7),Rev(8)
+   Data Hrev(9),Hrev(10)
+   Data Hrev(7),Hrev(8)
+   Data Hrev(5),Hrev(6)
+   Data Hrev(3),Hrev(4)
+   '
+   _BOUNCE:
+   Data 8,7,6,5,5,5,6,7,8,9,10,11,11,11,10,9
+   Data 0,1,2,3,3,3,2,1,0,15,14,13,13,13,14,15
+   Data 1,1,2,3,4,5,6,7,7,7,6,5,4,3,2,1
+   Data 15,15,14,13,12,11,10,9,9,9,10,11,12,13,14,15
+   Data 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
+   Data 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+   Data 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+   Data 14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+   '
+   _ROBOT:
+   Data 8,7,6,5,4
+   Data 0,1,2,3,4
+   Data 8,9,10,11,12
+   Data 0,15,14,13,12
+   '
+End Proc
+Procedure NEW_BALL
+   '
+   DISPLAY_SCORE
+   DISPLAY_TIMER
+   '
+   O0=ROBOT(0) : O1=ROBOT(1)
+   S0=ROBSPEED(0) : S1=ROBSPEED(1)
+   For P=0 To 1
+      ROBOT(P)=1
+      ROBOT$(P)="GO_CENTER" : AFTER$(P)=ROBOT$(P)
+      ROBSPEED(P)=24
+   Next 
+   XB=-1 : Bob Off BBALL
+   FLAGCOL=0
+   Repeat 
+      Bob Clear : MOVE_PLAYER[0] : MOVE_PLAYER[1] : Bob Draw : DISPLAY_FIELD : Screen Swap 
+      While Timer<3 : Wend : Timer=0
+   Until(ROBOT$(0)="HERE") and(ROBOT$(1)="HERE")
+   MESS=DMESS : FLAGCOL=-1
+   Limit Bob 
+   For P=0 To 1 : DB(P)=DP(P) : SP(P)=0 : MXSP(P)=20 : Next 
+   XB=XCENTER : YB=YCENTER : ZB=0 : DB=0 : SB=0 : SZB=Rnd(15)+16
+   ROBOT$="THINK"
+   Bob Clear : MOVE_PLAYER[0] : MOVE_PLAYER[1] : Bob Draw : DISPLAY_FIELD : Screen Swap 
+   FINISH=0 : MARK=-1
+   ROBOT(0)=O0 : ROBOT(1)=O1
+   ROBOT$(0)="THINK" : ROBOT$(1)="THINK"
+   ROBSPEED(0)=S0 : ROBSPEED(1)=S1
+   '
+   ' ***
+   ' Stop samples, and start music! 
+   Timer=0
+   Sam Stop : Music 1
+   '
+End Proc
+Procedure COME_BACK
+   '
+   DISPLAY_SCORE
+   DISPLAY_TIMER
+   '
+   O0=ROBOT(0) : O1=ROBOT(1)
+   S0=ROBSPEED(0) : S1=ROBSPEED(1)
+   For P=0 To 1
+      ROBOT(P)=1 : ROBOT$(P)="GO_BACK" : AFTER$(P)=ROBOT$(P) : ROBSPEED(P)=24
+   Next 
+   '
+   Limit Bob 16,8 To 240,504
+   '
+   XB=-1 : Bob Off BBALL : FLAGCOL=0
+   Repeat 
+      Bob Clear : MOVE_PLAYER[0] : MOVE_PLAYER[1] : Bob Draw : DISPLAY_FIELD : Screen Swap 
+      While Timer<3 : Wend : Timer=0
+   Until(ROBOT$(0)="HERE") and(ROBOT$(1)="HERE")
+   Limit Bob : FLAGCOL=-1
+   '
+   ROBOT(0)=O0 : ROBOT(1)=O1
+   ROBSPEED(0)=S0 : ROBSPEED(1)=S1
+   '
+End Proc
+Procedure BRAVOS
+   ' ***  
+   ' New procedure to make a white noise sound in two voices,   
+   ' to generate a big applause effect
+   Music Off 
+   Noise To VOI3+VOI4
+   Set Envel 0,0 To 50,63
+   Set Envel 0,1 To 75,63
+   Set Envel 0,2 To 50,0
+   Play VOI3,40,0
+   Play VOI4,60,0
+End Proc
+Procedure DISPLAY_SCORE
+   '
+   Screen 0
+   For P=0 To 1
+      DIGIT_PRINT[XSCR(P),YSCR,"  "]
+      A$=Mid$(Str$(SCRE(P)),2)
+      A$=String$(" ",2-Len(A$))+A$
+      DIGIT_PRINT[XSCR(P),YSCR,A$]
+   Next 
+   Screen 1
+   '
+End Proc
+Procedure DISPLAY_TIMER
+   '
+   Locate 0,66
+   Print Using "Time: #";MNT;":"; Using "##";SEC;
+   '
+End Proc
+Procedure DIGIT_PRINT[XX,Y,S$]
+   '
+   For D=0 To Len(S$)-1
+      '
+      X=XX+D*16
+      A$=Mid$(S$,D+1,1)
+      '
+      If A$=" "
+         Paste Bob X,Y,34
+      Else 
+         Paste Bob X,Y,35+Asc(A$)-48
+      End If 
+      '
+   Next 
+   '
+End Proc
+Procedure C0LLIDE[P,C]
+   '
+   On C Goto CYCLE,CYCLE,BALL
+   Pop Proc
+   '
+   ' Collision with other player    
+   CYCLE:
+   Q=1-P
+   CP(Q)=1 : SP(Q)=SP(P)+4*Sgn(SP(P)) : DP(Q)=DP(P) : Bob Off BBB+Q
+   CB(P)=B : CP(P)=1 : CC(P)=CC(P)+1 : SP(P)=-Min(SP(P),8)
+   ' ***
+   ' A funny sound, depending on the player involved
+   Sam Play VOI2,4+P,9000
+   Pop Proc
+   '
+   ' Collision with the ball  
+   BALL:
+   '
+   If ZB<32
+      If SP(P)>2
+         DB=DP(P)
+         SB=SP(P)+6
+         SZB=SP(P)/2+Rnd(SP(P)/2)
+         ' ***
+         ' BUMP!
+         Sam Play VOI1,9,8363
+      End If 
+      If SP(P)<2
+         DB=(DP(P)+8+1-Rnd(2)) mod 16
+         SB=-(SP(P)*3)/2+4
+         SZB=-SP(P)/2+Rnd(SP(P)/2)
+         ' ***
+         ' BIMP!
+         Sam Play VOI1,10,8363
+      End If 
+      If Abs(SP(P))<=2
+         SB=Max(SB,8)
+         DB=(DB-1+Rnd(2)) mod 16 : SZB=Rnd(8)
+         ' ***
+         ' BZOOEEP
+         Sam Play VOI1,11,10000
+      End If 
+      '
+      BUMP(P)=1 : CB(P)=0 : CC(P)=CC(P)+1
+      '
+   End If 
+End Proc
+Procedure BALL_ANIM
+   '
+   If FINISH<0
+      '
+      XB=XB+XDP(DB)*SB : YB=YB+YDP(DB)*SB
+      '
+      If ZB=0
+         SB=Max(SB-3,0)
+      Else 
+         SB=Max(SB-1,0)
+      End If 
+      '
+      ZB=ZB+SZB
+      ' ***
+      ' Now, when the balls hit the ground, we do a POP  
+      If ZB<=0 : SZB=-SZB/2 : ZB=SZB : If ZB : Sam Play VOI1,8,8363 : End If : End If 
+      If ZB : SZB=SZB-2 : End If 
+      '
+      X=XB/32 : Y=YB/32
+      '
+      Z=Max(Zone(X,Y-4),Max(Zone(X-4,Y+4),Zone(X+4,Y+4)))
+      '
+      If Z
+         If Z=<2
+            FINISH=2 : MARK=Z
+         Else 
+            DB=BOUNCE(Z,DB)
+            ' ***
+            ' BING 
+            DB=BOUNCE(Z,DB) : Sam Play VOI1,1,5654
+         End If 
+      End If 
+   End If 
+   '
+   If SB+SZB
+      I=Min(22+ZB/ZBALL*2+(CPT mod 2),31+(CPT mod 2))
+   Else 
+      I=22
+   End If 
+   '
+   Bob BBALL,XB/32,YB/32,I
+   '
+End Proc
+Procedure MOVE_PLAYER[P]
+   '
+   FL(P)=FL(P)+1
+   '
+   If CP(P)
+      If SP(P)
+         SP(P)=SP(P)-Sgn(SP(P))
+      Else 
+         CP(P)=CP(P)-1 : DP(P)=DB(P)
+      End If 
+   End If 
+   '  
+   If ROBOT(P)=1 : ROBOT_PLAYER[P] : End If 
+   '  
+   If ROBOT(P)=0
+      '
+      If CP(P)=0
+         '  
+         If P=PLA : J=Joy(1) : End If 
+         '  
+         CB(P)=0 : CC(P)=0
+         ' Go faster? 
+         If J and 1 : If SP(P)<16 : SP(P)=SP(P)+3 : End If : End If 
+         ' Go slower? 
+         If J and 2 : If SP(P)>-16 : SP(P)=SP(P)-3 : End If : End If 
+         ' Turn left? 
+         If J and 4 : DP(P)=DP(P)-1 : If DP(P)<0 : DP(P)=15 : End If : DB(P)=DP(P) : End If 
+         ' Turn right?
+         If J and 8 : DP(P)=DP(P)+1 : If DP(P)>15 : DP(P)=0 : End If : DB(P)=DP(P) : End If 
+         ' Brake? 
+         If J and 16 : SP(P)=0 : End If 
+         '  
+      End If 
+   End If 
+   '
+   XP(P)=XP(P)+XDP(DP(P))*SP(P)
+   YP(P)=YP(P)+YDP(DP(P))*SP(P)
+   '
+   XR(P)=XP(P)/32 : YR(P)=YP(P)/32
+   '
+   S=Sgn(SP(P))
+   I=IP(DB(P),Abs(S)*(FL(P) mod 2))
+   Bob BBP+P,XR(P),YR(P),I+P2BOB*P
+   '
+   XD=XR(P)+S*(XH(DP(P))*PSIZE)/32 : YD=YR(P)+S*(YH(DP(P))*PSIZE)/32
+   If FLAGCOL
+      C=Bob Col(BBP+P,BBP To BBALL)
+      A=Max(Zone(XD,YD),Max(Zone(XD+XHH(DP(P)),YD+YHH(DP(P))),Zone(XD-XHH(DP(P)),YD-YHH(DP(P)))))
+   End If 
+   '
+   ' If we are bouncing too much, we'll stop! 
+   If CC(P)>3
+      SP(P)=0 : CP(P)=0 : CC(P)=1
+      A=0 : C=0 : Bob Off BBB+P
+   End If 
+   '  
+   If A
+      ' Collision with a border
+      CP(P)=3 : XC(P)=XD : YC(P)=YD : CC(P)=CC(P)+1
+      SP(P)=-S*Min(Max(Abs(SP(P)+6),4),8)
+      ' ***
+      ' Bump!
+      Sam Play VOI1,6,4003
+   Else 
+      If C
+         ' Collision with a bob 
+         B=Col(-1) : If B<>CB(P) : C0LLIDE[P,B] : End If 
+      End If 
+   End If 
+   '
+   If CP(P)=3 : Bob BBB+P,XC(P)+Rnd(4),YC(P)+Rnd(4),21 : End If 
+   If CP(P)=2 : Bob Off BBB+P : End If 
+   '
+End Proc
+Procedure ROBOT_PLAYER[P]
+   '
+   If CP(P)
+      ROBOT$(P)=AFTER$(P) : BUMP(P)=1 : Pop Proc
+   Else 
+      CB(P)=0 : CC(P)=0
+      SP(P)=SP(P)+Sgn(ROBSP(P)-SP(P))
+   End If 
+   '
+   Goto ROBOT$(P)
+   '
+   THINK:
+   BUMP(P)=0 : ROBSP(P)=0
+   W=Rnd(ROBWAIT(P)) : H=Rnd(ROBHIT(P)) : G=Rnd(ROBGOAL(P))
+   M=Max(W,Max(H,G))
+   '
+   If G=M
+      ROBOT$(P)="GO_THERE" : WHERE$(P)="UBALL1" : CHECK$(P)="CHECK_POSITION" : AFTER$(P)="GO_GOAL1"
+      Pop Proc
+   End If 
+   '
+   If H=M
+      Gosub GPLAY
+      If GX>64*32 and GY>64*32
+         ROBOT$(P)="GO_THERE" : WHERE$(P)="GPLAY" : CHECK$(P)="CHECK_POSITION" : AFTER$(P)="THINK"
+         ROBHIT(P)=Max(1,ROBHIT(P)-5)
+         Pop Proc
+      End If 
+   End If 
+   '  
+   If W=M
+      ROBOT$(P)="GO_NOWHERE" : AFTER$(P)="THINK" : RPAR(P)=Rnd(ROBWAIT(P)+50)
+      Pop Proc
+   End If 
+   Pop Proc
+   '
+   GO_CENTER:
+   ROBOT$(P)="GO_THERE"
+   WHERE$(P)="CFIXED"
+   CHECK$(P)="CHECK_POSITION"
+   AFTER$(P)="HERE"
+   GX(P)=XCENTER : GY(P)=YCENTER+((P=GOAL)-(P<>GOAL))*48*32
+   Pop Proc
+   '  
+   HERE:
+   '  
+   If YP(P)<YCENTER : DB(P)=8 Else DB(P)=0 : End If 
+   DP(P)=DB(P)
+   ROBSP(P)=0 : SP(P)=0
+   Pop Proc
+   '
+   GO_BACK:
+   ROBOT$(P)="GO_THERE"
+   WHERE$(P)="CFIXED"
+   CHECK$(P)="CHECK_POSITION"
+   AFTER$(P)="HERE"
+   GX(P)=-64*32 : GY(P)=YCENTER+((P<>GOAL)-(P=GOAL))*16*32
+   Pop Proc
+   '
+   GO_NOWHERE:
+   ROBSP(P)=0
+   RPAR(P)=RPAR(P)-1 : If RPAR(P)<0 : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   '
+   GO_GOAL1:
+   ROBOT$(P)="GO_THERE" : WHERE$(P)="GBALL" : CHECK$(P)="CHECK_BALL" : AFTER$(P)="THINK"
+   Pop Proc
+   '
+   GO_THERE:
+   Gosub WHERE$(P)
+   If GX=0 : ROBOT$(P)=AFTER$(P) : Pop Proc : End If 
+   DX=GX-XP(P) : DY=GY-YP(P)
+   If DX<0 : D1=10 : DX=-DX : End If 
+   If DY<0 : D1=D1+5 : DY=-DY : End If 
+   D=(DY*32)/Max(DX,1)
+   If D>160 Then D2=0 : Goto SKIP
+   If D>47 Then D2=1 : Goto SKIP
+   If D>21 Then D2=2 : Goto SKIP
+   If D>6 Then D2=3 : Goto SKIP
+   If D<=6 Then D2=4
+   SKIP:
+   ROBSP(P)=ROBSPEED(P)
+   DB(P)=ROBDIR(D1+D2) : DP(P)=DB(P)
+   ODX(P)=DX : ODY(P)=DY : BUMP(P)=0
+   ROBOT$(P)=CHECK$(P)
+   Pop Proc
+   '
+   CHECK_BALL:
+   Gosub WHERE$(P) : DX=Abs(GX-XP(P)) : DY=Abs(GY-YP(P))
+   If DX>ODX(P)+32 or DY>ODY(P)+32 : ROBOT$(P)="GO_THERE" : End If : ODX(P)=DX : ODY(P)=DY
+   If BUMP(P) : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   '
+   CHECK_POSITION:
+   Gosub WHERE$(P) : DX=Abs(GX-XP(P)) : DY=Abs(GY-YP(P))
+   If DX>ODX(P) or DY>ODY(P) : ROBOT$(P)="GO_THERE" : End If : ODX(P)=DX : ODY(P)=DY
+   If BUMP(P) : ROBOT$(P)=AFTER$(P) : End If 
+   If DX<4*32 and DY<4*32 : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   '
+   GPLAY: GX=XP(1-P) : GY=YP(1-P) : Return 
+   '
+   UBALL1:
+   If P<>GOAL
+      If YP(P)>YB+32*32 : GX=0 : Return : End If 
+      If YP(P)>YB
+         GX=XB+Sgn(128*32-XB)*Rnd(16)*32
+      Else 
+         GX=XB+Sgn(128*32-XB)*(Rnd(32)+16)*32
+      End If 
+      GY=YB+24*32 : If GY>YBOTTOM : GY=YBOTTOM+16*32 : End If 
+   Else 
+      If YP(P)<YB-32*32 : GX=0 : Return : End If 
+      If YP(P)<YB
+         GX=XB+Sgn(128*32-XB)*Rnd(16)*32
+      Else 
+         GX=XB+Sgn(128*32-XB)*(Rnd(32)+16)*32
+      End If 
+      GY=YB-24*32 : If GY<YTOP : GY=YTOP-16*32 : End If 
+   End If 
+   Return 
+   '
+   GBALL: GX=XB : GY=YB : Return 
+   '
+   CFIXED: GX=GX(P) : GY=GY(P) : Return 
+   '
+End Proc
+Procedure DISPLAY_FIELD
+   '  
+   ' ***
+   ' First we'll check to see if we have to ERASE a message 
+   ' If so, MESS will negative  
+   If MESS<0
+      ' Switch to screen 0 and put back the old image! 
+      Screen 0 : Put Block 1 : Screen 1
+      ' When erasing, we set MESS to -2
+      ' So this routine will be called TWICE, and automaticaly 
+      ' erase the message on the DOUBLE BUFFERED screen  
+      MESS=MESS+1
+      ' Then it will reach zero, and automaticaly stop!
+   End If 
+   '
+   X=XR(0)-78 : Y=YR(0)-67
+   Screen Copy 1,X,Y,X+156,Min(Y+135,528) To Logic(0),2,2
+   '  
+   X=XR(1)-78 : Y=YR(1)-67
+   Screen Copy 1,X,Y,X+156,Min(Y+135,528) To Logic(0),162,2
+   '
+   If XB>0
+      X=XB/32-58 : Y=YB/32-29
+   Else 
+      X=XCENTER/32-58 : Y=YCENTER/32-29
+   End If 
+   '  
+   Screen Copy 1,X,Y,X+117,Min(Y+59,528) To Logic(0),102,139
+   '  
+   Screen Copy 1,0,528,80,536 To Logic(0),120,186,%11100000
+   ' ***
+   ' Do we have to display a message? 
+   ' Messages are stored in the bottom on screen 0, from lines
+   ' 200 to 256. There are 4 messages across the picture, 80 pixels each. 
+   ' MESS states the number of the message. 
+   If MESS>0
+      ' YES, let's get the message coordinate  
+      X=(MESS-1)*80
+      ' And simply copy it on the top of the screen... Very fast!
+      Screen Copy 0,X,200,X+80,256 To 0,XMESS,YMESS
+   End If 
+End Proc
+Procedure CLR_DISPLAY
+   '
+   Screen 0
+   For S=0 To 1
+      ' ***
+      '  We'll also erase the message  
+      Put Block 1
+      Cls 0,2,2 To 158,137
+      Cls 0,162,2 To 318,137
+      Cls 0,102,139 To 102+117,139+59
+      Screen Swap : Wait Vbl 
+   Next 
+   Screen 1
+   '
+End Proc
+Procedure ALL_ERASE
+   For B=1 To 15 : Erase B : Next 
+End Proc

@@ -1,0 +1,513 @@
+			SDLBASIC
+
+Guida di riferimento
+	1 Visione generale
+
+1.1Presentazione.
+
+Si tratta di un piccolo basic distribuito sotto licenza lgpl cross platform destinato a scrivere semplici giochi 2d. 
+Basato sull'interprete del wxbasic e sulle librerie sdl dispone di un avanzato screen virtuale e di un bob system interno. 
+E' possibile compilare i programmi direttamente in c usando la libreria strato SDLengine. 
+
+1.2 L'interprete basic
+
+Come interprete ho estratto l'interprete del wxbasic di David Cuny. 
+Questo ottimo basic e' veramenre ben fatto e consente di inserire le funzioni senza usare bison o flex. 
+Inoltre accetta di usare le funzioni come se fossero comandi senza generare errori (in pratica come il c). 
+Ho rimosso tutto il supporto al wxwindows quindi ho inserito il supporto alle sdl library. 
+Siccome non sono interessato a bindare il codice ho eliminato con facilita' le istruzioni per l'operazione. 
+Quindi ho inserito in builtin.c e builtin.h le rutine di link al modulo SDLengine.c e ho scritto il makefile 
+necessario per compilare sotto linux. Mio fratello (grazie Franco)mi ha concesso il suo pc con windows98 e il 
+suo visual c++ con cui ho compilato la versione win32 che dovrebbe funzionare anche sotto xp.
+Ci sono aluni limiti in questa implementazione: i nomi delle rutine devono essere interi 
+(per capirci screenswap e non screen swap) e sono obbligatorie le parentesi per i parametri 
+(se non ci sono parametri si deve scrivere () ). A voler ben guardare questo aspetto rende piu' facile portare 
+il codice in c. Infatti basta aggiungere un punto e virgola alla fine della riga ,initialize() all'inizo del 
+programma e terminate alla fine e poco altro per avere un sorgente c pronto per essere compilato e linkato con SDLengine. 
+Per rendere meglio l'idea ci sono alcuni esempi del caso scritti apposta.
+
+1.3 SDLengine
+
+E' il modulo che contiene le rutine strato tra l'interprete basic e le librerie SDL. 
+Contiene anche alcune rutine estratte da vari software distribuiti sotto licenza gpl. 
+Il concetto e' quello di avvicinarsi il piu' possibile a una sintassi semplice e pulita 
+cercando di nascondere l'obiect orienred delle librerie SDL poco adatto alla semplicita' del basic.
+
+1.4 sdlBasicIde l'editor di sdlBasic
+
+Ho scritto (anzi si puo' dire ho rubato) una semplice ide per scrivere modificare e lanciare i programmi 
+in sdl basic. Ho usato le fltk come gui ma si tratta di un lavoro ancora acerbo. 
+Per il momento il modo migliore per lanciare i programmi e' la shell.
+
+
+	2 Primi passi
+
+2.1 Installazione
+
+Linux binario(non ancora disponibile):
+dovete avere installato le librerie sdl,sdl-image , sdl-mixer e sdl.ttf (in mandrake 9.0 sono presenti tutte sui dischi).
+Scaricate e scompattate sdlbasic-bin.tar.gz ,entrate nella directory e srivete "su -c  install".
+
+windows binario;
+scompattate il file sdlBasic.zip , copiate le dll nella directory di sistema
+(in win95-98-me c:\windows\system , in xp-2000-nt c:\windows\system32) .
+
+linux sorgente:
+dovete avere anhe i pacchetti devel delle librerie. Scaricate sdlBasic-source.tar.gz scompattate e lanciate make install 
+come super user. Non ho fatto il configure perche.... non so farlo.
+
+windows sorgente:
+ci vuole il vc++ microsoft
+dovete scaricare gli sdk delle rispettive librerie SDL scaricate il sorgente.tar.gz (lo stesso di linux) 
+entrate nella directory visualc  avviate il workspace e buona fortuna. Attenzione compila solo in modo debug.
+
+
+
+	4 I comandi base del dcbasic 
+
+and 
+append
+as
+call
+case
+close
+const
+continue
+common
+data 
+declare
+delete
+dim 
+do
+each
+end
+erase
+error
+exit
+explicit
+for to next  
+function
+if then else else if end if
+in
+include
+input
+inv
+is 
+let
+lline
+loop   
+mod  
+new
+noconsole 
+not
+open
+option
+or
+output
+print
+qbasic
+redim 
+return
+select
+shared
+shl
+shr
+static
+step
+sub
+until
+wend
+while
+xor 
+printstack
+abs
+acos
+argc
+argv
+asc
+asin
+atan
+chdir
+chr 
+chr$
+command
+command$
+connect
+convbase
+convbase$
+cos
+date 
+date$
+hasdir
+hasdir$
+direxists
+eof
+exp
+fileexists
+fix
+floor
+format
+format$
+frac
+freefile
+getwxapp
+hex
+hex$ 
+indexes
+insert
+insert$
+instr
+int
+kill
+lcase
+lcase$
+left
+left$
+len
+length
+loc
+lof
+lbound
+ltrim
+ltrim$
+mainloop
+mid
+mid$
+mkdir
+quicksort
+randomize
+readbyte
+rename
+replace
+replace$
+replacesubstr
+replacesubstr$
+reverse
+reverse$
+right
+right$
+rinstr
+rmdir
+rnd
+round
+rtrim
+rtrim$
+run
+seek
+sgn
+shell
+sin
+space
+space$
+sqr
+str
+str$
+strf
+strf$
+string
+string$
+tally
+tan
+ticks
+time
+time$
+typeof
+typeof$
+ubound
+ucase
+ucase$
+val 
+writebyte 
+
+
+	4 I comandi SDL
+
+4.1 Comandi Screen
+
+sdlBasic ha un sofisticato sistema di gestione dello schermo composto da diversi comandi
+Il cuore del sistema e' il display che in pratica e' dove si riversa l'output visibile sia in finestra che a fullscreen. 
+Invece gli screen (ce ne sono 8) sono degli schermi virtuali. 
+Si puo impostare l'area del display che occupano le dimensioni e la posizione visibile (l'offset). 
+Il comando che aggiorna ogni variazione impostata e screenswap. Finche non si invoca questo comando non si vedranno 
+aggiornamenti sullo schermo
+
+
+setdisplay(w,h,bpp,mode )
+Apre lo schermo o la finestra grafica nella risoluzione indicata da width,height,bpp Se si tratta di una finestra naturalmente la profondita di colore non cambiera'. il modo stabilisce il tipo di display:
+0 full screen
+1 finestra a sezione fissa
+2 finestra ridimensionabile
+Per default viene aperta automaticamente con parametri 640,480,0,1
+viene anche settato lo screen 0  con le stesse dimensioni.
+
+displaywidth()
+E' una funzione che restituisce la larghezza del display
+
+displayheight()
+E' una funzione che restituisce l'altezza  del display
+
+displaybpp()
+E' una funzione che restituisce i byte per pixel  del display
+
+screenopen ( n, w, h, dx,dy, dw, dh, flag)
+definisce le dimensioni dello schermo virtuale n e la posizione della finestra visibile (il display). 
+Nel SDLengine sono disponibili 8 screen numerati da 0 a 7. 
+Se non viene invocato lo screen 0 sara' settato sulle dimensioni del display. 
+La voce flag permette di stabilire se lo screen si trova sopra o sotto il piano dei bob e se il colore nero e' trasparente
+
+screen (n)
+setta lo schermo virtuale attivo sul quale operano i comandi grafici
+
+screenclose (n)
+chiude lo schermo n e dealloca la memoria
+
+screenclone(n,s,x,y,w,h,flag)		
+Crea una nuova entrata nello schermo s. in pratica permette di avere due vedute dello stesso screen. 
+Ideale per giochi con due player
+
+screencopy(n,x,y,w,h,nd,xd,yd)          
+Copia una porzione di schermo dallo schermo n allo schermo nd. Si puo anche copiare sullo stesso schermo. 
+E' un comando per rendere facile la copia di grafica
+
+screenrect(x,y,w,h,flag)
+Ridimensiona e riposizipna la porzione di display occupata dallo screen n. 
+Il flag n stabilisce se questo screen e' sopra o sotto agli sprite. 
+Non e' possibile rendere trasparente il colore nero se non e' settato all'apertura
+
+xscreenrect()
+Riporta la coordinata x della porzione di display occupata dallo screen corrente.
+
+yscreenrect()
+Riporta la coordinata y della porzione di display occupata dallo screen corrente.
+
+wscreenrect()
+Riporta la larghezza della porzione di display occupata dallo screen corrente.
+
+hscreenrect()
+Riporta l'altezza della porzione di display occupata dallo screen corrente.
+
+screenwidth()
+E' una funzione che restituisce la larghezza dello screen
+
+screenheight()
+E' una funzione che restituisce l'altezza dello screen
+
+offset (x,y)
+posiziona il display sullo screen. Se il display dovesse sporgere dallo screen automaticamente sara' modificato il parametro in modo che sia al bordo
+
+xoffset()
+Restituisce la coordinata x della posizione del display sullo schermo
+
+yoffset()
+Restituisce la coordinata y della posizione del display sullo schermo
+
+cls()
+cancella l'intero screen : attenzione perche i bob sono indipendenti. per cancellare solo una parte potete usare: 
+ink(0) : bar(x,y,x1,y1)
+
+screenswap()
+aggiorna il display e il bob system. Fino a quando non invocate guesto comando non si vedranno le modifiche di nessun comando grafico compreso cls e offset
+
+setautoback(m)				
+attiva / disattiva lo screenswap automatico. Permette di rendere automatico l'aggiornamento grafico ogni m millisecondi. 
+E' necessara un po' di prudenza per non appesantire troppo il sistema
+
+dualplayfield(m) 			
+attiva  / disattiva l'aggiornamento degli screen sopra al piano degli sprite
+
+waitvbl					
+attende lo screenswap automatico
+
+
+4.2 Comandi di colore
+
+La gestione dei colori avviene a 32 16 e 8 bit. I comandi accettano i parametri sempre a 32 bit e provvedono internamente alle conversioni. Attualmente questa parte non funziona correttamente.
+
+ink( color)
+imposta il colore corrente. Lavora sempre a 24 bit e approssima automaticamente il colore in base alla risoluzione.
+
+rgb(r,g,b)
+restituisce il colore in formato numerico partendo dai tre fondamentali. 
+
+
+4.3 Comandi di Geometria
+
+Questi comandi si occupano di tracciare punti,linee,figure geometriche e provvedono anche a prelevare le infomazioni sul colore di un punto
+
+dot (x,y)
+traccia un punto sullo screen con il colore corrente settato con ink
+
+dot_ex(x,y,c)				
+scrive un punto con il colore c alla coordinata x,y
+
+
+point (x.y)
+restituisce il colore del punto x y sullo screen
+
+line (x,y,x1,y1)
+traccia una linea retta
+
+box (x,y,x1,y1)
+traccia un rettangolo vuoto
+
+bar (x,y,x1,y1)
+traccia un rettangolo pieno
+
+circle (x,y,r1,r2)
+traccia un cerchio
+
+ellipse (x,y,r1,r2)
+traccia un ellisse
+
+fillcircle (x,y,r)
+traccia un cerchio pieno
+
+fillellipse (x,y,r1,r2)
+traccia un ellisse piena
+
+
+4.4 Comandi di  file Input - Output
+
+Questi comandi si occupano di caricare e salvare le immagini i suoni e la musica dal file system rispettando le regole dei differenti sistemi operativi.
+
+loadimage (filename,n)
+carica un immagine grafica nel banco n. Sono al momento disponibili 4096 posti. Non ci sono vincoli prefissati per la dimensione.
+
+saveimage (filename,n *.bmp)
+salva l' immagine grafica del banco n.
+
+loadsound (filename ,n)
+Carica un suono nel banco n. Ci sono 512 banchi indipendenti riservati per i suoni. Come per le immagini non ci sono vincoli prefissati per la dimensione.
+
+loadmusic (filename)
+Carica in memoria un file musicale. I formati ammessi sono mod e soci (xm it pl3),ogg e mp3(questi ultimi solo in linux).
+
+4.5 Comandi di blitting
+
+Questi comandi trasferscono i dati grafici da un banco allo screen e viceversa alla massima velocita possibile
+
+
+blt(n,sx,sy,w,h,dx,dy)
+copia una parte del banco n sullo screen
+
+pastebob( x,y,n)
+stampa sullo screen un immagine rispettando la trasparenza 
+
+4.6 Comandi bob system 
+
+bob(n,x,y,fr)
+attiva o sposta il bob n alla coordinata x y con l'immagine fr. I bob vengono aggiornati automaticamente al comando screenswap. sono disponibili 256 bob
+
+deletebob(n)
+disattiva il bob n.
+
+xbob(n)
+riporta la coordinata x del bob n
+
+ybob (n)
+riporta la coordinata y del bob n
+
+frbob (n)
+riporta l'immagine(frame) del bob n
+
+livebob (n)
+Restituisce 1 seil bob e' al momento attivo.
+
+
+4.7 Comandi di Testo
+
+text (x,y,s,txt)
+Stampa un testo alla coordinata x y con l'altezza s
+il testo deve essere una stringa. Per stampare un numero bisogna usare str$(numero).
+
+setfont (pathfont)
+Cambia il font di tipo true type usato per per text textrender.
+pathfile e' il percorso del font.
+
+textrender (txt,s, n)
+Crea nel banco n un immagine della scritta richiesta. L'immagine ottenuta potra' essere usata come bob o blittata sullo schermo.
+
+4.8 Comandi del suono
+
+playsound (n,c)
+esegue il suono del banco n sul canale c. Ci sono per default 64 canali audio riservati.
+
+volumesound(c,v)
+Stabilisce il volume del canale. Deve essere compreso tra 0 e 128. Per default e' 128. Se lo settate a -1 restituira il volume corrente.
+
+playmusic (loop)
+Esegue il motivo caricato in memoria corrente. loop determina il numero di esecuzioni. Con -1 l'esecuzione sara' continua.
+
+Stopmusic()
+Interrompe l'esecuzione della musica corrente.
+
+volumemusic(v)
+Stabilisce il volume della musica. Deve essere compreso tra 0 e 128. Per default e' 128. Se lo settate a -1 restituira il volume corrente.
+
+fademusic(d)
+degrada ilvolume della musica di d punti. Se il valore e' uguale ominore di 0 termina l'esecuzione.
+
+
+4.9 Comandi relativi alla tastiera
+
+key(k)
+restituisce 1 se il tasto k e' premuto. Il sistema ha integrato un buon numero di costanti predefinite con il codice del tasto.
+
+
+4.10 Comandi relativi al mouse
+
+xmouse()
+restituisce la coordinata x del mouse. E' riferita allo screen corrente
+
+ymouse()
+restituisce la coordinata y del mouse. E' riferita allo screen corrente
+
+bmouse()
+restituisce lo stato dei tasti del mouse.
+
+mousehide()
+Nasconde il puntatore del mouse 
+
+mouseshow()
+Rende visibile il puntatore del mouse.
+
+
+4.11 Comandi del joystick
+
+
+xjoy()
+non implementata
+
+yjoy()
+non implementata
+
+bjoy(button)
+non implementata
+
+
+4.12Comandi relativi al timing di sistema
+
+wait(t)
+non fa nulla per t millesimi di secondo
+
+
+
+
+ToDo:
+'_______________________________________________________________________________
+joy system
+
+'_______________________________________________________________________________
+
+init:
+restart (soundfrq,buffer)	:la possibilita di riavviare le sdl con altri parametrii
+'_______________________________________________________________________________
+screen:
+screenclone(ssorg, sdest) : apre una nuova visuale su uno sreen
+'_______________________________________________________________________________
+
+geometria: 
+paint(x,y)	: riempie un area chiusada altri colori del colore corrente
+draw(x,y)	:traccia una linea dritta dalle coordinate correnti a x,y del colore corrente
+'_______________________________________________________________________________
+

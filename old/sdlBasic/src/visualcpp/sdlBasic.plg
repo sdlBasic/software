@@ -1,0 +1,45 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: sdlBasic - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x410 /fo"Release/Script1.res" /i "\devel\basic\sdlBasic\sdlBasic\src" "C:\devel\basic\sdlBasic\sdlBasic\src\Script1.rc"" 
+Creating temporary file "C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPB.tmp" with contents
+[
+/nologo /MD /w /W0 /GX /Zd /O2 /I "C:\devel\c-cpp\visual cpp\SDL\INCLUDE" /Fp"Release/sdlBasic.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\devel\basic\sdlBasic\sdlBasic\src\sdlBasic.c"
+"C:\devel\basic\sdlBasic\sdlBasic\src\SDLengine.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPB.tmp" 
+Creating temporary file "C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPC.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:yes /pdb:"Release/sdlBasic.pdb" /machine:I386 /out:"../sdlBasic.exe" 
+.\Release\sdlBasic.obj
+.\Release\SDLengine.obj
+.\Release\Script1.res
+"..\..\..\..\..\..\Programmi\Microsoft Visual Studio\VC98\Lib\glut32.lib"
+"..\..\..\..\..\c-cpp\visual cpp\SDL\LIB\SDL.lib"
+"..\..\..\..\..\c-cpp\visual cpp\SDL\LIB\SDL_image.lib"
+"..\..\..\..\..\c-cpp\visual cpp\SDL\LIB\SDL_mixer.lib"
+"..\..\..\..\..\c-cpp\visual cpp\SDL\LIB\SDL_ttf.lib"
+"..\..\..\..\..\c-cpp\visual cpp\SDL\LIB\SDLmain.lib"
+"..\..\..\..\..\c-cpp\visual cpp\SDL\LIB\SDL_net.lib"
+]
+Creating command line "link.exe @C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPC.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+sdlBasic.c
+SDLengine.c
+Linking...
+
+
+
+<h3>Results</h3>
+sdlBasic.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

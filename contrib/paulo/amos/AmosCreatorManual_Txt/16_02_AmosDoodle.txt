@@ -1,0 +1,41 @@
+Rem ************************************ 
+Rem *          Example 16.2            * 
+Rem *          AMOS Doodle             *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Define menu title
+Menu$(1)=" Shapes  "
+Menu$(1,1)="Point   "
+Menu$(1,2)="Circle  "
+Menu$(1,3)="Ellipse "
+Menu$(1,4)="Bar     "
+Menu$(2)=" Colour "
+Rem Create a colour bar
+For C=1 To 16
+   Menu$(2,C)="(IN 1,"+Str$(C)-""+")(BA 60,10)"
+Next C
+Rem Start menu 
+Menu On 
+Rem Set up screen
+TYPE=1 : Curs Off : Cls 0
+Do 
+   Rem Check menu 
+   If Choice
+      Rem If shape menu  
+      If Choice(1)=1
+         TYPE=Choice(2)
+      Else 
+         Rem If Colour menu 
+         Ink Choice(2)
+      End If 
+   End If 
+   Rem Draw object
+   If Mouse Key
+      X=X Screen(X Mouse) : Y=Y Screen(Y Mouse)
+      If TYPE=1 : Plot X,Y : End If 
+      If TYPE=2 : Circle X,Y,10 : End If 
+      If TYPE=3 : Ellipse X,Y,5,20 : End If 
+      If TYPE=4 : Bar X,Y To X+10,Y+10 : End If 
+   End If 
+Loop 

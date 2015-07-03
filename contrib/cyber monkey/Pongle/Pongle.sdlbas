@@ -1,0 +1,219 @@
+' ****************** init graphics etc. ******************************************
+sub init
+
+setdisplay(640,480,32,1)
+screenOpen(0,640,480,0,0,640,480,0)
+setfont("./fonts/Adve.ttf")
+setcaption("PONGLE v0.2")
+
+
+autoback (-15)
+paper(rgb(25,25,75))
+cls
+
+ink(rgb(255,127,127))
+text (160,10,50,"P O N G L E")
+ink(rgb(255,0,0))
+text (162,12,50,"P O N G L E")
+ink(rgb(255,255,255))
+text (310,440,12,"(C) 2007 by Markus Mangold. All rights reserved")
+
+loadimage("./gfx/ball.bmp",2)
+loadimage("./gfx/bat.bmp",3)
+loadimage("./gfx/wall.bmp",4)
+loadsound ("./sfx/slingsht.wav",2)
+loadsound ("./sfx/target.wav",1)
+loadmusic ("./sfx/deutschm.mid")
+
+screenswap
+end sub
+
+' *********************** display chosen menu item**************************************
+sub Titel (choice)
+if choice =1 then
+ink(rgb(255,255,0))
+else
+ink(rgb(127,127,127))
+end if
+bar(200,100,440,150)
+ink (rgb(0,0,255))
+text(240,100,30,"New Game")
+
+if choice =2 then
+ink(rgb(255,255,0))
+else
+ink(rgb(127,127,127))
+end if
+bar(200,170,440,220)
+ink (rgb(0,0,255))
+text(260,170,30,"Options")
+
+if choice =3 then
+ink(rgb(255,255,0))
+else
+ink(rgb(127,127,127))
+end if
+bar(200,240,440,290)
+ink (rgb(0,0,255))
+text(240,240,30,"Highscore")
+
+if choice =4 then
+ink(rgb(255,255,0))
+else
+ink(rgb(127,127,127))
+end if
+bar(200,310,440,360)
+ink (rgb(255,0,0))
+text(280,310,30,"Quit")
+
+
+waitvbl
+end sub
+' *******************************menu loop *************************************
+sub menu
+playmusic(0)
+
+auswahl =1
+Titel(auswahl)
+while( inkey<>27)
+druecker=mousebutton
+if mousezone (200,100,240,50) then
+	auswahl=1
+	Titel(auswahl)
+end if
+if mousezone (200,170,240,50) then
+	auswahl=2
+	Titel(auswahl)
+end if
+if mousezone (200,240,240,50) then
+	auswahl=3
+	Titel(auswahl)
+end if
+if mousezone (200,310,240,50) then
+	auswahl=4
+	Titel(auswahl)
+end if
+if druecker=1 and auswahl=4 then
+	end
+end if
+if druecker=1 and auswahl=1 then
+	stopmusic
+	game()
+	init()
+	menu()
+end if
+
+
+screenswap
+wend
+end sub
+' ******************************** game loop **********************************************
+sub game
+mousehide
+batx=320: baty=420
+batspeed=3
+ballx=320:bally=350
+ballspeed=2
+vectorx=-1
+vectory=-1
+score = 0
+lives = 3
+
+
+
+cls
+for x = 0 to 640 step 32
+	pasteicon (x,0,4)
+next
+for y = 0 to 480 step 32
+	pasteicon (0,y,4)
+	pasteicon (608,y,4)
+next
+
+while key(27)=0
+textrender ("Score: "+str$(score),20,5)
+sprite (10,35,35,5)
+textrender ("Lives: "+str$(lives),20,6)
+sprite (11,500,35,6)
+if key (k_left) then
+	batx=batx-batspeed
+end if
+if key (k_right) then
+	batx=batx+batspeed
+end if
+if batx >= 544 then
+	batx=544
+end if
+if batx <= 32 then
+	batx=32
+end if
+ballx=ballx+(ballspeed*vectorx)
+bally=bally+(ballspeed*vectory)
+if ballx <=32 then
+	playsound(1,1)
+	ballx=32: vectorx=vectorx*-1
+
+end if
+if ballx >=594 then
+	 playsound(1,1)
+	 ballx=594:vectorx=vectorx*-1
+
+end if
+if bally <=32 then
+	playsound(1,1)
+	bally=32: vectory=vectory*-1
+
+end if
+if spritehit (0,1) then
+		playsound (2,2)
+		vectory=-vectory
+		bally=bally-10
+		score=score+10
+		if score = 100 then
+				ballspeed = ballspeed +1
+		end if
+		if score = 200 then
+				ballspeed = ballspeed +1
+		end if
+		if score = 300 then
+				ballspeed = ballspeed +1
+		end if
+		if score = 400 then
+				ballspeed = ballspeed +1
+		end if
+		if score = 500 then
+				ballspeed = ballspeed +1
+		end if
+end if
+if bally >= 480 then
+	lives=lives-1
+	batx=320: baty=420
+	ballx=320:bally=350
+	vectorx=-1
+	vectory=-1
+end if
+
+if lives <0 then
+
+	text (120,200,60,"GAME OVER!",0)
+	text (200,270,20, "Press any key to exit",0)
+	screenswap
+	waitkey
+	exit while
+end if
+
+sprite (0,batx,baty,3)
+sprite (1,ballx,bally,2)
+
+screenswap
+wend
+
+sprite (1,-32,-32,2)
+sprite (10,-50,-50,5)
+sprite (11,-50,-50,6)
+
+mouseshow
+end sub
+' ********************************** main program *********************************************
+init()
+menu()

@@ -1,0 +1,118 @@
+'--- Cluster filter - from png to bmp
+'--- Paulo Silva (GPL) - 0405111841
+'--- sets a custom cluster halftone, making an indexed
+'---   picture (at least theorically) from a rgb picture
+'--- bug: result is very far from desired (where is the cluster?)
+'--- bug: it's very slow even when converting a 100x100
+'---   picture on a 2ghz x86
+autoback(0)
+
+fnam$="pic4":finpal$=fnam$+".act":finp$=fnam$+".png":fout$=finp$+".bmp"
+
+'--- functions
+function rrgb(c1)
+   rrgb=bitwiseand(int(c1/65536),0xFF):end function
+function grgb(c1)
+   grgb=bitwiseand(int(c1/256),0xFF):end function
+function brgb(c1)
+   brgb=bitwiseand(c1,0xFF):end function
+function eucl(x,y,z)
+    eucl=sqr((x^2)+(y^2)+(z^2)):end function
+function midrgb(c1,c2,a1)
+   r1=rrgb(c1):g1=grgb(c1):b1=brgb(c1)
+   r2=rrgb(c2):g2=grgb(c2):b2=brgb(c2)
+    rv=(r1*a1)+(r2*(100-a1))
+    gv=(g1*a1)+(g2*(100-a1))
+    bv=(b1*a1)+(b2*(100-a1))
+    midrgb=rgb(rv,gv,bv)
+ end function
+function distrgb(c1,c2)
+   r1=rrgb(c1):g1=grgb(c1):b1=brgb(c1)
+   r2=rrgb(c2):g2=grgb(c2):b2=brgb(c2)
+   rd=abs(r2-r1):gd=abs(g2-g1):bd=abs(b2-b1)
+     distrgb=eucl(rd,gd,bd)
+ end function
+function lum(c1)
+'- thanks to Rumiko Takahashi ;)))
+   r1=rrgb(c1):g1=grgb(c1):b1=brgb(c1)
+   lum=((r1*30)+(g1*59)+(b1*11))/100
+ end function
+
+'-- define cluster
+dim clus[4,4]
+ clus[0,0]=2 :clus[1,0]=10:clus[2,0]=5 :clus[3,0]=15
+ clus[0,1]=0 :clus[1,1]=6 :clus[2,1]=9 :clus[3,1]=13
+ clus[0,2]=4 :clus[1,2]=14:clus[2,2]=3 :clus[3,2]=11
+ clus[0,3]=8 :clus[1,3]=12:clus[2,3]=1 :clus[3,3]=7
+
+'--- clear cluster palette sequence
+dim seq[16]
+  for z=0 to 15:seq[z]=0:next
+
+dim pal[256]
+'--- palette defined here above or opened
+'---   .act is a mere palette in a hexdump format
+'---   (rgb sequence: 256 colours = 768 bytes)
+open finpal$ for input as #1
+  for i=0 to 255
+    r1=readbyte(1):g1=readbyte(1):b1=readbyte(1)
+    pal[i]=rgb(r1,g1,b1):next
+ close #1
+
+'-- open pic
+  xedge=0:yedge=0
+open finp$ for input as #1
+   for i=1 to 16: n=readbyte(1): next
+   for i=1 to 2: n=readbyte(1): next
+     xedge=readbyte(1)*256:xedge=xedge+readbyte(1)
+   for i=1 to 2: n=readbyte(1): next
+     yedge=readbyte(1)*256:yedge=yedge+readbyte(1)
+ close #1
+   setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+   ScreenOpen (1,xedge,yedge,0,0,0,0,0)
+screen(1)
+    Loadimage(finp$,1): pasteicon(0,0,1)
+
+'x<0 bug
+'for y=0 to yedge: for x=0 to xedge
+for y=1 to yedge: for x=1 to xedge
+
+screen(1)
+cpix=point(x,y)
+
+  for z=0 to 15:seq[z]=0:next
+    stc=0x00
+for z=0 to 15
+     nperc=100/(z+1):uin=512:nct=0
+  for n=0 to 255
+     tpal=midrgb(pal[n],pal[stc],nperc)
+     ugt=distrgb(tpal,cpix)
+      if ugt<uin then: nct=n:uin=ugt:end if
+   next
+     seq[z]=nct
+ next
+
+
+'-- sort
+for z1=0 to 15
+  for z2=0 to 14
+   if lum(seq[z2])>lum(seq[z2+1]) then
+      tmpr=seq[z2]:seq[z2]=seq[z2+1]:seq[z2+1]=tmpr
+    end if
+ next
+ :next
+   mox=x mod 4:moy=y mod 4
+
+screen(0)
+
+   ink (pal[seq[clus[mox,moy]]]):dot(x,y)
+
+
+next:
+ screenswap
+next 'x,y
+
+'-- save pic hier
+grab (1,0,0,xedge,yedge):saveimage (fout$,1)
+screenswap
+  waitkey

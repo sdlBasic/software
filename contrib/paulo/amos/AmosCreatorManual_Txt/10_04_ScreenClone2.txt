@@ -1,0 +1,34 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.4         *   
+Rem *          Screen Clone 2          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Open a wide screen 
+Screen Open 1,1000,10,16,Lowres
+Rem Clones=7   
+C=7
+Rem Create screen clones 
+For I=2 To C
+   Screen Clone I
+Next I
+Rem Set up screen clones 
+Rem Define amal movement string  
+O$="Loop: For R0=1 To 125; Let X=X+4; Next R0;"
+O$=O$+"For R0=1 To 125; Let X=X-4; Next R0; Jump Loop"
+Rem Initialise screens 
+For I=1 To C
+   Rem Position screen
+   Screen Display I,120,I*40,400,10
+   Rem Assign screen To an AMAL Channel   
+   Channel I To Screen Offset I
+   Amal I,O$
+Next I
+Rem Write some text to the cloned screen 
+A$=" This is just a single screen. It has been duplicated "
+A$=A$+" eight times using SCREEN CLONE. Amazing isnt it?"
+Print A$;
+Rem scroll clones using amal 
+Amal On 
+Do 
+Loop 

@@ -1,0 +1,23 @@
+'
+'      Bob tutorial #06 - Limiting a Bob to an area of the screen      
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+Double Buffer 
+Locate 10,20 : Print "Move AMOS down here!"
+X Mouse=276 : Y Mouse=137
+'
+'Note: It is essential that a Bob is already set up before a   
+'      limit Bob command is executed. Otherwise the Limit Bob will 
+'      have no effect
+'
+Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),8
+'
+' Limit Bob 1 to the top part of the screen
+'
+Limit Bob 1,0,0 To 320,100
+Do 
+   Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),8
+Loop 

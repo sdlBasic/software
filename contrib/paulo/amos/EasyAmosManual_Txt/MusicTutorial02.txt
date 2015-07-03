@@ -1,0 +1,17 @@
+'
+'      Sound tutorial #02 - How to load a Sample bank and play it  
+'
+'
+' Load the bank
+'
+Load "Easy_Examples:Sounds/Tricycle_Samples.abk"
+'
+' and play the samples!  
+'
+For A=1 To 11
+   Print "Sample number ";A
+   For B=1 To 3
+      Sam Play A
+      Wait 20
+   Next B
+Next A

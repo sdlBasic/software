@@ -1,0 +1,176 @@
+'- 3d Drawing demo - 040803 - sdlBasic version - Paulo Silva
+'- (3d algorythms based on Michel Rousselet codes for zx-spectrum )
+'- bugs: 
+'- crash may happen (when the object is a bit close to observer)
+'-          (Division by zero from pitag() function (-> ????))
+ 
+'open "log.txt" for output as #1
+
+'global variables: xobs,yobs,zobs,xtgt,ytgt,ztgt,qdst,zoom
+
+common xobs,yobs,zobs,xtgt,ytgt,ztgt,qdst,zoom
+
+radiano=57.2957792
+
+wdwd=0
+xedge=800:yedge=600
+  setdisplay(xedge,yedge,32,wdwd)
+screen(0)
+'ink(0):paper(8^8-1):cls
+ink(0x101060):paper(0x404040):cls
+
+
+
+
+'-- funcoes
+
+function absv(n)
+   absv=n
+   if n<0 then:absv=n*-1:end if
+ end function
+
+function wdrandom(n)
+   tmpr1=(n*20000)
+   tmpr=(rnd(tmpr1))-(n*10000)
+   wdrandom=tmpr/10000
+ end function
+
+function eucl(x1,y1,z1)
+    x1=abs(x1)
+    y1=abs(y1)
+    z1=abs(z1)
+    eucl=sqr((x1^2)+(y1^2)+(z1^2))
+ end function
+
+function pitag(x2,y2)
+      'print #1,"pitag (logout)"
+    x2=abs(x2)
+    y2=abs(y2)
+x1=x2
+y1=y2
+      'print #1,x2
+      'print #1,y2
+  if ((x2^2)+(y2^2))<>0 then
+     pitagl=sqr((x2^2)+(y2^2))
+   else
+     pitagl=0
+   end if
+      'print #1,pitagl
+      pitagl=abs(pitagl)
+     pitagstg$=str$(pitagl)
+      'print #1,pitagstg$
+     pitag=val(pitagstg$)
+      'print #1,"ok"
+end function
+
+function angulo(xe,ye)
+      'print #1,"angulo (logout)"
+       tmprq=0
+   if xe<=0 and ye<=0 then:tmprq=3:end if
+   if xe<=0 and ye>=0 then:tmprq=4:end if
+   if xe>=0 and ye>=0 then:tmprq=1:end if
+   if xe>=0 and ye<=0 then:tmprq=2:end if
+       quadt=tmprq
+'   v=asin(abs(xe)/pitag(xe,ye))
+   v=asin(abs(xe)/pitag(xe,ye))
+      tmpr=v*57.2957792:tmpr2=tmpr
+   if quadt=2 then:tmpr2=180-tmpr:end if
+   if quadt=3 then:tmpr2=180+tmpr:end if
+   if quadt=4 then:tmpr2=360-tmpr:end if
+      angulo=tmpr2
+ end function
+
+function xfrom3d(x1,y1,z1)
+      'print #1,"xfrom3d (logout)"
+   xdn=x1-xobs:ydn=y1-yobs:zdn=z1-zobs
+     xvn=xtgt-xobs:yvn=ytgt-yobs:zvn=ztgt-zobs
+'   rdnang=angulo(xdn,ydn):rdndist=pitag(xdn,ydn)
+'     rvnang=angulo(xvn,yvn):rvndist=pitag(xvn,yvn)
+   rdnang=angulo(xdn,ydn):rdndist=pitag(xdn,ydn)
+     rvnang=angulo(xvn,yvn):rvndist=pitag(xvn,yvn)
+   rdnang=rdnang-rvnang:rvnang=0
+     xdn=sin(rdnang/radiano)*rdndist
+     ydn=cos(rdnang/radiano)*rdndist
+     xvn=0:yvn=rvndist
+'   rdnang=angulo(zdn,ydn):rdndist=pitag(zdn,ydn)
+'     rvnang=angulo(zvn,yvn):rvndist=pitag(zvn,yvn)
+   rdnang=angulo(zdn,ydn):rdndist=pitag(zdn,ydn)
+     rvnang=angulo(zvn,yvn):rvndist=pitag(zvn,yvn)
+   rdnang=rdnang-rvnang:rvnang=0
+     zdn=sin(rdnang/radiano)*rdndist
+     ydn=cos(rdnang/radiano)*rdndist
+     xproj=(xedge/2)+(zoom*((qdst*xdn)/ydn))
+     yproj=(yedge/2)+(zoom*((qdst*zdn)/ydn))
+      xfrom3d=xproj
+ end function
+
+function yfrom3d(x1,y1,z1)
+      'print #1,"yfrom3d (logout)"
+   xdn=x1-xobs:ydn=y1-yobs:zdn=z1-zobs
+     xvn=xtgt-xobs:yvn=ytgt-yobs:zvn=ztgt-zobs
+'   rdnang=angulo(xdn,ydn):rdndist=pitag(xdn,ydn)
+'     rvnang=angulo(xvn,yvn):rvndist=pitag(xvn,yvn)
+   rdnang=angulo(xdn,ydn):rdndist=pitag(xdn,ydn)
+     rvnang=angulo(xvn,yvn):rvndist=pitag(xvn,yvn)
+   rdnang=rdnang-rvnang:rvnang=0
+     xdn=sin(rdnang/radiano)*rdndist
+     ydn=cos(rdnang/radiano)*rdndist
+     xvn=0:yvn=rvndist
+'   rdnang=angulo(zdn,ydn):rdndist=pitag(zdn,ydn)
+'     rvnang=angulo(zvn,yvn):rvndist=pitag(zvn,yvn)
+   rdnang=angulo(zdn,ydn):rdndist=pitag(zdn,ydn)
+     rvnang=angulo(zvn,yvn):rvndist=pitag(zvn,yvn)
+   rdnang=rdnang-rvnang:rvnang=0
+     zdn=sin(rdnang/radiano)*rdndist
+     ydn=cos(rdnang/radiano)*rdndist
+     xproj=(xedge/2)+(zoom*((qdst*xdn)/ydn))
+     yproj=(yedge/2)+(zoom*((qdst*zdn)/ydn))
+      yfrom3d=yproj
+ end function
+
+Sub Rect3d_xy(xc1,yc1,xc2,yc2,zc1)
+      'print #1,"rect3dxy (logout)"
+   x1=xfrom3d(xc1,yc1,zc1)
+    y1=yfrom3d(xc1,yc1,zc1)
+   x2=xfrom3d(xc2,yc1,zc1)
+    y2=yfrom3d(xc2,yc1,zc1)
+   x3=xfrom3d(xc2,yc2,zc1)
+    y3=yfrom3d(xc2,yc2,zc1)
+   x4=xfrom3d(xc1,yc2,zc1)
+    y4=yfrom3d(xc1,yc2,zc1)
+   line (x1,y1,x2,y2)
+    line (x2,y2,x3,y3)
+    line (x3,y3,x4,y4)
+    line (x4,y4,x1,y1)
+ End Sub
+
+'--- programa
+      'print #1,"main (logout)"
+
+while 0=0
+
+'     zoom=16 '- defaulty used for 256x192 
+     zoom=96
+
+
+'for frm=0 to 50 step .2
+
+for frm=0 to 350 step 1.4
+
+
+'     xobs=25+frm:yobs=0:zobs=frm
+
+     xobs=70+frm:yobs=70+(frm/5):zobs=90+(frm/3)
+
+     xtgt=25:ytgt=15:ztgt=5
+     qdst=10
+   cls
+     for zz=10 to 45 step 5
+       Rect3d_xy(10,10,50,50,zz):next
+   waitvbl
+       if key(27)<>0 then:end:end if
+ next
+
+wend
+
+

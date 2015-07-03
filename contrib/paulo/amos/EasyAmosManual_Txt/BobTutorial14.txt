@@ -1,0 +1,43 @@
+'
+'      Bob tutorial #14 - The mask parameter     
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+Double Buffer 
+'
+'Call a procedure that draws up lots of AMOS characters into 
+'the background screen 
+SPLAT
+'
+Restore MASKS
+For Z=1 To 5
+   Read MASK,MASK$
+   Locate 10,0 : Centre MASK$
+'
+'Here we assign the mask parameter. Note the use of all bit planes 
+'
+   Set Bob 1,0,%111111,MASK
+   For X=200 To 100 Step -1
+      Bob 1,X,130,6
+      Wait Vbl 
+   Next X
+   Locate 12,19 : Print "Press a key";
+   Wait Key 
+   Bob Off 
+Next Z
+MASKS:
+Data %11000000,"     Replace mask %11000000   "
+Data %110000,"    Invert mask %110000       "
+Data %10000000," A logical AND mask %10000000 "
+Data %11100000," A logical OR mask %11100000  "
+Data %1100000,"An Exclusion OR mask %01100000"
+Procedure SPLAT
+   I=1
+   For Z=1 To 20
+      Paste Bob(Z*14)-15,50,I
+      I=I+1
+      If I=10 Then I=1
+   Next Z
+End Proc

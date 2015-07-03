@@ -1,0 +1,42 @@
+'
+'      Bob tutorial #13 - Colours and planes explained     
+'
+Dim CL(6)
+CL(1)=2 : CL(2)=4 : CL(3)=8 : CL(4)=16 : CL(5)=32 : CL(6)=64
+Screen Open 0,320,200,64,Lowres
+Load "Easy_Tutorial:Bobs/Colours.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0
+Ink 1
+Gr Writing 0
+Double Buffer 
+'
+For B=1 To 7
+   Read PLANE,PLANE$
+   Text 10,10,"Effect of plane pattern: "+PLANE$
+   For A=1 To 6
+'
+'Set all 6 bobs up with the plane bit pattern
+'
+      Set Bob A,1,PLANE,%11101010
+'
+'Display the 6 bobs using the new plane
+'
+      Bob A,A*40+40,80,7-A
+      Text 2,50,"Colours:"
+      Text A*40+56,50,Str$(CL(A))-" "
+      Text 2,150,"Planes:"
+      Text A*40+56,150,Str$(A)-" "
+   Next A
+   Text 110,180,"Press a key"
+   Wait Key : Bob Off : Cls 0
+Next B
+Wait Vbl 
+Data %111111,"%111111"
+Data %11111,"%011111"
+Data %1111,"%001111"
+Data %111,"%000111"
+Data %11,"%000011"
+Data %1,"%000001"
+Data %0,"%000000"

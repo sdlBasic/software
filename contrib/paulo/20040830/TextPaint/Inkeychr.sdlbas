@@ -1,0 +1,6 @@
+
+while 0=0
+u$=chr$(inkey)
+locate(0,0)
+prints(u$)
+wend

@@ -1,0 +1,17 @@
+Rem ****************************************** 
+Rem *        AMOS Example 11.3               * 
+Rem *          X and Y Sprite                * 
+Rem *    (c) Mandarin / Jawx 1990            * 
+Rem ****************************************** 
+Rem
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Get Sprite Palette 
+Curs Off : Cls 0 : Paper 0
+Locate 0,0 : Print "X coordinate is ";
+Locate 0,1 : Print "Y coordinate is ";
+Do 
+   Sprite 9,X Mouse,Y Mouse,1
+   Locate 20,0 : Print X Sprite(9);"  ";
+   Locate 20,1 : Print Y Sprite(9);"  ";
+   Wait Vbl 
+Loop 

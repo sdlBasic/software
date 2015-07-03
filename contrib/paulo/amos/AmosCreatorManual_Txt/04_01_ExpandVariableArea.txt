@@ -1,0 +1,19 @@
+Rem ************************************ 
+Rem *          Example 4.1             *   
+Rem *    Expanding the variable area   *     
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Create a variable area 20,000 bytes long 
+Set Buffer 20
+Rem Each item takes four bytes   
+Dim VARS(5000)
+Print "Generating values"
+For V=1 To 5000
+   VARS(V)=Rnd(5000)
+Next V
+Print "Adding values together"
+For T=1 To 5000
+   RESULT=RESULT+VARS(T)
+Next T
+Print "Sum of array=";RESULT

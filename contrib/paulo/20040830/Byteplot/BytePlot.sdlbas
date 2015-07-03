@@ -1,0 +1,15 @@
+
+sub BytePlot(x,y,v,i,p)
+  for z=0 to 7:ik=p:z2=7-z   
+    if (((int(v/(2^z2)))mod 2) and (2^z2)) then:ik=i:end if
+    ink(ik):dot(x+z,y): next
+ end sub
+
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+for y= 20 to 100
+   BytePlot(20,y,15+128,0x00ff00,0xffff00): next
+
+waitkey(k_esc)
+

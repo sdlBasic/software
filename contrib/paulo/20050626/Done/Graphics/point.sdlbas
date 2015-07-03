@@ -1,0 +1,12 @@
+setdisplay(320,240,32,1)
+  paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+  circle(120,100,80)
+for y=20 to 200:for x=30 to 150
+   c1=point(x,y)
+   c2=0xFFFFFF-c1
+   ink(c2)
+   dot(320-x,y)
+     if key(27)<>0 then:end:end if
+    waitvbl
+ next:next
+waitkey

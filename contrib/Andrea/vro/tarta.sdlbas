@@ -1,0 +1,43 @@
+setdisplay(400,350,16,1)
+mousehide()
+text(100,80,32,"gioco bellissimo")
+waitkey(0)
+s = loadimage( "b.png" )
+pasteicon(0,0,s)
+x=100
+y=300
+f=1
+loadimage("up1.png",1)
+loadimage("up2.png",2)
+loadimage("right1.png",3)
+loadimage("right2.png",4)
+loadimage("left1.png",5)
+loadimage("left2.png",6)
+loadimage("down1.png",7)
+loadimage("down2.png",8)
+do
+j=bjoy(0)
+if andbit(j,gp2x_north) then :y=y-5:if f=1 then :wait(40):f=2: else :wait(40) :f=1:end if:end if
+if andbit(j,gp2x_south) then :y=y+5:if f=7 then :wait(40):f=8: else :wait(40) :f=7:end if:end if
+if andbit(j,gp2x_west) then :x=x-5:if f=5 then :wait(40):f=6: else :wait(40) :f=5:end if::end if
+if andbit(j,gp2x_east) then :x=x+5:if f=3 then :wait(40):f=4: else :wait(40) :f=3:end if:end if
+bob(1,x,y,f)
+while y<0
+	y+=2
+	screenoffset(y,0)
+end while
+while y>315
+	y-=2
+	screenoffset(y,0)
+end while
+while x<0
+	x+=2
+	screenoffset(x,0)
+end while
+while x>365
+	x-=2
+	screenoffset(x,0)
+end while
+waitvbl
+loop
+

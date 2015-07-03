@@ -1,0 +1,5 @@
+finp$="test.mpg":usesound=1:optionalloop=1:windowed=1
+setdisplay(512,384,32,windowed):paper(0x808080):ink(0):pen (0):cls
+loadmpeg(finp$,usesound):screenopen(1,320,240,32,64,320,240,0)
+plaympeg(optionalloop)
+while key(27)=0:wend

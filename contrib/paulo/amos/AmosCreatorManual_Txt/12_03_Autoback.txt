@@ -1,0 +1,31 @@
+Rem ************************************ 
+Rem *        AMOS Example 12.3         * 
+Rem *            Autoback              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Load "amos_data:Sprites/Octopus.abk"
+Rem Set up screen
+Flash Off : Curs Off : Cls 0 : Locate 0,0 : Centre "<Autoback>"
+Rem Getbob colours 
+Get Sprite Palette 
+Rem Activate double buffering  
+Double Buffer 
+Rem Create an amal ainmation sequence
+M=15
+Rem Define 15 animation channels and position bob
+For N=1 To M
+   Channel N To Bob N
+   Bob N,(N-1)*10,5,5
+Next 
+Rem Animate each bob in turn 
+For N=1 To M
+   Amal N,"Anim 0,(5,2)(6,2)(7,2)(8,2); L: Move 100,150,100 ; Move -100,-150,100 ; Jump L"
+   Wait 10 : Amal On : Anim On 
+Next 
+Amal On 
+Rem Paste bobs at random positions 
+Repeat 
+   Rem The bob images are pasted into both logical and physical screens 
+   Paste Bob Rnd(320),Rnd(200),Rnd(3)+1
+Until Mouse Key

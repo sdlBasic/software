@@ -1,0 +1,53 @@
+Rem ************************************ 
+Rem *        AMOS Example 14.1         * 
+Rem *        AMAL Attack wave          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load sprites 
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Rem get colours
+Get Sprite Palette 
+Rem set up screen
+Curs Off : Cls 0 : Paper 0 : Locate 0,0 : Centre "<Amal Attack Wave>"
+Rem Position sprite
+Sprite 9,130,50,1
+Rem Define animation sequence
+Rem Set initial position 
+A$="Loop: Let RH=180  Let RW=300"
+Rem Move forwards
+A$=A$+" For RL=0 To 5"
+Rem Tighten loop 
+A$=A$+" Let RH=RH-16  Let RW=RW-16 "
+Rem Move right 
+A$=A$+" For R0=1 To RW/4  Let X=X+4  Next R0"
+Rem Move down
+A$=A$+" For R0=1 To RH/4  Let Y=Y+4  Next R0"
+Rem Tighen loop
+A$=A$+" Let RH=RH-16  Let RW=RW-16"
+Rem Move left
+A$=A$+" For R0=1 To RW/4  Let X=X-4  Next R0"
+Rem Move up
+A$=A$+" For R0=1 To RH/4  Let Y=Y-4  Next R0"
+A$=A$+" Next RL"
+Rem Backwards
+A$=A$+" For RL=0 To 5"
+Rem Right
+A$=A$+" For R0=1 To RW/4  Let X=X+4  Next R0"
+Rem Down 
+A$=A$+" For R0=1 To RH/4  Let Y=Y+4  Next R0"
+Rem Expand loop
+A$=A$+" Let RH=RH+16  Let RW=RW+16"
+Rem Left 
+A$=A$+" For R0=1 To RW/4  Let X=X-4  Next R0"
+Rem Up 
+A$=A$+" For R0=1 To RH/4  Let Y=Y-4  Next R0"
+Rem Expand loop
+A$=A$+" Let RH=RH+16  Let RW=RW+16 "
+A$=A$+" Next RL: Jump Loop"
+Rem Call amal program
+Amal 9,A$
+Amal On 
+Rem Wait forever!
+Do 
+Loop 

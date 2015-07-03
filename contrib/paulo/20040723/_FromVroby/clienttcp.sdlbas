@@ -1,0 +1,30 @@
+'|----------------------------------------------------------------
+'| sdlBasic test  clientTCP.sdlbas
+'|	 date 16/07/2004
+'| description:
+'|	 a little client
+'| bugfix:
+'| Bug:
+'|----------------------------------------------------------------
+setdisplay (640,200,0,1)
+
+sub main
+	host$=inputs("host name:","localhost")
+	server=connectsock(host$,1024)
+	prints("connetted host ")
+	wait(500)
+	while ret$<>"Q"
+	if(isserverready(server)<>0)then
+		 ret$=readsock(server,1024)
+		 prints(ret$)
+	end if
+	if inkey<>0 then
+		 ret$=inputs(">","")
+		 writesock(server,ret$,len(ret$))
+		 wait (500)
+	end if
+	end while
+	writelinesock(server,"good bye \n")
+	closesock(server)
+end sub
+main

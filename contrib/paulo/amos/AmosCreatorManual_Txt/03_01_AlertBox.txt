@@ -1,0 +1,100 @@
+Rem ************************************ 
+Rem *        AMOS Example 3.1          * 
+Rem *    Alert Box demonstration       * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Set up arrays  
+Reserve Zone 10
+BASE=1 : Dim XB(2),YB(2),B$(2),T$(2)
+Rem Clear screen 
+Curs Off : Cls 0
+Rem Call Alert box 
+ALERT[50,"Alert box ","","Ok","Cancel",1,2]
+Curs Off : Pen 2 : Paper 0 : Locate 0,10 : Centre "You selected button "+Str$(Q)
+Rem alert box routine
+Rem Alert[y coord,title1$,title$,button1$,button2$,Ink,Paper]
+Rem see the above example
+Rem some zones are reserved
+Rem button number returned in Q (-1=abort) 
+Procedure ALERT[Y,T1$,T2$,B1$,B2$,C1,C2]
+   Shared Q,X,BASE,NB,I,P
+   Shared XB(),YB(),B$(),T$()
+   Rem intialisation
+   Memorize X : Memorize Y : Curs Off 
+   B$(1)=B1$ : B$(2)=B2$ : I=C1 : P=C2
+   Rem quit if first button is blank
+   If B1$="" Then Q=-1 : Pop Proc
+   Rem Get size of box  
+   W=Len(B1$)+4
+   If B2$="" Then NB=1 : Else NB=2 : W=W+Len(B2$)+2
+   TL=Max(Len(T1$),Len(T2$))+4
+   Rem Are buttons wider than title 
+   If TL>W Then W=TL+4
+   If NB=2
+         Rem display 2 buttons centred roughly in the box   
+         L=Len(B1$)+Len(B2$)+2 : XB(1)=(W-L)/2+1 : XB(2)=XB(1)+Len(B1$)+3 : W=W+3
+      Else 
+         Rem display 1 button 
+         XB(1)=(W-Len(B1$))/2
+      End If 
+   Rem Quit if box too wide 
+   If W>37 Then Q=-1 : Pop Proc
+   H=8 : Rem set height of box
+   Rem draw box 
+   CBOX[Y,W,H,C1,C2]
+   Rem create buttons 
+   A=1 : While A<=NB
+      XB(A)=XB(A)+X Text(X) : YB(A)=Y Text(Y)+H-3
+      MAKE_BUTTON[B$(A),A,XB(A),YB(A)]
+   Inc A : Wend 
+   Rem centre titles
+   If T1$<>"" Then Locate X Text(X),Y Text(Y)+1 : Centre T1$
+   If T2$<>"" Then Locate X Text(X),Y Text(Y)+2 : Centre T2$
+   Rem Read buttons 
+   DIALOGUE
+   Rem Replace background 
+   Put Cblock 1,X,Y
+   Remember X : Remember Y : Curs On 
+End Proc
+Procedure MAKE_BUTTON[B$,N,X,Y]
+Rem Make a button
+Shared BASE
+Locate X,Y
+   XB=X Graphic(X Curs)-7 : YB=Y Graphic(Y Curs)-7
+   Print Border$(B$,2);
+   Set Zone N+BASE,XB,YB To X Graphic(X Curs)+7,Y Graphic(Y Curs)+15
+End Proc
+Procedure INVERT[B$,X,Y,P,I]
+Rem Invert a button when its selected
+   Paper I : Pen P
+   Locate X,Y
+   Print Border$(B$,2)
+   Pen I : Paper P
+End Proc
+Procedure CBOX[Y,W,H,P,I]
+Rem Create the actual alert box and save the background underneath 
+   Shared X
+   W=W*8 : H=H*8
+   X=160-W/2
+   Get Cblock 1,X,Y,W+16,H+16
+   Ink 0 : Bar X+5,Y+5 To X+W+5,Y+H+5
+   Ink P : Bar X,Y To X+W,Y+H
+   Ink I : Box X+1,Y+1 To X+W-1,Y+H-1
+   Paper P : Pen I
+End Proc
+Procedure DIALOGUE
+Rem Read the buttons 
+Shared B$(),XB(),YB(),I,P,Q,BASE,NB
+ Q=0
+ While Q=0
+      While Mouse Key=0 : Wend 
+      Z=Mouse Zone
+      If Z<BASE or Z>BASE+NB
+         Bell : Wait 10
+      Else 
+         Q=Z-BASE : INVERT[B$(Q),XB(Q),YB(Q),I,P]
+         Play 30,40
+      End If 
+   Wend 
+End Proc

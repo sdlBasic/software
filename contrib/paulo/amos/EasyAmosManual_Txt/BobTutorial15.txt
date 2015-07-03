@@ -1,0 +1,50 @@
+'
+'      Bob tutorial #15 - Getting the Bob palette    
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Double Buffer 
+Curs Off : Flash Off 
+Cls 0 : Hide 
+Bob 1,150,180,2
+Pen 1 : Paper 0
+Print At(2,2);"Keep pressing keys to"
+Print At(2,4);"colour Amos in!"
+Wait Key 
+'
+'Mask %1 gets colour 1 
+Get Sprite Palette %1
+Wait Key 
+'
+'Mask %10 gets colour 2 etc
+Get Sprite Palette %10
+Wait Key 
+Get Sprite Palette %100
+Wait Key 
+Get Sprite Palette %1000
+Wait Key 
+Get Sprite Palette %10000
+Wait Key 
+Get Sprite Palette %100000
+Wait Key 
+Get Sprite Palette %1000000
+Wait Key 
+Get Sprite Palette %10000000
+Wait Key 
+Get Sprite Palette %100000000
+Wait Key 
+Get Sprite Palette %1000000000
+Wait Key 
+Get Sprite Palette %10000000000
+Wait Key 
+Get Sprite Palette %100000000000
+Wait Key 
+Get Sprite Palette %1000000000000
+Wait Key 
+Get Sprite Palette %10000000000000
+Wait Key 
+Get Sprite Palette %100000000000000
+Wait Key 
+Get Sprite Palette %1000000000000000
+Bob 1,,,6
+Wait 100
+Direct 

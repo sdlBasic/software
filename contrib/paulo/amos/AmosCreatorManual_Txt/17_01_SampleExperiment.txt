@@ -1,0 +1,21 @@
+Rem ************************************ 
+Rem *        AMOS Example 17.1         * 
+Rem *       Sample experimentor        * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Sam Bank 6
+Load "SamplesSam.abk",6
+On Error Proc ERR
+Locate 0,0 : Centre "<Sample Experimentor>"
+Do 
+   Locate 0,3
+   Cline : Input "Sample number?";S
+   Cline : Input "Speed?";SP
+   Sam Play 15,S,SP
+   Locate 0,22 : Centre "<Hit a key>"
+   Wait Key 
+Loop 
+Procedure ERR
+Locate 0,3 : Print "Sample not allowed"
+Resume Next 
+End Proc

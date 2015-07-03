@@ -1,0 +1,6 @@
+/*
+ * NON MODIFICARE QUESTO FILE - generato automaticamente da Glade.
+ */
+
+GtkWidget* create_window1 (void);
+GtkWidget* create_fileselection1 (void);

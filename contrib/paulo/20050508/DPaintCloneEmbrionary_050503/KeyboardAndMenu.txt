@@ -1,0 +1,79 @@
+
+
+'keys:
+'s- dots
+'d- stream line
+'v- straight line
+'q- curved line
+'f- fill
+'?- ?????
+'r- rectangle
+'c- circle
+'e- ellipse
+'w- polygons
+'b- brush
+'t- type
+'g- grid
+'?- mirror
+'m- magnify
+'?- zoom in/out
+'?- undo
+'?- clear
+
+'menu:
+'.Picture
+'..Load
+'..Save
+'..Print
+'..Flip
+'..Change Colour
+'..Spare
+'..Page Size
+'..Show Page
+'..Screen Format
+'..About
+'..Quit
+'.Brush
+'..Load
+'..Save
+'..Restore
+'..Size
+'..Flip
+'..Edge
+'..Rotate
+'..Change Color
+'..Bend
+'..Handle
+'.Mode
+'..Matte
+'..Colour
+'..Replic
+'..Smear
+'..Shade
+'..Blend
+'..Cycle
+'..Smooth
+'..Tint
+'..Halfbrite
+'.Anim
+'..Load
+'..Save
+'..Move
+'..Frames
+'..Control
+'..Anim Brush
+'..Method
+'.Effect
+'..Stencil
+'..Background
+'..Perspective
+'.Prefs
+'..Coords
+'..Fast FB
+'..MultiCycle
+'..Be Square
+'..Workbench
+'..ExclBrush
+'..AutoTransp
+'..No Icons
+

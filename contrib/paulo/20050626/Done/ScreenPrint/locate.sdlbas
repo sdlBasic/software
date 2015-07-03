@@ -1,0 +1,6 @@
+setdisplay(320,240,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+  locate(1,1):prints("locate(1,1)")
+  locate(15,3):prints("locate(15,3)")
+  locate(5,8):prints("locate(5,8)")
+  locate(7,5):prints("locate(7,5)")
+waitkey

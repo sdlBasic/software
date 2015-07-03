@@ -1,0 +1,19 @@
+for compiling yuo MUST change the path of mingw in mingw.bat
+in my system (i have some compiler)the path is:
+c:\devel\c-cpp\ming\bin
+if in your system (i suppose)are in disk d:
+you simple change the addpath line with your mingw path + \bin
+in line of compile change include path with your mingw path + \include
+
+you must download all sdl library
+for sdl main library download the official mingw library
+for others (sdl_image sdl_mixer sdl_ttf and sdl_net) i suggest the download of
+Sdk for visual c. unpack it and copy lib folder in mingw lib folder and 
+include folder in mingw include folder.
+If possible i will get in download page of sdlBasic site  a version of mingw 
+complete with all need for compiler sdlBasic
+
+
+
+
+				__vroby__ 

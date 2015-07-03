@@ -1,0 +1,152 @@
+'
+'interface
+'
+'
+'
+'
+'
+'
+'_____________________________________________________________________
+
+
+common _interface[256,8]
+
+'properties
+common _state=0
+    common destroy=0
+    common drawing=1
+    common clicked=2
+
+common _type=1
+    common window=0
+    common frame=1
+    common label=2
+    common menubutton=3
+    common button=4
+    common textentry=5
+    common textarea=6
+    common check=7
+    common radio=8
+    common list=9
+    common combo=10
+common _parent=2
+common _x=3
+common _y=4
+common _w=5
+common _h=6
+common _value=7
+
+'colors
+common _back_col =0xa0a0a0
+common _light=0xffffff
+common _dark=0
+
+
+'reset the array
+for i=0 to 256
+    _interface[i,0]=0
+next
+
+
+' GET / SET
+'_____________________________________________________________________
+
+' getparam(n,param) : return the value of param
+function getparam(n,param)
+    return _interface[n,param]
+end function
+'_____________________________________________________________________
+
+' setparam(n,param,value) : set a param with value
+sub setparam(n,param,value)
+    _interface[n,param]=value
+end sub
+'_____________________________________________________________________
+
+' setnew :set a new interaface element
+sub setnew(n,type,parent,x,y,w,h,value)
+    _interface[n,_state]=1 'state default is 1 -1 =destroy
+    _interface[n,_type]=type
+    _interface[n,2]=parent
+    _interface[n,3]=x
+    _interface[n,4]=y
+    _interface[n,5]=w
+    _interface[n,6]=h
+    _interface[n,7]=value
+end sub
+'_____________________________________________________________________
+'
+
+' DRAWING SYSTEM
+'_____________________________________________________________________
+
+sub draw_window(state,x,y,w,h,value)
+
+    ink(_back_col): bar(x,y,x+w,y+h)
+    ink(_light): box(x,y,x+w,y+h)
+    ink(_light): bar(x,y,x+w,y+15)
+    ink(_back_col): text(x+10,y,12,value)
+end sub
+'_____________________________________________________________________
+
+sub draw_button(state,x,y,w,h,value)
+
+    ink(_back_col): bar(x,y,x+w,y+h)
+    ink(_light): line(x,y,x+w,y):line(x,y,x,y+h)
+    ink(_dark):  line(x+w,y+h,x+w,y):line(x+w,y+h,x,y+h)
+    ink(_light): text(x+2,y,12,value)
+end sub
+'_____________________________________________________________________
+
+sub drawobject(i)
+    if _interface[i,_state]=1 then
+	'WINDOW
+	if _interface[i,_type]=window then
+	    draw_window(_interface[i,_state],_interface[i,_x],_interface[i,_y],_interface[i,_w],_interface[i,_h],_interface[i,_value])
+	    _interface[i,_state]=2
+	end if
+	'BUTTON
+	if _interface[i,_type]=button then
+	    draw_button(_interface[i,_state],_interface[i,_x],_interface[i,_y],_interface[i,_w],_interface[i,_h],_interface[i,_value])
+	    _interface[i,_state]=2
+	end if
+    end if
+end sub
+'_____________________________________________________________________
+
+sub draw
+    for i =0 to 256
+	drawobject(i)
+    next
+end sub
+'_____________________________________________________________________
+
+
+' EVENT SYSTEM
+'_____________________________________________________________________
+
+sub eventobject(i)
+    if _interface[i,_state]=2 then
+	if mousezone(_interface[i,_x],_interface[i,_y],_interface[i,_w],_interface[i,_h])then
+	    if bmouse=1 then
+		_interface[i,_state]=3
+	    end if
+	end if
+    end if
+end sub
+'_____________________________________________________________________
+
+sub event
+    for i =0 to 256
+	eventobject(i)
+    next
+end sub
+'_____________________________________________________________________
+
+sub waitevent()
+    draw
+    event
+end sub
+'_____________________________________________________________________
+
+

@@ -1,0 +1,9 @@
+   setdisplay(256,192,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for f=1 to 90
+   x=rnd(256):y=rnd(192):c=rnd(0xFFFFFF):r=rnd(30)
+   ink(c):circle(x,y,r)
+   paint(x,y)
+ next
+   waitkey
+
+

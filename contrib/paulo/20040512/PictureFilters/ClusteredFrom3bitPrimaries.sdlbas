@@ -1,0 +1,67 @@
+
+'- original qbasic version - 0112141818
+'- sdlbasic version - 0405111338
+'- halftone picture converter (bmp 4/8/24bit)
+
+finp$="pic4.png":fout$=finp$+".bmp"
+
+function rrgb(c1)
+   rrgb=bitwiseand(int(c1/65536),0xFF)
+ end function
+function grgb(c1)
+   grgb=bitwiseand(int(c1/256),0xFF)
+ end function
+function brgb(c1)
+   brgb=bitwiseand(c1,0xFF)
+ end function
+
+dim clust[8,8]
+
+'-- define cluster
+' a$="00,12,03,15,08,04,11,07,02,14,01,13,10,06,09,05"
+  a$="00,06,08,14,02,12,04,10,08,14,00,06,04,10,02,12"
+for y2=0 to 3:for x2=0 to 3:lc=(y2*4)+x2
+'- read clust(x2,y2)
+clust[x2,y2]=val(mid$(a$,(lc*3)+1,2))
+next :next 'x2, y2
+
+'-- open pic
+
+  xedge=0:yedge=0
+open finp$ for input as #1
+   for i=1 to 16: n=readbyte(1): next
+   for i=1 to 2: n=readbyte(1): next
+     xedge=readbyte(1)*256:xedge=xedge+readbyte(1)
+   for i=1 to 2: n=readbyte(1): next
+     yedge=readbyte(1)*256:yedge=yedge+readbyte(1)
+ close #1
+
+    setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+   ScreenOpen (1,xedge,yedge,0,0,0,0,0)
+screen(1)
+    Loadimage(finp$,1): pasteicon(0,0,1)
+
+dim cor[16]
+cor[0]=0x000000:cor[1]=0x0000FF
+cor[2]=0xFF0000:cor[3]=0xFF00FF
+cor[4]=0x00FF00:cor[5]=0x00FFFF
+cor[6]=0xFFFF00:cor[7]=0xFFFFFF
+
+for y=0 to yedge-1
+  for x=0 to xedge-1
+       screen(1)
+     c=point(x,y):r=rrgb(c):g=grgb(c):b=brgb(c)
+      patgf=(((clust[x mod 4,y mod 4]+1)*255)/16)
+        rpat=0:if r>patgf then:rpat=1:end if
+        gpat=0:if g>patgf then:gpat=1:end if
+        bpat=0:if b>patgf then:bpat=1:end if
+
+       o4b=(bpat+(rpat*2)+(gpat*4))mod 8
+       screen(0)
+    ik=cor[o4b]:ink(ik):dot(x,y)
+ next:next
+
+'- grava imagem
+grab (1,0,0,xedge,yedge):saveimage (fout$,1)
+  waitkey
+

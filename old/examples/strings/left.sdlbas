@@ -1,0 +1,7 @@
+'test   left$
+a$="ciao ciao"
+while key(27)=0
+    'print(left$(a$,5))
+    print a$
+end while
+

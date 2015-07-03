@@ -1,0 +1,17 @@
+'test loadimages
+include "filegraphics.sdlblib"
+
+autoback(1)
+n=loadimages_soft("media/gnome.png",32,32,1)
+prints(n)
+
+i = 1 
+    for y= 0 to 4
+        for x=0 to 7
+            sprite(i,10+x*64,20+y*64,i)
+            i=i+1
+        next
+    next    
+waitkey
+
+saveimages_soft("prova.bmp",1,n)

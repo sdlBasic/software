@@ -1,0 +1,59 @@
+'-- pre-embrionary of network gaming on sdlBasic
+'-- the idea is this just moving sprites when terminals are running the
+'--   same example, just like Armagetron and UnrealTournament works
+
+prints("this network example doesn't work yet")
+prints("it only has the very elementar structure to be fixed")
+
+'# (ct)=client ; (sv)=server
+IdClient=0:IdServer=1
+
+'1 - read preferences.ini
+'  1.1 - get to know if the app is server or client; check servers and id conflicts
+
+apid=IdClient
+
+'  1.2 - (ct) get only server id; (sv) get neighbours id
+
+if apid=IdClient then
+'- get only server id from preferences
+ end if
+if apid=IdServer then
+'- get clients id from preferences
+ end if
+
+
+'  1.3 - (ct) send sprite colour to server;(sv) get sprite colours from clients
+
+
+'2 - game
+
+while 0=0
+
+
+'  2.1 check keyboard and sprite position; put sprites at their positions
+'  2.2 (ct) send sprite pos to server; (sv) get sprite pos from clients
+
+if apid=IdClient then
+'- send sprite pos to server
+ end if
+if apid=IdServer then
+'- get sprite pos from clients
+ end if
+
+
+
+'  2.3 (ct) get sprite pos from server; (sv) send sprite pos to clients
+
+if apid=IdClient then
+'- get sprite pos from server
+ end if
+if apid=IdServer then
+'- send sprite pos to clients
+ end if
+
+
+
+end while
+
+

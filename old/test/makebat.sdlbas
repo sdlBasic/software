@@ -1,0 +1,14 @@
+'makebat.sdlbas
+'only for windows(at this time)
+shell ("dir /s /b *.sdlbas>out.txt") 
+open "out.txt" for input as 1
+while eof(1)=0 
+    file input #1,a$
+    prints(a$)
+    
+    open left$(a$,len(a$)-7)+"bat" for output as 2
+        print #2,"sdlBasic "+"\""+mid$(a$,rinstr(a$,"\\")+1)+"\""
+    close 2     
+end while
+close 1
+waitkey

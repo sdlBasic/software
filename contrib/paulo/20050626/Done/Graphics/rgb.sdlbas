@@ -1,0 +1,9 @@
+setdisplay(240,320,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for f=1 to 20
+vred=int(rnd(255))
+vgre=int(rnd(255))
+vblu=int(rnd(255))
+pen(rgb(vred,vgre,vblu))
+prints("rgb("+str$(vred)+","+str$(vgre)+","+str$(vblu)+")")
+next
+waitkey

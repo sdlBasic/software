@@ -1,0 +1,18 @@
+'
+'      Bob tutorial #16 - Removing a mask with No Mask   
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+Double Buffer 
+For A=0 To 23
+Print "Click left mouse button to remove MASK!   ";
+Next A
+Do 
+   Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),8
+   If Mouse Key=1
+      Bob Off 
+      No Mask 8
+   End If 
+Loop 

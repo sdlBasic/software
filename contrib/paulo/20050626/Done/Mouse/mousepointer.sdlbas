@@ -1,0 +1,9 @@
+   setdisplay(320,200,32,0):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+   a=0
+while 0=0
+   a=a+1:b=(int(a/16))mod 3
+   mousepointer(b+1)
+   if key(27)<>0 then:end :end if
+   waitvbl
+ wend
+

@@ -1,0 +1,243 @@
+'-- SVG Font Reader 
+'-- Paulo Silva -(GPL) - 040626
+'---   Note: please verify the .svg document you're trying is so
+'---     line-broken as the .svg i included as example (VeraMono)
+'---     i'm not that skilled coder - all drawing commands must be
+'---     very clear like that (each command on each text line)
+'- converting .ttf typefaces to .svg:
+'- batik-ttf2svg.jar (http://xml.apache.org/ - i'm not sure)
+'- (.svg - a standard xml format for vectorial drawings, which can also embed '- typefaces (human readable as .txt))
+
+
+'--- Here comes the desired .svg typeface document
+finp$="VeraMono_LineBroken.svg"
+
+'--- the window size (=400 is 400x400)
+sqsiz=400
+
+'--- in the glfsk$ variable you can choose your desired character
+'---  (as seen from 'glyph unicode="s"' for example)
+'glfsk$="s"
+'--- or randomly
+randomize
+whlgsk$="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+u=rnd(len(whlgsk$)):glfsk$=mid$(whlgsk$,u,1)
+
+
+setdisplay(sqsiz,sqsiz,32,1):setcaption(".svg Font Reader (sdlBasic)")
+
+paper(8^8-1):ink(0):pen(0):cls
+'prints("started")
+setcaption(".svg Font Reader - started")
+paper(8^8-1):ink(0):pen(0):cls
+
+'- not accuraced xoff and yoff values
+xoff=190:yoff=780
+
+setcaption(".svg Font Reader - functions")
+
+function lstinf$(a$,b$,c$)
+    adra=1:adrb=1:blngt=len(b$):d$=""
+  while adrb<=blngt
+     if mid$ (a$,adra,1)=mid$ (b$,adrb,1) then:adrb+=1:end if
+     adra=adra+1
+   end while
+  while mid$(a$,adra,1)<>left$(c$,1)
+     d$=d$+mid$(a$,adra,1):adra+=1
+   end while
+     lstinf$=d$
+ end function
+
+function thz(cnv,vmn,vmx,vlr)
+   vdf=vmx-vmn:thz=(((vlr-vmn)*cnv)/vdf)
+ end function
+
+' _________________________________________________________________
+'[::: analysing .svg text line sizes (reader stop if over 250)     ]
+' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+setcaption(".svg Font Reader - analysing svg lines")
+
+  lsz=0:lsflg=0
+  open finp$ for input as #1
+while eof(1)=0
+  a=ReadByte(1)
+      lsz=lsz+1
+    if ((a=0x0A) or (a=0x0D)) then:lsz=0:end if
+    if lsz>250 then
+       'prints ("please break the .svg text lines before converting")
+       'prints ("each line should have less than 250 characters")
+       'prints ("each path command (L, C or M) must be at line start")
+       'prints ("maybe this converter will crash now")
+       lsflg=1
+     end if
+ end while
+  close #1
+
+
+' _________________________________________________________________
+'[::: Looking for Ascent and Descent values                        ]
+' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+setcaption(".svg Font Reader - looking ascent and descent")
+
+  fnd=0
+  open finp$ for input as #1
+while fnd<>3
+  file input #1,text$:text$=ltrim$(text$)+"   ":lf6$=left$(text$,6)
+    if lf6$="ascent" then
+       ascnd=val(lstinf$(text$,chr$(34),chr$(34)))
+       setcaption(".svg Font Reader - found ascent"):fnd=fnd+1:end if
+    if lf6$="descen" then
+       dscnd=val(lstinf$(text$,chr$(34),chr$(34)))*-1
+       setcaption(".svg Font Reader - found descent"):fnd=fnd+2:end if
+ end while
+  close #1
+
+setcaption(".svg Font Reader - calculating needed variables")
+   tfbod=ascnd+dscnd
+   bordr=tfbod/8
+   wldsp=(bordr*2)+tfbod
+   fctrv=sqsiz/wldsp
+
+setcaption(".svg Font Reader - drawing board")
+
+yg1=sqsiz-(bordr*fctrv):yg2=sqsiz-((bordr+dscnd)*fctrv)
+ yg3=sqsiz-((bordr+tfbod)*fctrv)
+xg1=sqsiz-(bordr*fctrv):xg2=sqsiz-((bordr+dscnd)*fctrv)
+ xg3=sqsiz-((bordr+tfbod)*fctrv)
+ink(0x3333FF):line(0,yg1,sqsiz,yg1)
+ line(0,yg2,sqsiz,yg2):line(0,yg3,sqsiz,yg3)
+ line(xg1,0,xg1,sqsiz):line(xg3,0,xg3,sqsiz)
+
+ink(0)
+
+
+
+' _________________________________________________________________
+'[::: This part should seek for glyph                              ]
+' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+'- command to seek: "glyph-name"
+setcaption(".svg Font Reader - seeking glyph")
+
+ open finp$ for input as #1
+   fndglf=0
+
+while fndglf=0 
+  file input #1,text$:text$=ltrim$(text$)+"   ":lf12$=left$(text$,12)
+    if lf12$="glyph unicod" then
+         zfz$=lstinf$(text$,chr$(34),chr$(34))
+       if (zfz$=glfsk$) then:fndglf=1
+           setcaption("found glyph: "+glfsk$)
+        else
+           setcaption("skip glyph: "+zfz$)
+        end if
+     end if
+ wend
+
+setcaption("found glyph: "+glfsk$+" - ok")
+
+
+
+
+' _________________________________________________________________
+'[::: opening canvas dialog                                        ]
+' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
+
+setcaption(".svg Font Reader - more sub-routines")
+
+sub DrawBezierF(x0,y0,x1,y1,x2,y2,x3,y3,fc,xo,yo)
+    For i=0 To 100 step 10
+         t=i/100
+       xa=(x3)-(3*x2)+(3*x1)-(x0):ya=(y3)-(3*y2)+(3*y1)-(y0)
+       xb=(3*x2)-(6*x1)+(3*x0):yb=(3*y2)-(6*y1)+(3*y0)
+       xc=(3*x1)-(3*x0): yc=(3*y1)-(3*y0)
+       xi=(((((xa*t)+xb)*t)+xc)*t)+x0:yi=(((((ya*t)+yb)*t)+yc)*t)+y0
+   if i=0 then:xold=xi:yold=yi:end if
+    ink (0x000000)
+      line ((xold+xo)*fc,sqsiz-((yold+yo)*fc),(xi+xo)*fc,sqsiz-((yi+yo)*fc))
+   xold=xi:yold=yi:next
+ end sub
+
+sub DrawCubicF(x0,y0,x1,y1,x2,y2,fc,xo,yo)
+    xr1=x1-x0:yr1=y2-y1:x3=x0+x2-x1:y3=y0+y2-y1:xr2=x2-x1:yr2=y3-y2:stepv=10
+  for i=0 to stepv
+     ir=i*(1.570796/stepv):xsn=(xr1*sin(ir))-(xr2*cos(ir))
+       ycs=(yr1*(cos(ir)*-1))-(yr2*sin(ir)):xi=x3+xsn:yi=y3+ycs
+     if i=0 then:xold=xi:yold=yi:end if
+    ink (0x000000)
+     line ((xold+xo)*fc,sqsiz-((yold+yo)*fc),(xi+xo)*fc,sqsiz-((yi+yo)*fc))
+   xold=xi:yold=yi:next
+ end sub
+
+sub DrawLineF(x0,y0,x1,y1,fc,xo,yo)
+     line ((x0+xo)*fc,sqsiz-((y0+yo)*fc),(x1+xo)*fc,sqsiz-((y1+yo)*fc))
+ end sub
+
+   prints(" ")
+
+
+
+
+' _________________________________________________________________
+'[::: reading (looks for lines starting with: M,C,L,Q,T,H,V)       ]
+' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
+setcaption(".svg Font Reader - reading drawing")
+
+  xp0=0:yp0=0
+endglf=0
+
+while endglf=0
+  file input #1, text$:text$=ltrim$(text$)+"   ":frst$=left$(text$,1)
+     if left$(text$,4)=chr$(34)+"/><" then: endglf=1 : end if
+
+    if (frst$="M") then 
+       xq0=val(lstinf$(text$," "," ")):yq0=val(lstinf$(text$,"  "," "))
+     end if
+
+    if (frst$="L") then 
+       xq1=val(lstinf$(text$," "," ")):yq1=val(lstinf$(text$,"  "," "))
+           DrawLineF(xq0,yq0,xq1,yq1,fctrv,xoff,yoff)
+       xq0=xq1:yq0=yq1
+     end if
+
+    if (frst$="C") then 
+       xq1=val(lstinf$(text$," "," ")):yq1=val(lstinf$(text$,"  "," "))
+       xq2=val(lstinf$(text$,"   "," ")):yq2=val(lstinf$(text$,"    "," "))
+       xq3=val(lstinf$(text$,"     "," ")):yq3=val(lstinf$(text$,"      "," "))
+        DrawBezier(xq0,yq0,xq1,yq1,xq2,yq2,xq3,yq3)
+       xq0=xq3:yq0=yq3       
+     end if
+
+    if (frst$="Q") then 
+       xq1=val(lstinf$(text$," "," ")):yq1=val(lstinf$(text$,"  "," "))
+       xq2=val(lstinf$(text$,"   "," ")):yq2=val(lstinf$(text$,"    "," "))
+            xqe=xq2+(xq2-xq1):yqe=yq2+(yq2-yq1)
+        DrawCubicF(xq0,yq0,xq1,yq1,xq2,yq2,fctrv,xoff,yoff)
+       xq0=xq2:yq0=yq2       
+     end if
+
+    if (frst$="T") then 
+       xq1=val(lstinf$(text$," "," ")):yq1=val(lstinf$(text$,"  "," "))
+         DrawCubicF(xq0,yq0,xqe,yqe,xq1,yq1,fctrv,xoff,yoff)
+       xq0=xq1:yq0=yq1
+     end if
+
+    if (frst$="V") then 
+       yq1=val(lstinf$(text$," "," "))
+       DrawLineF(xq0,yq0,xq0,yq1,fctrv,xoff,yoff)
+       yq0=yq1
+     end if
+
+    if (frst$="H") then 
+       xq1=val(lstinf$(text$," "," "))
+       DrawLineF(xq0,yq0,xq1,yq0,fctrv,xoff,yoff)
+       xq0=xq1
+     end if
+
+ end while
+   close #1
+
+setcaption(".svg Font Reader - ...")
+while(0=0):if key(27) then : end :end if: wend
+

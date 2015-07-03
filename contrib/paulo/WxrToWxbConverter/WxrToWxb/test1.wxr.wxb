@@ -1,0 +1,17 @@
+ 
+frame=new wxFrame( Null, -1, "dialog1", wxPoint(15,20), wxSize(319,214),wxRAISED_BORDER | wxCAPTION | wxSYSTEM_MENU)
+frame.Centre()
+panel=new wxPanel(frame, -1 )
+  control= new wxRadioButton( panel, -1, "TextVersion1", wxPoint(147,70), wxSize(144,20))
+  control= new wxRadioButton( panel, -1, "TextVersion2", wxPoint(147,90), wxSize(144,20))
+  control= new wxStaticText( panel, -1, "StaticText", wxPoint(7,118), wxSize(284,12))
+  control= new wxStaticBox( panel, -1, "", wxPoint(7,6), wxSize(99,100))
+  control= new wxButton( panel, -1, "Button1", wxPoint(7,138), wxSize(87,20))
+  control= new wxButton( panel, -1, "Button2", wxPoint(105,138), wxSize(87,20))
+  control= new wxButton( panel, -1, "Button3", wxPoint(203,138), wxSize(89,20))
+  control= new wxButton( panel, -1, "1", wxPoint(115,14), wxSize(29,30))
+  control= new wxButton( panel, -1, "2", wxPoint(154,14), wxSize(28,30))
+  control= new wxButton( panel, -1, "3", wxPoint(190,14), wxSize(28,30))
+  control= new wxButton( panel, -1, "4", wxPoint(231,14), wxSize(28,30))
+frame.Show(True)
+ 

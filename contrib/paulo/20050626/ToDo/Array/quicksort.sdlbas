@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+dim a$[4]:a$[1]="dragon":a$[2]="lion":a$[3]="eagle":a$[4]="panther"
+prints(a$[1]):prints(a$[2]):prints(a$[3]):prints(a$[4])
+quicksort(a$[]):prints("")
+prints(a$[1]):prints(a$[2]):prints(a$[3]):prints(a$[4])
+waitkey

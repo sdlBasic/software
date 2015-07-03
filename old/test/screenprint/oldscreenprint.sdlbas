@@ -1,0 +1,96 @@
+''''''''''''''''''''''''''''''''''''''
+' screenprint
+'
+' Studio preliminare della stampa a video grafico a caratteri
+'
+''''''''''''''''''''''''''''''''''''''
+setautoback(25) 'refresh automatico
+Common size
+Common stx
+Common sty
+Common paper_color
+
+'-------------------------------------------------------------------------------------------------------
+
+sub spen (c)
+	ink(c)
+	size=13
+	setfont("/usr/local/share/sdlBasic/fonts/VeraMono.ttf")	
+	for i =0 to 255
+		textrender(chr$(i),size-1,i)
+	next
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+sub spaper(c)
+	paper_color=c
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+sub screatefont
+	spaper(0)
+	spen(rgb(255,255,255))
+	stx=0
+	sty=0
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+sub sputchar (n)
+	ink (paper_color)
+	xs=size/4*3
+	bar(stx*xs,2+sty*size,stx*xs+xs,2+sty*size+size)
+	pasteicon (stx*xs,sty*size,n)
+	
+	stx=stx+1 
+	if stx>(screenwidth/xs) then
+		stx=0
+		sty=sty+1
+	end if
+	
+	if n=13 then
+	    stx=0
+	    sty=sty+1
+	end if
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+sub sprints (n$)
+	for i =1 to len (n$)
+		sputchar(asc(mid$(n$,i,1)))
+		
+	next
+	stx=0:sty=sty+1
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+sub slocate(x,y)
+	stx=x
+	sty=y
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+sub main
+	screatefont
+	slocate (1,1):sprints("ciao mondo")
+
+	spaper (rgb(255,0,0))
+	slocate (10,2):sprints("altro ciao")
+	sprints("Questo e' un testo di compatibilita'")
+	spen(rgb(0,0,255))
+	sprints("12345678901234567890123456789012345678901234567890123456789012345678901234567890")
+	spaper(0)
+	for i =0 to 10
+		slocate(20-i,10+i)
+		sprints("ciao")
+	next	
+		
+	while(0=0)
+		if (key(27))then
+			exit while
+		end if
+	end while
+end sub
+'-------------------------------------------------------------------------------------------------------
+
+main
+

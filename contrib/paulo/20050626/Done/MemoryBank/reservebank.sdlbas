@@ -1,0 +1,7 @@
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+prints("reserving bank #1, with 512 bytes"):reservebank(1,512)
+prints("")
+prints("peek(1,41)="+str$(peek(1,41)))
+prints("poke(1,41,123)"):poke(1,41,123)
+prints("peek(1,41)="+str$(peek(1,41)))
+waitkey

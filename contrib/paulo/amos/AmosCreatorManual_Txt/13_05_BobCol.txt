@@ -1,0 +1,90 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.5         * 
+Rem *            Bob Col               * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem initialisation 
+MAKE_OBJECTS
+Double Buffer 
+Flash Off 
+Dim B$(4)
+Curs Off : Cls 16 : Hide 
+Rem Assign AMAL channels to bobs 
+For CH=1 To 5
+   Channel CH To Bob CH
+Next CH
+Rem Set hot spots
+Hot Spot 2,0
+Hot Spot 3,$20
+Hot Spot 4,2
+Hot Spot 5,$22
+Rem Set up ship movement 
+A$="AUtotest( Let R0=Joy1&15 ; If R0>0 Direct Mover else Direct Next  ) "
+A$=A$+"Next:  Let RX=X ; Let RY=Y ; Wait"
+A$=A$+"Mover: Let R0=Joy1 ; Let R1=R0&3 ; If R1=0 Jump Horiz"
+A$=A$+"       If R1=1 Jump Up"
+A$=A$+"       Let R1=2 ; Jump Horiz "
+A$=A$+"Up:    Let R1=-2 "
+A$=A$+"Horiz: Let R2=R0&12 ; If R2=0 Jump Cont"
+A$=A$+"       If R2=4 Jump Left"
+A$=A$+"       Let R2=2 ; Jump Cont"
+A$=A$+"Left:  Let R2=-2"
+A$=A$+"Cont:  Let X=X+R2 ; Let Y=Y+R1 ; "
+Rem Note boolean algebra 
+A$=A$+"       Let R4=X>0 ;  Let R5=X<320 ; Let R6=Y<195  ; Let R7=Y>0"
+A$=A$+"       If R4&R5&R6&R7 Jump Ok "
+A$=A$+"       Let X=X-R2 ; Let Y=Y-R1"
+A$=A$+"Ok:    Let RX=X ; Let RY=Y ; Jump Mover"
+Rem Set up attack movements. Note the different speeds 
+Rem Slow down if required  
+B$(1)="Loop:  Move RX-X,RY-Y,10 ; Jump Loop"
+B$(2)="Loop:  Move RX-X,RY-Y,14 ; Jump Loop"
+B$(3)="Loop:  Move RX-X,RY-Y,18 ; Jump Loop"
+B$(4)="Loop:  Move RX-X,RY-Y,22 ; Jump Loop"
+Rem Main loop
+PLACE_ALIENS
+Repeat 
+   Rem Check for collision
+   C=Bob Col(8)
+   If C<>0
+      PLACE_ALIENS
+   End If 
+Until Mouse Key=2
+Procedure PLACE_ALIENS
+   Rem place aliens at a random position
+   Shared B$(),A$
+   Randomize Timer
+   Rem position ship
+   Bob 1,Rnd(300),Rnd(150),1
+   Amal 1,A$
+   Rem place aliens 
+   For B=2 To 5
+      Bob B,Rnd(300),Rnd(150),B
+      Amal B,B$(B-1)
+   Next B
+   Amal On 1
+   Rem wait for fire button 
+   FWAIT
+   Amal On 
+End Proc
+Procedure FWAIT
+   Rem wait for the fire button 
+   Repeat 
+   Until Fire(1)
+End Proc
+Procedure MAKE_OBJECTS
+   Rem generate some blitter images on the fly
+   Rem make eyes! 
+   Curs Off : Cls 0
+   Ink 2 : Ellipse 8,8,7,5 : Paint 9,9
+   Ink 6 : Circle 8,8,4 : Paint 9,9
+   For B=2 To 5 : Get Bob B,0,2 To 16,16 : Next B
+   Cls 0,0,0 To 40,40
+   Ink 5
+   Rem make ship  
+   Polygon 8,0 To 16,16 To 0,16 To 8,0
+   Ink 0
+   Polygon 8,10 To 16,16 To 0,16 To 8,10
+   Get Bob 1,0,0 To 16,16
+End Proc

@@ -1,0 +1,8 @@
+
+
+while (0=0)
+   locate (0,0)
+   k$=str$(inkey)+"    "
+   prints(k$)
+   wait(10)
+ wend

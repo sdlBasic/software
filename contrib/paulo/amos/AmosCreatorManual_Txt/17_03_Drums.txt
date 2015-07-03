@@ -1,0 +1,27 @@
+Rem ************************************ 
+Rem *        AMOS Example 17.3         * 
+Rem *             Drums                * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load music 
+Load "AmosteroidsTitleMus.abk"
+Flash Off : Curs Off : Centre "Press a key to hit them drums!"
+Rem play music 
+Music 1
+Rem activate all four voices for noise 
+Noise To 15
+Rem set volume of noise and music  
+Volume 15,63 : Mvolume 32
+Rem create drum envelope 
+Set Envel 0,0 To 1,63
+Set Envel 0,1 To 10,0
+Rem play drum
+Do 
+   Rem wait for a key 
+   Repeat : A$=Inkey$ : Until A$<>""
+   Exit If A$=Chr$(13)
+   S=Scancode
+   Rem play note using drum 
+   If S>0 and S<96 Then Play %100,S,0
+Loop 

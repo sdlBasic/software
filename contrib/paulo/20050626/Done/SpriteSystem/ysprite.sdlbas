@@ -1,0 +1,10 @@
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+screenopen(7,80,80,0,0,0,0,0)
+   paper(8^8-1):ink(0):pen(0):cls:setcolorkey(8^8-1)
+    line(0,0,32,32):line(32,0,0,32):grab(1,0,0,32,32)
+ screenclose(7)
+while key(27)=0
+   sprite(1,xmouse,ymouse,1)
+   locate(1,1):prints("ysprite(1)="+str$(ysprite(1))+"   ")
+   waitvbl
+ end while

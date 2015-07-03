@@ -1,0 +1,78 @@
+'
+'      Text tutorial #1 - Loading a font by its name 
+'
+'
+Dim F_NAME$(50),FS(50),FP$(50)
+Global F_NAME$(),FS(),FP$()
+'
+'First wipe all fonts from memory (if there are any).
+'
+WIPE_FONTS
+'
+'Now get the fonts list from disc  
+'
+Get Fonts 
+'  
+'The next procedure call sorts out the list into arrays
+'
+FONT_EXAMINE
+'
+'Ask for a font. If it exists the Set Font number will be returned, if not 
+'a zero is passed back.
+'
+'Note the parameters sent: "fontname.font" and the size of the font
+'
+SET_A_FONT["helvetica.font",24]
+'
+A=Param
+If A=0 Then End 
+'
+'Ok, font found. Display some text using this font.
+'
+Set Font A
+Text 100,100,"This is the font!"
+'
+Procedure FONT_EXAMINE
+   For F=1 To 49
+      F$=Font$(F)
+      If F$="" : Exit : End If 
+      '
+      ' Get the name of the font 
+      '
+      T$=Mid$(F$,1,29) : F_NAME$(F)=T$-" "
+      '
+      ' Get the size of the font 
+      '
+      T$=Mid$(F$,30,3) : FS(F)=Val(T$)
+      '
+      ' Get the location of the font (Rom or Disc) 
+      '
+      T$=Mid$(F$,34,37) : FP$(F)=T$
+   Next 
+End Proc
+Procedure SET_A_FONT[FIND$,SIZE]
+'
+' Search through the fonts and try to match up with users request
+'
+   FIND$=Lower$(FIND$)
+   Z=0
+   For A=1 To 49
+      If F_NAME$(A)=FIND$
+         If SIZE=FS(A)
+            Z=A : Exit 
+         End If 
+      End If 
+   Next A
+End Proc[Z]
+Procedure WIPE_FONTS
+   '
+   'AmigaDos will not wipe fonts from memory until the memory is full. So 
+   'this routine requests an impossible amount of memory which in turn forces 
+   'AmigaDos to free up any unused areas it has. This wipes old font lists
+   'from memory so that you can start from scratch. 
+   '
+   On Error Goto SKIP
+   Erase 15 : Reserve As Work 15,10000000
+   SKIP: Resume SKIP2
+   SKIP2:
+End Proc

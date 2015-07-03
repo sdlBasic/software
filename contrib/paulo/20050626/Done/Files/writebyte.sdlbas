@@ -1,0 +1,5 @@
+open"ascii96chrs.txt" for output as #1
+  for a=32 to 127
+     writebyte(1,a)
+   next
+ close#1

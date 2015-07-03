@@ -1,0 +1,20 @@
+Rem ************************************ 
+Rem *        AMOS Example 15.2         * 
+Rem *         Screen Blocks            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem load a screen
+F$=Fsel$("*.*","","Load a screen") : If F$="" Then Edit 
+Load Iff F$,0
+Rem split the screen into blocks 
+For I=0 To 7
+   For J=0 To 9
+      Rem grab blocks
+      Get Block I*10+J+1,I*32,J*20,32,20
+Next J : Next I
+Rem main loop
+Do 
+      Rem display a random block at a random position
+      Put Block Rnd(48)+1,Rnd(Screen Width)+1,Rnd(Screen Height)+1
+Loop 

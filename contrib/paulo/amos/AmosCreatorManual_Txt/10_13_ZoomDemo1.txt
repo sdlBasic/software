@@ -1,0 +1,76 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.13        * 
+Rem *           Zoom demo              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Close Editor 
+F$=Fsel$("*.*","Load a screen") : If F$="" Then Edit 
+Load Iff F$,1
+Limit Mouse 0,0 To Screen Height,Screen Width
+Rem define a second screen the same size as the first
+If Screen Width>600 Then REZ=Hires Else REZ=Lowres
+Screen Open 0,Screen Width,Screen Height,Screen Colour,REZ
+Flash Off : Get Palette 1
+Rem create the magnification window
+Screen Open 2,320,50,2,Lowres
+Screen Display 2,,250,,50
+Rem main loop
+Do 
+   Screen To Front 1 : Screen 1
+   Rem get size and position of zoom box
+   GROWBOX
+   If GRABBED
+      Screen 0 : Cls 
+      Rem position zoom box at the centre of the screen
+      W=GX2-GX1 : H=GY2-GY1 : WM#=W*MAG# : HM#=H*MAG#
+      Rem check for errors 
+      If WM#>0 and HM#>0
+         TX=(Screen Width-Int(WM#))/2 : TY=(Screen Height-Int(HM#))/2
+         BX=Screen Width-TX : BY=Screen Height-TY
+         If TX>=0 and TY>=0 and BX<=Screen Width and BY<=Screen Height
+            Rem enlarge zoom box 
+            Zoom 1,GX1,GY1,GX2,GY2 To 0,TX,TY,BX,BY
+         Else 
+            Locate 0,0 : Centre "Magnification not allowed"
+         End If 
+      End If 
+      Screen To Front 0 : Locate 0,1 : Centre "<Hit a key>" : Wait Key : GRABBED=0
+   End If 
+Loop 
+Procedure GROWBOX
+   Rem A simple procedure to create a rubber banding effect 
+   Rem Define coordinates as GLOBAL 
+   Shared GX1,GX2,GY1,GY2,GRABBED
+   Rem Set up XOR mode
+   Gr Writing 2
+   Rem Rubber band
+   Repeat 
+      Rem Wait until the left mouse button is pressed  
+      If Mouse Key=1
+         Rem Get coordinates of top corner
+         GX1=X Screen(X Mouse) : GY1=Y Screen(Y Mouse) : GX2=GX1 : GY2=GY1
+         While Mouse Key=1
+            Rem Drag box around with the mouse 
+            Box GX1,GY1 To GX2,GY2
+            GX2=X Screen(X Mouse) : GY2=Y Screen(Y Mouse)
+            Box GX1,GY1 To GX2,GY2
+         Wend 
+         Box GX1,GY1 To GX2,GY2 : GRABBED=True
+         Rem Make GX1,GY1 the coords of the TOP left corner   
+         If GX1>GX2 : T=GX1 : GX1=GX2 : GX2=T : End If 
+         If GY1>GY2 : T=GY1 : GY1=GY2 : GY2=T : End If 
+      End If 
+      Rem Wait until mouse button is released
+   Until GRABBED
+   Rem Restore writing mode to normal 
+   Plot GX1,GY1 : Gr Writing 1
+   MAGNIFY
+End Proc
+Procedure MAGNIFY
+   Rem read magnifaction
+   Rem Allowable values range from about 0.1 to 5 
+   Shared MAG#
+   Screen To Front 2 : Screen 2
+   Input "Magnification factor?";MAG#
+End Proc

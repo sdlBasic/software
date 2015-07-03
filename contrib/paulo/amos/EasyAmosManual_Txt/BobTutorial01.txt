@@ -1,0 +1,21 @@
+'
+'      Bob tutorial #01 - Displaying a Bob   
+'
+'Load in a Bob file from the Examples disc 
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+'
+'Remove the cursor from the screen and stop colour three from flashing 
+Curs Off : Flash Off 
+'
+'Change the screen's palette to one used by the Bobs   
+Get Sprite Palette 
+'
+'Make the screen all colour zero 
+Cls 0
+'
+'Position Bob 1 at x:160 and y:130 and use image 1 from the bank 
+Bob 1,160,130,1
+'
+'We must now wait for a VBL, otherwise the program would end without 
+'the Bob being displayed automatically.  
+Wait Vbl 

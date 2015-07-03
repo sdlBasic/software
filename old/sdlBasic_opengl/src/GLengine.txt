@@ -1,0 +1,59 @@
+GLengine quick help
+----------------------------------------------------------------------------------------------------------------------------
+
+Section
+
+GLscreen
+GLcamera
+GLlight
+GLtexture
+GLobject
+GLmatrix
+GLlowlevel
+
+
+-- GLscreen -------------------------------------------------------------------------------------------------------------
+
+GLsetdisplay(w,h,bpp,mode)	: open the sdldisplay in opengl blit mode (0 full screen | 1 windows 2 resizable
+GLscreenswap()			: swap the buffers of display
+GLscreen2D(m)			: enable(1) disable(0) the updating of 2d sdl screen in GLdisplay
+GLscreenrect (x,y,w,h)		: define the glviewport
+
+-- GLcamera -------------------------------------------------------------------------------------------------------------
+GLcameraposition(x,y,z)		: set the position of camera
+GLcameraangle(x,y,z)		: set the angle where point camera
+GLcameralook(x,y,z)		: the camera point at xyz coords in space
+
+-- GLlight --------------------------------------------------------------------------------------------------------------
+*GLmakelight(n,x,y,z,r,g,b,pow)
+
+-- GLgraphics ------------------------------------------------------------------------------------------------------------
+GLcolor(r,g,b)			: set the current opengl color in format rgb
+
+-- GLtexture ------------------------------------------------------------------------------------------------------------
+GLloadtexture(file,n)		: load a texture in a buffer n
+GLmaketexture(n,m)		: make sdlimage n in a textur in buffer n : m is a method of create texture
+GLtexture(n)			: set the texture n
+
+-- GLobject -------------------------------------------------------------------------------------------------------------
+Glmakecube(x,y,z,size)		: make a cube object
+Glmakesphere(x,y,z,size)	: make a sphere (texture not work)
+GLmakesurface(v1,v2,v3,v4)	: make a rectangular surface with a texture (v1 v2 v3 v4 are vertexs)
+
+-- GLmatrix -------------------------------------------------------------------------------------------------------------
+
+GLbegin(type)			: start a drawing matrix type can be triangle qads etc.
+GLend				: terminate a drawing matrix
+GLtexcoord(x,y)			: set point of a surface texturable
+GLsetvertex(v OR x,y,z)		: set a matrix vertex
+GLnormal(x,y,z)			:
+GLpushmatrix			:
+GLpopmatrix			:
+GLflush				:
+
+-- GLlowlevel -----------------------------------------------------------------------------------------------------------
+
+GLvertex (n,x,y,z)		: set the vertex array n
+GLtranslate (x,y,z)		: move the matrix
+GLrotate(ang,x,y,z)		: rotate the matrix
+GLenable(param)			: enable feature

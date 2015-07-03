@@ -1,0 +1,8 @@
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+prints("after you pressing any key, part of this display, previously saved (.bmp), will be loaded and placed on the screen")
+grab(1,40,0,80,80):saveimage("loadimage.bmp",1)
+waitkey:cls
+loadimage("loadimage.bmp",1)
+pasteicon(0,0,1)
+while 0=0:wend
+

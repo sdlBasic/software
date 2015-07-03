@@ -1,0 +1,21 @@
+Rem ************************************ 
+Rem *        AMOS Example 6.5          * 
+Rem *          Set TEMPRAS             * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Timer=0
+For N=0 To 100
+   Ink Rnd(15)
+   Polyline Rnd(320),Rnd(200) To Rnd(320),Rnd(200) To Rnd(320),Rnd(200)
+Next 
+T1=Timer
+Reserve As Work 5,2048
+Set Tempras Start(5),2048
+Timer=0
+For N=0 To 100
+   Ink Rnd(15)
+   Polyline Rnd(320),Rnd(200) To Rnd(320),Rnd(200) To Rnd(320),Rnd(200)
+Next 
+Print "Normal system: ";T1 : Print "Tempras time for same job: ";Timer
+Set Tempras 

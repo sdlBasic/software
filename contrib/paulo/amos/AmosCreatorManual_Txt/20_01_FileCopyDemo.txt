@@ -1,0 +1,62 @@
+Rem ************************************ 
+Rem *        AMOS Example 20.1         * 
+Rem *         File copy demo           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+
+Rem Open screen  
+
+Screen Open 0,640,200,8,Hires
+
+Rem check number of drives 
+
+If Exist("Df1:") or Exist("Dh0:") Then D=2 Else D=1
+Rem Get source disc
+CHECK_DRIVE["Source"]
+
+Repeat 
+   Input "Enter full pathname of source directory?";SOURCE$
+   If SOURCE$="" Then Boom : Edit 
+   If Right$(SOURCE$,1)<>"/" Then SOURCE$=SOURCE$+"/"
+Until Exist(SOURCE$)
+
+Rem Set destination disc 
+Input "Enter full pathname of destination directory?";DEST$
+If DEST$="" Then Boom : Edit 
+If Right$(DEST$,1)<>"/" Then DEST$=DEST$+"/"
+Rem get first file in folder 
+F$=Dir First$(SOURCE$)
+F$=Left$(F$,30)-" "
+
+While F$<>""
+   Rem find file length 
+   FILE_LENGTH[SOURCE$+F$] : L=Param
+   Reserve As Work 10,L
+   Rem load file
+   Print "Reading..";SOURCE$+F$
+   Bload SOURCE$+F$,10
+   CHECK_DRIVE["Destination"]
+   Rem create a directory if it does not exist
+   If Exist(DEST$)=0 Then Print "Creating ";DEST$ : Mkdir DEST$-"/"
+   Rem save file
+   Print "Writing..";DEST$+F$
+   Bsave DEST$+F$,Start(10) To Start(10)+L
+   Rem get next file in directory 
+   F$=Dir Next$ : F$=Left$(F$,30)-" "
+   Erase 10
+   If F$<>"" Then CHECK_DRIVE["Source"]
+Wend 
+Dir DEST$
+End 
+
+Procedure FILE_LENGTH[F$]
+Print F$
+   Rem get length of file in bytes
+   Open In 1,F$ : L=Lof(1) : Close 1
+End Proc[L]
+
+Procedure CHECK_DRIVE[D$]
+   Shared D
+   Rem swap discs if required 
+   If D=1 Then Input "Please place the "+D$+" disc into drive zero (Df0:)";A$
+End Proc

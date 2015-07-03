@@ -1,0 +1,104 @@
+'sdl opengl first demo
+
+loadimage("sdlBasic.png",1)
+GLsetdisplay(800,600,32,1)
+GLloadtexture("sdlBasic.png",2)
+
+GLmaketexture(1,0)
+paper(rgb(64,64,255))
+cls
+
+'GLscreenrect(400,300,400,300)
+
+
+glvertex(1,-10, 10, -15 )
+glvertex(2, 10, 10, -15 )
+glvertex(3, 10,-10, -15 )
+glvertex(4,-10,-10, -15 )
+
+glScreenswap
+x=0:y=0:z=140
+ax=0:ay=0:az=90
+n=-18:na=1
+while(key(27)=0)
+
+
+    for a=0 to 360
+	'glcameraangle(ax,ay,az)
+
+	'glcameralook(n, -10, 2)
+	'glcameralook(0,n,0)
+	ax=-sin(n/z)*(n+z)
+	'ay=(cos(y-10)* (x-n ))
+	glcameraposition(x,y,z)
+	glcameraangle(ax,ay,az)
+
+
+
+
+	bob(1,a,0,1)
+
+
+
+	'gltranslate(0,0,-25)
+
+	'glrotate(a,1,0,0)
+
+	gltexture(2)
+	glcolor(255,255,255)
+	glmakecube(0,0,5,4)
+
+
+
+	'gltranslate(0,0,-15)
+	gltexture(1)
+	n=n+na
+	if n>180 then: na=-1:end if
+	if n<-180 then: na=1:end if
+
+	glmakesphere(0,n,-10,2)
+
+
+	gltexture(1)
+	glBegin(GL_QUADS)
+	glTexCoord(0,0):glsetvertex(-10, 10,5)
+	glTexCoord(1,0):glsetvertex( 10, 10,5)
+	glTexCoord(1,1):glsetvertex( 10,-10,5)
+	glTexCoord(0,1):glsetvertex(-10,-10,5)
+
+	glTexCoord(1,0):glsetvertex( 10, 10,5)
+	glTexCoord(0,0):glsetvertex(-10, 10,5)
+	glTexCoord(0,1):glsetvertex(-10,-10,5)
+	glTexCoord(1,1):glsetvertex( 10,-10,5)
+
+	glEnd
+    gltexture(2)
+	glmakesurface(2,1,4,3)
+	glmakesurface(1,2,3,4)
+
+
+    if key(k_space) then
+
+	if key(k_up)then : ay=ay-1 :end if
+	if key(k_down)then : ay=ay+1 :end if
+	if key(k_left)then : ax=ax-1 :end if
+	if key(k_right)then :ax=ax+1 :end if
+	if key(asc("z"))then : az=az-1 :end if
+	if key(asc("x"))then : az=az+1 :end if
+    else
+	if key(k_up)then : y=y-1 :end if
+	if key(k_down)then : y=y+1 :end if
+	if key(k_left)then : x=x-1 :end if
+	if key(k_right)then : x=x+1 :end if
+	if key(asc("z"))then : z=z-1 :end if
+	if key(asc("x"))then : z=z+1 :end if
+    end if
+
+    locate(0,0):prints(" x:"+str$(x)+" y:"+str$(y)+" z:"+str$(z)+"   ")
+    locate(0,1):prints(" ax:"+str$(ax)+" ay:"+str$(ay)+" az:"+str$(az)+"   ")
+
+    glscreenswap
+
+    if key(27) then :end:end if
+    next
+end while

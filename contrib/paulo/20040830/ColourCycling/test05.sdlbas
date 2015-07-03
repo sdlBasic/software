@@ -1,0 +1,42 @@
+  setdisplay(320,200,8,0):paper(30):cls:randomize
+
+sub colourcyclingt(d,i,f,b)
+  if d=1 then
+    t=color(i):for e=i to f-1:color(e,color(e+1)):next 
+    if b=1 then:color(f,t):end if 
+  else
+    t=color(f):for e=f to i+1 step -1:color(e,color(e-1)):next 
+    if b=1 then:color (i,t):end if:end if
+ end sub
+
+'- creating palette
+for i= 0 to 255:u=rnd(0xFFF)*4096+rnd(0xFFF)
+    if key(27)<>0 then:end:end if
+   color(i,u):next
+
+'- drawing lines
+for i= 0 to 255:ink(i):line (i+32,16,i+32,128)
+   if key(27)<>0 then:end:end if
+ next
+
+'- colour cycling loop
+while 0=0
+'- colorcycling(10,50,1)
+
+'-- Shift up, loop on
+   colourcyclingt(0,10,50,1)
+    if key(27)<>0 then:end:end if
+
+'-- Shift down, loop on
+   colourcyclingt(1,70,110,1)
+    if key(27)<>0 then:end:end if
+
+'-- Shift up, loop off
+   colourcyclingt(0,130,170,0)
+    if key(27)<>0 then:end:end if
+
+'-- Shift down, loop off
+   colourcyclingt(1,190,230,0)
+    if key(27)<>0 then:end:end if
+
+wend

@@ -1,0 +1,12 @@
+   setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+   prints("Let this example running for a")
+   prints("while and/or try to use the mouse")
+   prints("pointer too.")
+   prints("'Esc' key will close this example.")
+while 0=0
+   if int(rnd(1000))<50 then
+      locatemouse(rnd(320),rnd(200)):end if
+   waitvbl
+      if key(27)<>0 then:end:end if
+ wend
+

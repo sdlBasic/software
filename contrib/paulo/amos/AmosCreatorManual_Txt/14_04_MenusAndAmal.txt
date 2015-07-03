@@ -1,0 +1,46 @@
+Rem ************************************ 
+Rem *        AMOS Example 14.4         * 
+Rem *         Menus and AMAL!          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Centre "LEFT button positions screen"
+Print 
+Centre "RIGHT button calls up menu"
+Load Iff "AMOS_DATA:IFF/AMOSPIC.IFF",1
+Rem Assign amal channel zero to screen one 
+Channel 0 To Screen Display 1
+Rem Limit mouse movements. not hardware coords   
+Rem Limit Mouse 130,50 To 320+130,50+255 
+Rem Simple amal program to position screen 
+Amal 0,"Loop: If K1=0 Jump Loop ; Let Y=YM Jump Loop"
+Rem menu type
+Menu Tline 1
+Menu Bar 2
+Menu Separate 3
+Rem Create menu. This can be anything you like 
+For L1=1 To 4
+   Menu$(L1)=Str$(L1)
+   Menu$(L1,1)=" Move! "," Haha? "
+   For L2=2 To 4
+      Menu$(L1,L2)="(lo 2,0)"+Str$(L1)+Str$(L2)+" "
+      For L3=1 To 4
+         Menu$(L1,L2,L3)=Str$(L1)+Str$(L2)+Str$(L3)+" "
+         For L4=1 To 2
+            Menu$(L1,L2,L3,L4)=Str$(L1)+Str$(L2)+Str$(L3)+Str$(L4)+" "
+         Next 
+      Next 
+   Next 
+Next 
+Amal On 
+Menu On 
+Rem read menu  
+Do 
+   If Choice
+      Home 
+      For X=1 To 4
+         Print Choice(X);
+      Next 
+      Print "       "
+   End If 
+Loop 

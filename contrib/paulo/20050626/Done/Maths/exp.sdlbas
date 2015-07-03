@@ -1,0 +1,5 @@
+setdisplay(240,320,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for f=1 to 20
+prints("exp("+str$(f)+")="+str$(exp(f)))
+next
+waitkey

@@ -1,0 +1,14 @@
+# (ct)=client ; (sv)=server
+
+1 - read preferences.ini
+  1.1 - get to know if the app is server or client; check servers and id conflicts
+  1.2 - (ct) get only server id; (sv) get neighbours id
+  1.3 - (ct) send sprite colour to server;(sv) get sprite colours from clients
+
+2 - game
+(start loop)
+  2.1 check keyboard and sprite position; put sprites at their positions
+  2.2 (ct) send sprite pos to server; (sv) get sprite pos from clients
+  2.3 (ct) get sprite pos from server; (sv) send sprite pos to clients
+(end loop)
+

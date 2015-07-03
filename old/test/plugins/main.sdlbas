@@ -1,0 +1,9 @@
+'
+' plugins
+'
+include "mappa.sdlbas"
+sub main
+	mappa_run
+end sub
+main
+waitkey

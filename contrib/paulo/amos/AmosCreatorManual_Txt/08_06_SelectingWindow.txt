@@ -1,0 +1,23 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.6          * 
+Rem *       Selecting a window         * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Activate window saving 
+Wind Save 
+Rem Reserve a screen zone for each window
+Reserve Zone 5
+Locate 0,0 : Centre "Click on a window"
+Rem Open windows 
+For I=1 To 5
+   Wind Open I,(I-1)*50,I*20,10,8,2
+   Rem create a screen zone around the window 
+   Set Zone I,(I-1)*50,I*20 To(I-1)*50+80,I*20+64
+   Pen I+1 : Print "Window ";I
+Next I
+Do 
+   Rem Select current window
+   W=Mouse Zone
+   If Mouse Key=1 and W>0 and W<=10 Then Window W
+Loop 

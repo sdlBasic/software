@@ -1,0 +1,47 @@
+'
+'      Screen tutorial #11 - Grabbing and pasting blocks     
+'
+Load "Easy_Tutorial:Bobs/Mix.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 2
+Locate 0,15 : Print "Press a key"
+'
+' Stick the bobs on the screen ready to be disected
+'
+For A=1 To 4
+   Paste Bob(A-1)*80,0,A
+Next A
+'
+' Get the blocks from the pasted Bobs left on screen 0 
+'
+For HEADS=1 To 4
+   Get Block HEADS,(HEADS-1)*80,0,80,25
+Next HEADS
+For BODIES=1 To 4
+   Get Block BODIES+4,(BODIES-1)*80,25,80,30
+Next BODIES
+For LEGS=1 To 4
+   Get Block LEGS+8,(LEGS-1)*80,55,80,29
+Next LEGS
+'
+' Now paste a random mix of the blocks to make up silly bodies!
+'
+Do 
+   '
+   ' Pick a head from the four
+   '
+   A=Rnd(3)+1
+   Put Block A,0,0
+   '
+   ' Do the body
+   '
+   A=Rnd(3)+1
+   Put Block A+4,0,25
+   '
+   ' And finally, the legs
+   '
+   A=Rnd(3)+1
+   Put Block A+8,0,55
+   Wait Key 
+Loop 

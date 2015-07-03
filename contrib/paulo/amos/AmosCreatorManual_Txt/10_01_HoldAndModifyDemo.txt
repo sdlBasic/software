@@ -1,0 +1,28 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.1         * 
+Rem *      Hold and Modify Demo        *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Create an empty HAM screen 
+Screen Open 0,320,290,4096,Lowres
+Screen Display 0,129,30,320,270
+Rem Initialise screen
+Curs Off : Cls 0 : Flash Off 
+Locate 0,2 : Pen 15 : Paper 0
+Centre "HAM screens can be generated INSIDE AMOS"
+Rem Draw bars
+For B=0 To 15
+   Rem Draw a bar with the a blue component equal to B  
+   Colour B,B : Ink B : Bar 32,B*15+32 To 288,B*15+47
+   Rem Plot entire colour bar   
+   For R=0 To 15
+      Rem Plot a point in each box with a red component=R
+      For L1=32 To 47 : Ink 32+R : Plot R*16+33,B*15+L1 : Next L1
+      Rem Fill each box with a series of point whose green components  
+      Rem range from 0-15
+      For G=0 To 15
+         Ink 48+G : Draw R*16+G+34,B*15+32 To R*16+G+34,B*15+47
+      Next G
+   Next R
+Next B

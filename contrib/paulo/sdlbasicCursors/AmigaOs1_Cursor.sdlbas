@@ -1,0 +1,7 @@
+  xedge=320:yedge=240:wdwd=0:setdisplay(xedge,yedge,32,wdwd)
+ScreenOpen (1,xedge,yedge,0,0,0,0,0)
+Loadimage("AmigaOs1_Cursor.gif",1): pasteicon(0,0,1): Screen(1)
+   setcolorkey(0xff00ff):grab(0,0,0,16,16)
+screen(0):ink(0):pen(0):paper(0x0000FF):cls
+while 0=0:if key(27) then:end:end if:wend
+

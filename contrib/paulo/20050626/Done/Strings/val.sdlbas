@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+a$="30"+"97"
+b=val(a$)+50
+prints(b)
+waitkey
+

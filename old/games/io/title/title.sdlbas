@@ -1,0 +1,31 @@
+'
+' sdlBasic game: IO
+' 
+'   Name:      title.sdlbas
+'   Purpose:   title screen  
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+' Bugs:
+'
+' Todo:
+'  ALL!!!
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ sub title
+	 loadmusic ("title/music/title.mod")
+	 playmusic (-1)
+	screenopen (1,640,480,0,0,640,480,0)
+	text(300,200,64,"IO")
+	screenswap
+
+	while key(27)=0
+		if key(13) then
+			exit while
+		end if	
+	end while
+	stopmusic()
+	screenclose(1)
+	screenswap 
+	
+end sub

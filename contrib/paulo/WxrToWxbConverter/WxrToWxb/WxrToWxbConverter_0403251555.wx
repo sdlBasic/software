@@ -1,0 +1,121 @@
+ finp$="test1.wxr":fout$=finp$+".wxb"
+
+'__ WxrConverter - Paulo Silva - 0302011939
+'__ sources should be .wxr files like created from wxWindows Dialog Editor (available from wxMSW-2.2.9 - www.wxwindows.org)
+
+function locstrinfo$(a$,b$,c$)
+     adra=1:adrb=1:blngt=len(b$):d$=""
+   while adrb<=blngt
+     if mid$ (a$,adra,1)=mid$ (b$,adrb,1) Then:adrb+=1:End If
+     adra+=1:end while
+   while mid$(a$,adra,1)<>left$(c$,1):d$=d$+mid$(a$,adra,1):adra+=1:end while
+     locstrinfo$=d$
+ end function
+
+  dim ctrlindx$[15]
+'  _______________________________ convertable
+    ctrlindx$[1]="wxButton":ctrlindx$[2]="wxStaticBox"
+    ctrlindx$[3]="wxTextCtrl":ctrlindx$[4]="wxComboBox"
+    ctrlindx$[5]="wxGauge"
+'  _______________________________ needs xsize fixes
+    ctrlindx$[6]="wxStaticText":ctrlindx$[7]="wxCheckBox"
+    ctrlindx$[8]="wxRadioButton"
+'  _______________________________ wxSlider
+    ctrlindx$[9]="wxSlider"
+'  _______________________________ misunderstood
+    ctrlindx$[10]="wxScrollBar":ctrlindx$[11]="wxListBox"
+    ctrlindx$[12]="wxChoice"
+'  _______________________________ makes crashes
+    ctrlindx$[13]="wxRadioBox"
+      yaspect=2:xaspect=1.75
+      xsizefix1=3:xfrszfx1=4:yfrszfx1=24:lpz=0
+      Open finp$ FOR Input AS #1:Open fout$ FOR OUTPUT AS #2
+  FOR t=0 TO 1: t=0
+    IF EOF(1)=0 Then
+              Line Input #1, text$:text$=Ltrim$(text$)
+
+
+      If Left$(text$, 5)="style" Then
+        style$=locstrinfo$(text$,"'","'")
+
+
+        Line Input #1, text$:text$=Ltrim$(text$)
+
+      If Left$(text$, 5)="title" Then
+        title$=locstrinfo$(text$,"'","'")
+
+       end if
+
+
+
+          FOR u=0 TO 1: u=0
+              Line Input #1, text$:text$=Ltrim$(text$)
+            IF LEFT$(text$, 1)="x" Then:u=2:End If
+          Next
+
+              xpoint$=locstrinfo$(text$,"x=",",")
+               xpoint=val(xpoint$):xpoint=int(xpoint*xaspect):xpoint$=str$(xpoint)
+              ypoint$=locstrinfo$(text$,"x=y=",",")
+               ypoint=val(ypoint$):ypoint=int(ypoint*yaspect):ypoint$=str$(ypoint)
+              xsize$=locstrinfo$(text$,"x=y=w=",",")
+               xsize=val(xsize$):xsize=int(xsize*xaspect)+xfrszfx1:xsize$=str$(xsize)
+              ysize$=locstrinfo$(text$,"x=y=w=h=",",")
+               ysize=val(ysize$):ysize=int(ysize*yaspect)+yfrszfx1:ysize$=str$(ysize)
+            if lpz<>0 Then:Print#2,"frame.Show(True)":End If
+              lpz=1
+         xsize=val(xsize$)+xfrszfx1:xsize$=str$(xsize)
+          ysize=val(ysize$)+yfrszfx1:ysize$=str$(ysize)
+          wxbo$=      "frame=new wxFrame( Null, -1, "+chr$(34)+title$+chr$(34)
+          wxbo$=wxbo$+", wxPoint("+xpoint$+","+ypoint$+"), wxSize("+xsize$+","+ysize$+"),"+style$+")"
+         Print#2," ":Print#2,wxbo$
+          Print#2,"frame.Centre()"
+          Print#2,"panel=new wxPanel(frame, -1 )"
+      End If
+
+'     IF LEFT$(text$, 16)="use_dialog_units" Then
+'         yaspect=1:xaspect=1
+'      end if
+
+
+     IF LEFT$(text$, 7)="control" Then
+           wxcontrol$=Ltrim$(locstrinfo$(text$,"=,",","))
+           title$=locstrinfo$(text$,"=,,'","'")
+           xpoint$= locstrinfo$(text$,"=,,'','','',",",")
+            xpoint=val(xpoint$):xpoint=int(xpoint*xaspect):xpoint$=str$(xpoint)
+           ypoint$= locstrinfo$(text$,"=,,'','','',,",",")
+            ypoint=val(ypoint$):ypoint=int(ypoint*yaspect):ypoint$=str$(ypoint)
+           xsize$=locstrinfo$(text$,"=,,'','','',,,",",")
+            xsize=val(xsize$):xsize=int(xsize*xaspect):xsize$=str$(xsize)
+           ysize$=locstrinfo$(text$,"=,,'','','',,,,",",")
+            ysize=val(ysize$):ysize=int(ysize*yaspect):ysize$=str$(ysize)
+'__     convertable: wxButton,wxStaticBox,wxTextCtrl,wxComboBox,wxGauge
+           for i=1 to 5
+             if wxcontrol$=ctrlindx$[i] Then
+               wxbo$=      "  control= new "+wxcontrol$+"( panel, -1, "+chr$(34)+title$+chr$(34)
+               wxbo$=wxbo$+", wxPoint("+xpoint$+","+ypoint$+"), wxSize("+xsize$+","+ysize$+"))"
+               Print#2,wxbo$
+             End If
+           Next
+'__      needs xsize fixes: wxStaticText,wxCheckBox,wxRadioButton
+           for i=6 to 8
+             if wxcontrol$=ctrlindx$[i] Then
+               xsize=val(xsize$)+xsizefix1:xsize$=str$(xsize)
+               wxbo$=      "  control= new "+wxcontrol$+"( panel, -1, "+chr$(34)+title$+chr$(34)
+               wxbo$=wxbo$+", wxPoint("+xpoint$+","+ypoint$+"), wxSize("+xsize$+","+ysize$+"))"
+               Print#2,wxbo$
+             End If
+           Next
+'__      wxSlider
+           i=9         
+             if wxcontrol$=ctrlindx$[i] Then
+               wxbo$=      "  control= new wxSlider( panel, -1, 1 , 1, 100"
+               wxbo$=wxbo$+", wxPoint("+xpoint$+","+ypoint$+"), wxSize("+xsize$+","+ysize$+"))"
+               Print#2,wxbo$
+             End If
+     End If: End If
+    IF EOF(1) <> 0 Then: t=2 : End If
+  Next
+    Print#2,"frame.Show(True)":Print#2," "
+  Close #1: Close #2
+
+

@@ -1,0 +1,25 @@
+Rem ************************************ 
+Rem *          Example 16.9            * 
+Rem *            Ellipse               *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Menu$(1)="Shapes"
+Rem Create a circle (note fancy background string) 
+Menu$(1,1)="(LO 20,10)(EL 10,10)","(LO 20,10)(IN 1,3)(EL 10,10)"
+Rem Wide ellipse 
+Menu$(1,2)="(LO 20,20)(EL 5,20)","(LO 20,20)(IN 1,3)(EL 5,20)"
+Rem Tall ellipse 
+Menu$(1,3)="(LO 20,20)(EL 20,5)","(LO 20,20)(IN 1,3)(EL 20,5)"
+Rem Start menu 
+Menu On 
+Rem Read menu
+Do 
+   Rem Get choice 
+   If Choice Then TYPE=Choice(2)
+   Rem Draw object
+   If Mouse Key
+      If TYPE=1 : Circle X Screen(X Mouse),Y Screen(Y Mouse),10 : End If 
+      If TYPE=2 : Ellipse X Screen(X Mouse),Y Screen(Y Mouse),5,20 : End If 
+      If TYPE=3 : Ellipse X Screen(X Mouse),Y Screen(Y Mouse),20,5 : End If 
+   End If 
+Loop 

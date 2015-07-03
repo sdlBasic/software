@@ -1,0 +1,45 @@
+'
+'      Bob tutorial #09 - Bob collisions   
+'
+Dim BX(3),BY(3),BXD(3),BYD(3),BIMAGE(3)
+Screen Open 1,640,40,2,Hires
+Curs Off 
+Screen 0
+Load "Easy_Tutorial:Bobs/Collide.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Double Buffer 
+Cls 0 : Pen 1 : Paper 0 : Hide 
+'
+BX(1)=0 : BY(1)=70 : BXD(1)=2 : BYD(1)=0 : BIMAGE(1)=2
+BX(2)=320 : BY(2)=160 : BXD(2)=-3 : BYD(1)=0 : BIMAGE(2)=3
+BX(3)=50 : BY(3)=0 : BXD(3)=0 : BYD(3)=3 : BIMAGE(3)=4
+'BX(4)=190 : BY(4)=200 : BXD(4)=0 : BYD(4)=-3 : BIMAGE(4)=2
+Do 
+   For A=1 To 3
+      BX(A)=BX(A)+BXD(A)
+      BY(A)=BY(A)+BYD(A)
+      '
+      If BX(A)>320 Then BXD(A)=BXD(A)*-1
+      If BX(A)<0 Then BXD(A)=BXD(A)*-1
+      '
+      If BY(A)>200 Then BYD(A)=BYD(A)*-1
+      If BY(A)<0 Then BYD(A)=BYD(A)*-1
+      '
+      Bob A,BX(A),BY(A),BIMAGE(A)
+   Next A
+   Bob 4,X Screen(X Mouse),Y Screen(Y Mouse),1
+      Screen 1
+      Locate 15,0
+      For A=1 To 4
+         C2=Bob Col(A)
+         If A=4
+            Print "Disc";
+         Else 
+            Print "Ball"+Str$(A);
+         End If 
+         Print ":";C2;"   ";
+      Next A
+      Screen 0
+   Wait Vbl 
+Loop 

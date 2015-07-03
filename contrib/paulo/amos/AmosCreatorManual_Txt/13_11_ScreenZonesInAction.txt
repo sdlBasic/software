@@ -1,0 +1,99 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.11        * 
+Rem *      Screen zones in action      * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Initalisation
+MAKE_OBJECTS
+Curs Off : Cls 0
+Rem create block arrays
+Dim XBLOCK(100),YBLOCK(100),BLOCK(100),LEVEL(20)
+MAKE_BLOCKS
+Channel 1 To Sprite 9
+Sprite 9,0,0,2
+Limit Mouse X Hard(0,0),Y Hard(0,0) To X Hard(0,320-32),Y Hard(0,199)
+Flash Off 
+Paper 0 : Locate 0,0 : Centre "Screen Zones"
+Rem----------------------------------------
+Rem call mouse control routine 
+MOUSE_CONTROL
+Sprite Off : Bell 
+Rem--------------------------------------- 
+End 
+Procedure MOUSE_CONTROL
+Rem This procedure controls the ship and detects a collision 
+Rem define number of aliens and total killed as shared 
+   Shared ALIENS,DEAD
+   Hide On 
+   IMAGE=1 : Rem choose bob image 
+   Rem Main loop  
+   Repeat 
+      Rem position ship at mouse coords
+      Sprite 8,X Mouse,220,IMAGE : Wait Vbl 
+      Rem fire missile 
+      If Mouse Click Then MISSILE
+      Rem check for collision between missile and block
+      Z=Hzone(X Sprite(9),Y Sprite(9)) : If Z>0 Then DESTROY_BLOCK[Z]
+   Until DEAD=ALIENS
+End Proc
+Procedure MISSILE
+   Rem fire missile 
+   Sprite 9,X Mouse,215,2
+   A$="Move 0,-200,25"
+   Amal 1,A$
+   Amal On 
+End Proc
+Procedure MAKE_BLOCKS
+   Rem create blocks and enclose them with a screen zone
+   Rem define important variables as global 
+   Shared XBLOCK(),YBLOCK(),BLOCK()
+   Shared XBASE,YBASE,HEIGHT,WIDTH,R,C,ALIENS
+   Rem set position,size, and number of blocks  
+   XBASE=80 : YBASE=30 : WIDTH=16 : HEIGHT=10 : R=10 : C=5 : ALIENS=R*C
+   Rem reserve one zone for each block
+   Reserve Zone R*C
+   Reset Zone 
+   Rem create blocks
+   For X=0 To R-1
+      For Y=0 To C-1
+         Rem get position of block
+         Z=X*C+Y+1 : X1=X*WIDTH+XBASE : Y1=Y*HEIGHT+XBASE
+         XBLOCK(Z)=X1 : YBLOCK(Z)=Y1 : BLOCK(Z)=Rnd(12)+3 : Ink BLOCK(Z)
+         Rem draw block 
+         Bar X1,Y1 To X1+WIDTH-1,Y1+HEIGHT-1
+         Rem define screen zone 
+         Set Zone Z,X1,Y1 To X1+WIDTH-1,Y1+HEIGHT-1
+      Next Y
+   Next X
+End Proc
+Procedure DESTROY_BLOCK[B]
+   Rem destroy a block
+   Shared XBLOCK(),YBLOCK(),BLOCK(),HEIGHT,WIDTH,DEAD,XBASE
+   Rem has block already been destroyed 
+   If BLOCK(B)=0 Then Pop Proc
+   Rem stop missile and increment killed
+   Amal Off 1 : Sprite Off 9 : Inc DEAD
+   Rem erase block from screen  
+   Cls 0,XBLOCK(B),YBLOCK(B) To XBLOCK(B)+WIDTH,YBLOCK(B)+HEIGHT+1
+   Rem erase block from memory
+   BLOCK(B)=0 : Boom 
+End Proc
+Procedure MAKE_OBJECTS
+   Rem generate the images required for the game on the fly 
+   Cls 0
+   Rem get generate ship  
+   Polygon 8,0 To 16,16 To 0,16 To 8,0
+   Ink 0
+   Polygon 8,10 To 16,16 To 0,16 To 8,10
+   Get Sprite 1,0,0 To 16,16
+   Rem hot spot at centre of ship 
+   Hot Spot 1,$11
+   Rem create missile 
+   Cls 0,0,0 To 17,17
+   Ink 2
+   Bar 7,0 To 9,16
+   Get Sprite 2,0,0 To 16,16
+   Rem hot spot at tip of missile 
+   Hot Spot 2,$10
+End Proc

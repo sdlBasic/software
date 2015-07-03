@@ -1,0 +1,49 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.7          * 
+Rem *       Resizing a window          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Activate window saving 
+Wind Save 
+Rem Reserve a screen zone for the window 
+Reserve Zone 1
+Rem Create a window and enclose it with a screen zone
+Wind Open 1,10,50,10,10,1
+Set Zone 1,10,50 To 10+80,50+80
+Rem fill window with asterixes 
+For X=0 To 7 : For Y=0 To 7 : Locate X,Y : Print "*"; : Next Y : Next X
+Rem Resize routine 
+Do 
+   Rem If left button pressed while the mouse is inside the window
+   If Mouse Key=1 and Mouse Zone=1
+      Rem Generate a rubber band 
+      GX1=10 : GY1=50 : GROWBOX
+      Rem Redefine the screen zone 
+      Reset Zone 1 : Set Zone 1,GX1,GY1 To GX2,GY2
+      Rem Calculate the new window size
+      SX=(GX2-GX1)/8 : SY=(GY2-GY1)/8
+      Rem Change the window size 
+      Wind Size SX,SY
+   End If 
+Loop 
+Procedure GROWBOX
+   Shared GX1,GX2,GY1,GY2
+   Gr Writing 2
+   Repeat 
+      If Mouse Key=1
+         GX2=X Screen(X Mouse) : GY2=Y Screen(Y Mouse)
+         OGX=GX2 : OGY=GY2
+         While Mouse Key=1
+            Box GX1,GY1 To GX2,GY2
+            GX2=X Screen(X Mouse) : GY2=Y Screen(Y Mouse)
+            Box GX1,GY1 To GX2,GY2
+         Wend 
+         Box GX1,GY1 To OGX,OGY
+         Box GX1,GY1 To GX2,GY2 : GRABBED=True
+         If GX1>GX2 : T=GX1 : GX1=GX2 : GX2=T : End If 
+         If GY1>GY2 : T=GY1 : GY1=GY2 : GY2=T : End If 
+      End If 
+   Until GRABBED
+   Gr Writing 1
+End Proc

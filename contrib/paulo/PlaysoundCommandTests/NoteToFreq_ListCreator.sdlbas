@@ -1,0 +1,9 @@
+
+open "NoteToFreq.txt" for output as #1
+  for note=-24 to 24
+    freq=2^(note/12)
+    print#1,"note:"+str$(note)+" -> freq:hz*"+str$(freq)
+   next
+ close #1
+waitkey
+

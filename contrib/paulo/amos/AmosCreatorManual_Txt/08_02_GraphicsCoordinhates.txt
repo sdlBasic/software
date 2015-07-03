@@ -1,0 +1,18 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.2          * 
+Rem *       Graphics co-ordinates      * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Initialise screen
+Curs Off : Cls 0 : Paper 0
+Do 
+   Rem generate some ranom numbers
+   X=Rnd(32) : Y=Rnd(22) : T=Rnd(15) : P=Rnd(15)
+   Pen T : Paper P
+   Locate X,Y : Print "AMOS"
+   Rem get the graphics coordinates of the text 
+   TX=X Graphic(X) : TY=Y Graphic(Y) : BX=X Graphic(X+4) : BY=Y Graphic(Y+1)
+   Rem draw a box around the text 
+   Box TX,TY To BX,BY
+Loop 

@@ -1,0 +1,47 @@
+  setdisplay(320,200,8,0):paper(0):cls:randomize
+    enablepalette(1)
+sub colourcyclingt(d,i,f,b)
+  if d=1 then
+    t=color(i):for e=i to f-1:color(e,color(e+1)):next
+    if b=1 then:color(f,t):end if
+  else
+    t=color(f):for e=f to i+1 step -1:color(e,color(e-1)):next
+    if b=1 then:color (i,t):end if:end if
+ end sub
+
+function sinsq(v,q1,q2)
+   v1=(v/q1)*6.141592
+   sinsq=((1+sin(v1))*q2)/2
+ end function
+
+
+
+for i=0 to 15:color (i,rgb(255,i*16,0)):next
+for i=0 to 15:color (i+16,rgb(255,255-(i*16),0)):next
+
+waitkey
+
+
+
+'- drawing lines
+for y= 0 to 199
+  yv1=y mod 32
+  ink(yv1):line (0,y,319,y)
+   if key(27)<>0 then:end:end if
+ next
+
+
+
+'- colour cycling
+  waitkey
+for i=0 to 300
+   waitvbl
+   colorcycling(0,31,1)
+  if key(27)<>0 then:end:end if
+ next
+'- end loop
+while 0=0
+  if key(27)<>0 then:end:end if
+ wend
+
+

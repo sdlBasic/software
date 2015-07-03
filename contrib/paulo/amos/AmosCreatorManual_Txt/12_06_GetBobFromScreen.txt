@@ -1,0 +1,55 @@
+Rem ************************************ 
+Rem *        AMOS Example 12.6         * 
+Rem *    Gets a Bob from a screen      *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Free some memory 
+Close Editor 
+Rem Load a picture from the disc 
+F$=Fsel$("*.*",""," Load a picture ") : If F$="" Then End 
+Load Iff F$,0
+Rem Set double buffered mode 
+Double Buffer 
+Rem Call Growbox routine 
+GROWBOX
+Rem Get a bob inside the box 
+Get Bob 1,GX1,GY1 To GX2,GY2
+Rem Clear screen 
+Cls : Screen Swap : Wait Vbl : Cls 
+Rem Use Bob as a brush 
+Repeat 
+Rem Move bob to the current mouse coordinates
+Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),1
+Rem If left button clicked then paste bob onto the screen
+If Mouse Key=1 Then Paste Bob X Screen(X Mouse),Y Screen(Y Mouse),1
+Rem wait until Right button is pressed 
+Until Mouse Key=2
+Procedure GROWBOX
+Rem A simple procedure to create a rubber banding effect 
+Rem Define coordinates as GLOBAL 
+Shared GX1,GX2,GY1,GY2
+Rem Set up XOR mode
+Gr Writing 2
+Rem Rubber band
+Repeat 
+   Rem Wait until the left mouse button is pressed  
+   If Mouse Key=1
+      Rem Get coordinates of top corner
+      GX1=X Screen(X Mouse) : GY1=Y Screen(Y Mouse) : GX2=GX1 : GY2=GY1
+      While Mouse Key=1
+         Rem Drag box around with the mouse 
+         Box GX1,GY1 To GX2,GY2
+         GX2=X Screen(X Mouse) : GY2=Y Screen(Y Mouse)
+         Box GX1,GY1 To GX2,GY2
+      Wend 
+         Box GX1,GY1 To GX2,GY2 : GRABBED=True
+         Rem Make GX1,GY1 the coords of the TOP left corner   
+         If GX1>GX2 : T=GX1 : GX1=GX2 : GX2=T : End If 
+         If GY1>GY2 : T=GY1 : GY1=GY2 : GY2=T : End If 
+   End If 
+Rem Wait until mouse button is released
+Until GRABBED
+Rem Restore writing mode to normal 
+Gr Writing 1
+End Proc

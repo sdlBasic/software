@@ -1,0 +1,6 @@
+setdisplay(320,240,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+  locate(1,1):prints("atx="+str$(atx))
+  locate(15,3):prints("atx="+str$(atx))
+  locate(5,8):prints("atx="+str$(atx))
+  locate(7,5):prints("atx="+str$(atx))
+waitkey

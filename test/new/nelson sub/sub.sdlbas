@@ -1,0 +1,17 @@
+sub mySub(a)
+	if a>5 then
+		exit sub
+	end if
+		prints(str$(a))
+end sub
+
+setDisplay(640,480,32,1)
+ink(rgb(255,255,255))
+pen(rgb(255,255,255))
+cls
+
+
+for x = 1 to 10
+    mySub(x)
+next
+waitkey

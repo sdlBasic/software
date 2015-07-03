@@ -1,0 +1,34 @@
+
+function hexvl(a$)
+   e=asc(ucase$(a$))
+   hexvl=abs(((e>=48 and e<=57)*(e-48))+((e>=65 and e<=70)*(e-55)))
+ end function
+
+function bytefromhexdump(a$,byteadr)
+   i=(byteadr*2)+1
+   m1$=mid$(a$,i,1):m2$=mid$(a$,i+1,1)
+   tmpr=(hexvl(m1$)*16)+hexvl(m2$) 
+   bytefromhexdump=tmpr
+ end function
+
+sub HexdumpPlot(x,y,a$,i,p)
+  for e=0 to (len(a$)/2)-1
+      v=bytefromhexdump(a$,e)
+    for z=0 to 7:ik=p:z2=7-z   
+      if (((int(v/(2^z2)))mod 2) and (2^z2)) then:ik=i:end if
+      ink(ik):dot(x+z,y+e):next:next
+ end sub
+
+xedge=320:yedge=200
+setdisplay(xedge,yedge,32,0):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+for i=0 to 100
+     x=int(rnd((xedge-1)/8))
+     y=int(rnd((yedge-1)/8))
+   hx$="183c3c667ec3c300"
+     HexdumpPlot (x*8,y*8,hx$,0x336699,0x99FF88)
+ next
+
+waitkey(k_esc)
+

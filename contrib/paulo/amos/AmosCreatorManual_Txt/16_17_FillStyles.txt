@@ -1,0 +1,19 @@
+Rem ************************************ 
+Rem *           Fill Styles            * 
+Rem *    Sorry, error in the manual    * 
+Rem *    This is not Example 11.8!     * 
+Rem *         Example 16.17            *     
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Menu$(1)="Patterns "
+Rem Create a bar (default pattern is empty)
+Menu$(1,1)="(BA 100,20)"
+Rem Pattern 1
+Menu$(1,2)="(PA 1)(BA 100,20)"
+Rem Pattern 2
+Menu$(1,3)="(PA 2)(BA 100,20)"
+Rem Pattern 3
+Menu$(1,4)="(PA 3)(BA 100,20)(PA 0)"
+Menu On 
+Direct 

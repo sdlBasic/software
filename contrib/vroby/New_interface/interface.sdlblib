@@ -1,0 +1,1968 @@
+' sdlBasic interface version 3
+'
+'_________________________________________________________________________________________________________________
+
+' INSTRUCTIONS
+'
+' for make a interface program simple use this rutines
+'
+' the scheme of a program is simple:
+' use setnew to set the necessary control
+' use draw for drawing the control in display
+' make a loop cycle (tipicaly with while wend commands)
+' use the rutines waintevent(0 or -1) to wait an event condition
+' use getparam rutine to interrogate the control for event tipically with "if" condition control
+' use setparam and drawobject to change the displayed controls
+'
+' Interface not used callback for simplicity reason
+'
+'
+'
+' i suggest to use the follow rutines:
+
+' newcontrol(type,parent,x,y,w,h,value):set a new control and return the number id
+' destroycontrol(n): destroy the control. Use refresh for deleting the control of display.
+' destroyall : destroy all control
+
+' setnew(n,type,parent,x,y,w,h,value) :set a new interaface element
+' setparam(n,param,value) : set a param with value:and force redrawing
+' getparam(n,param) : return the value of param
+
+' getlist(n,entry) : return the value of entry in list
+' setlist(n,entry,value) : set a list entry with value. Use it for change a value of list element
+' addlist(n,value) : append a list entry with value and update listcount
+' insertlist(n,entry):insert the entry from the list
+' deletelist(n,entry):remove the entry from the list
+' clearlist(n): clear the list
+' sortlist(n)
+
+' drawobject(control): draw a control
+' redrawobject(control) redraw with sync single object
+' draw(): draw all controls set
+' refresh(): redraw all controls
+
+' eventobject(i): check thevents of control.param is the number of the control
+' event(): check all control: return 0 if not found events
+' waitevent(t): wait an event for t cycle. With -1 for ever or event occurred
+
+'_________________________________________________________________________________________________________________
+
+' HISTORY
+'--- from Vroby (0404xx or earlier)
+'--- more implementation trying from vroby (040502)
+'--- more implementation trying from Paulo Silva (040429,040512)
+'--- added list system trying from vroby (040604)
+'--- added listcontrol trying from vroby(040604)
+'--- bug fix of slider control trying from vroby (040605)
+'--- added scrollbar at listcontrol (040606)
+'--- more examples (040607-040609)
+'--- added dialog msgbox and fsell (040619)
+'--- added dialog inputbox (040619)
+'--- added menu control (040620)
+
+'_________________________________________________________________________________________________________________
+
+' TODO
+'--- combo control
+'--- vslider control
+'--- vgauge control
+'--- textarea control
+'--- grid control
+
+'_________________________________________________________________________________________________________________
+
+' COMMON ARRAYS
+common _interface[256,16]:'the array of the control
+common _list[16,0xffff] :'the array of datalist
+common _listcontrol[16]:'the array of controls associate at list objects
+common _listcount[16]: 'the array of listcount (the number of elements in list) properties
+common _listindex[16]: 'the array of first element displayed in a control(for scroll elements)
+'_________________________________________________________________________________________________________________
+
+' PROPERTIES
+common _state=0 :'the state of control used for event and drawing
+common remove=-1,destroy=0,drawing=1,operative=2,clicked=3,activated=4
+
+common _type=1: 'the type of control
+common window=0,frame=1,staticbox=1,label=2,menu=3
+common button=4,textentry=5,textarea=6,check=7
+common radio=8,list=9,combo=10,slider=11,image=12,gauge=13
+
+common _parent=2 : ' the parent of the control (for inclusion in windows frame clipcontrol and other)
+common _x=3,_y=4,_w=5,_h=6 :' coordinates x,y is position w and h the dimension
+common _value=7 : ' the value of the control (can be a title, caption object select and depend of type control)
+
+common _fontsize=8, _backgroundcolor=9, _forecolor=10, _lightcolor=11, _darkcolor=12,_pencolor=13: 'drawing personalization
+
+
+'_________________________________________________________________________________________________________________
+' CONTROL LIMITS
+common first_control=1
+common selected_control=1
+common clicked_control=1
+'_________________________________________________________________________________________________________________
+
+' COLORS
+common _back_col=0xdddddd,_light_col=0xffffff,_dark_col=0,_fore_col=0xaaaaaa
+'_________________________________________________________________________________________________________________
+
+' DEFAULT FONTSIZE
+common _default_font_size=12
+'_________________________________________________________________________________________________________________
+
+
+
+for i=0 to 256:_interface[i,0]=0:next :'reset the array
+'_________________________________________________________________________________________________________________
+
+' Common rutines
+'_________________________________________________________________________________________________________________
+
+'textclip(x,y,w,s,text)
+sub textclip(x,y,w,h,s,txt,pencolor)
+
+	ink(pencolor)
+    imagetemp=textrender(txt,s)
+    if imageexists(imagetemp) then
+	blt(imagetemp,0,0,w-4,imageheight(imagetemp),x+2,y)
+	deleteimage(imagetemp)
+    end if
+end sub
+'_________________________________________________________________________________________________________________
+function glen(t$,size)
+	if len(t$)=0 then : return 0: exit function :end if
+	tmp=textrender(t$,size)
+	l=imagewidth(tmp)
+	deleteimage(tmp)
+	return l
+end function
+'_____________________________________________________________________________________________
+
+function gprint_curs(x,gx,gy,gw,size,testo$,backcolor,pencolor)
+	txt$=testo$
+	ink(backcolor)
+	bar(gx,gy+1,gx+gw,gy+(size*3/2)-3)
+	ink(pencolor)
+	imagetemp=textrender(txt$,size)
+	blt(imagetemp,max(0,glen(left$(txt$,x),size)-gw),0,gw,imageheight(imagetemp),gx,gy)
+	gcur=min(glen(left$(txt$,x),size),gw)
+	if x=0 then: gcur=0:end if
+	line (gx+gcur,gy+3,gx+gcur,gy+imageheight(imagetemp)-3)
+	deleteimage(imagetemp)
+end function
+'_____________________________________________________________________________________________
+
+function gzoneinputs(gx,gy,gw,size,def$,backcolor,pencolor)
+	x=len(def$)
+	txt$=def$
+
+	gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+	do
+		a=inkey
+
+		'move cursor
+		if key(k_left) then
+			x=x-1
+			if x<0 then: x=0 :end if
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while key(k_left)<>0:end while
+			a=0
+		end if
+
+		if key(k_right) then
+			x=x+1
+			if x>len(txt$) then :x=len(txt$):end if
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while key(k_right)<>0:end while
+			a=0
+		end if
+
+		if key(k_end) then
+			x=len(txt$)
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while key(k_end)<>0:end while
+			a=0
+		end if
+
+		if key(k_home) then
+			x=0
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while key(k_home)<>0:end while
+			a=0
+		end if
+
+
+		'hit return
+		if a=13 then
+			exit do
+			a=0
+		end if
+
+		'backdel
+		if key(k_backspace) then
+			if x >0 then
+				if x=len(txt$) then
+					if len(txt$)=1 then
+						txt$=""
+					else
+						txt$= left$(txt$,x-1)
+					end if
+				else
+					txt$= left$(txt$,x-1)+ mid$(txt$,x+1)
+				end if
+				x=x-1
+			end if
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while key(k_backspace):end while
+			a=0
+		end if
+
+		'del
+		if key(k_delete) then
+			if x < len(txt$) then
+				if x=0 then
+					if len(txt$)=1 then
+						txt$=""
+					else
+						txt$= mid$(txt$,x+2)
+					end if
+				else
+					if x=len(txt$)-1 then
+						txt$= left$(txt$,x)
+					else
+						txt$= left$(txt$,x)+ mid$(txt$,x+2)
+					end if
+				end if
+			end if
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while key(k_delete):end while
+			a=0
+		end if
+
+		'carica un carattere
+		if a<>0 then
+			if len(txt$)=x then
+				txt$=txt$+chr$(a)
+			else
+				txt$= left$(txt$,x)+chr$(a)+ mid$(txt$,x+1)
+			end if
+
+			x=x+1
+			gprint_curs(x,gx,gy,gw,size,txt$,backcolor,pencolor)
+			while inkey=a:end while
+			a=0
+		end if
+	loop
+	return txt$
+
+end function
+
+
+
+' GET / SET
+' the rutines for param controll access
+'_________________________________________________________________________________________________________________
+
+' getparam(n,param) : return the value of param
+function getparam(n,param)
+    return _interface[n,param]
+end function
+'_________________________________________________________________________________________________________________
+
+' was(control,event) : return 1 if the event is occurred
+function was(control,event)
+    if getparam(control,state)=event then
+	return 1
+    else
+	return 0
+    end if
+end function
+'_________________________________________________________________________________________________________________
+
+' setparam(n,param,value) : set a param with value:and force redrawing
+sub setparam(n,param,value)
+    _interface[n,param]=value
+    if param<>_state and _interface[n,_state]=operative then :	_interface[n,_state]=drawing:end if
+end sub
+'_________________________________________________________________________________________________________________
+
+
+' GETLIST / SETLIST
+' the rutines for manage lists data
+'_________________________________________________________________________________________________________________
+
+' setlistbind(n) : set a first list free to control n
+function setListBind(n)
+    for il =0 to 16
+	if _listcontrol[il]=0 then
+	    _listcontrol[il]=n
+	    _listcount[il]=0
+	    _listindex[il]=0
+
+	    return il
+	    exit function
+	end if
+    next
+    return -1
+end function
+'_________________________________________________________________________________________________________________
+
+' setlistunbind(n) : remove list bind to control n
+function setListUnbind(n)
+    for il =0 to 16
+	if _listcontrol[il]=n then
+	    _listcontrol[il]=0
+	    _listcount[il]=0
+	    _listindex[il]=0
+	    return il
+	    exit function
+	end if
+    next
+    return -1
+end function
+'_________________________________________________________________________________________________________________
+
+' getlistbind(n) : get a list asociates
+function getlistbind(n)
+    for il =0 to 16
+	if val(_listcontrol[il])=n then
+	    return il
+	    exit function
+	end if
+    next
+    return -1
+end function
+'_________________________________________________________________________________________________________________
+
+' getlist(n,entry) : return the value of entry in list
+function getlist(n,entry)
+    return _list[getlistbind(n),entry]
+end function
+'_________________________________________________________________________________________________________________
+
+' setlist(n,entry,value) : set a list entry with value
+sub setlist(n,entry,value)
+    _list[getlistbind(n),entry]=value
+end sub
+'_________________________________________________________________________________________________________________
+
+' addlist(n,value) : append a list entry with value and update listcount
+sub addlist(n,value)
+    l=getlistbind(n)
+    _list[l,_listcount[l]]=value
+    _listcount[l]+=1
+end sub
+'_________________________________________________________________________________________________________________
+
+' insertlist(n,entry):insert the entry from the list
+sub insertlist(n,entry,value)
+    l=getlistbind(n)
+    for idl =_listcount[l] to entry step -1
+	_list[l,idl]=_list[l,idl-1]
+    next
+    _listcount[l]+=1
+    _list[l,entry]=value
+end sub
+'_________________________________________________________________________________________________________________
+
+' deletelist(n,entry):remove the entry from the list
+sub deletelist(n,entry)
+    l=getlistbind(n)
+    for idl =entry to _listcount[l] -2
+	_list[l,idl]=_list[l,idl+1]
+    next
+    _listcount[l]-=1
+end sub
+
+'_________________________________________________________________________________________________________________
+
+' clearlist(n): clear the list
+sub clearlist(n)
+    l=getlistbind(n)
+    _listcount[l]=0
+    _listindex[l]=0
+end sub
+
+'_________________________________________________________________________________________________________________
+
+' sortlist(n): resort the list
+sub sortlist(n)
+    l=getlistbind(n)
+
+    for s1 = 0 to _listcount[l]-1
+	for s2 = s1 to _listcount[l]-1
+	    if _list[l,s1]>_list[l,s2] then
+		stemp=_list[l,s1]
+		_list[l,s1]=_list[l,s2]
+		_list[l,s2]=stemp
+	    end if
+	next
+    next
+
+end sub
+
+
+'_________________________________________________________________________________________________________________
+' CONTROLS RUTINES
+' for make and destroy controls of interface
+'_________________________________________________________________________________________________________________
+
+' setnew(n,type,parent,x,y,w,h,value) :set a new interaface element
+sub setnew(n,type,parent,x,y,w,h,value)
+    _interface[n,_state]=1 'state default is 1 -1 =destroy
+    _interface[n,_type]=type
+    _interface[n,_parent]=parent
+    _interface[n,_x]=x
+	_interface[n,_y]=y
+    _interface[n,_w]=w
+	_interface[n,_h]=h
+    _interface[n,_value]=value
+    _interface[n,_fontsize]=_default_font_size
+    _interface[n,_backgroundcolor]=_back_col
+    _interface[n,_forecolor]=_fore_col
+    _interface[n,_lightcolor]=_light_col
+    _interface[n,_darkcolor]=_dark_col
+    _interface[n,_pencolor ]=_dark_col
+
+    'automatic bindlisting
+    if type=list then :setlistbind(n):end if
+    if type=menu then :setlistbind(n):_interface[n,_state]=0:end if
+end sub
+'_________________________________________________________________________________________________________________
+
+'newcontrol(type,parent,x,y,w,h,value): set a new controls in array interface. return the number of control
+function newcontrol(type,parent,x,y,w,h,value)
+     for i= first_control to 255
+	 if _interface[i,0]=0 and _interface[i,_type]<>menu then
+	     setnew(i,type,parent,x,y,w,h,value)
+	     return i
+	     exit function
+	 end if
+    next
+    return -1
+end function
+'_________________________________________________________________________________________________________________
+
+' destroycontrol(n): destroy the control. Use refresh for deleting the control of display.
+sub destroycontrol(n)
+    _interface[n,_state]=-1
+    drawobject(n)
+    _interface[n,0]=0
+    _interface[n,_type]=0
+end sub
+'_________________________________________________________________________________________________________________
+
+' destroyall : destroy all control
+sub destroyall
+    for i =0 to 256
+	_interface[i,0]=0
+	_interface[i,_type]=0
+    next
+end sub
+
+'_________________________________________________________________________________________________________________
+
+
+' DRAWING SYSTEM
+' drawing system use many routines that provides to draw respective element
+' in a specific state drawobject set the relative coordinate of parent object
+' and select the appropriate draw routine draw write all elements
+' refresh rewrite all elements in current state
+'_________________________________________________________________________________________________________________
+
+' draw_window(control,state,x,y,w,h,value): draw a window control
+sub draw_window(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+	if state=1 then
+		ink(forecolor): bar(x,y,x+w,y+h)
+		ink(backgroundcolor): bar(x+5,y+fontsize+5,x+w-5,y+h-5)
+		textclip(x+10,y,320,h,fontsize,value,pencolor)
+		ink(darkcolor):box(x+5,y+fontsize+5,x+w-5,y+h-5): box(x-1,y-1,x+w+1,y+h+1):
+
+		state=2
+	end if
+end sub
+'_________________________________________________________________________________________________________________
+
+' draw_staticbox(control,state,x,y,w,h,value): draw staticbox and frame control
+sub draw_staticbox(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+	if state=1 then
+		ink(backgroundcolor):bar(x,y+(fontsize/2),x+w,y+h)
+		ink(darkcolor): box(x,y+(fontsize/2),x+w,y+h)
+		'ink(lightcolor):box(x+1,y+1,x+w+1,y+h+1)
+		ink(backgroundcolor):vl=glen(value+" ",fontsize): bar(x+10,y,x+10+vl+8,y+fontsize)
+		textclip(x+14,y,w,h,fontsize,value,pencolor)
+		state=2
+    end if
+  end sub
+'_________________________________________________________________________________________________________________
+
+' draw_label(control,state,x,y,w,h,value): draw a label control
+sub draw_label(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+	h=fontsize+2:setparam(control,_h,h)
+
+
+   if state=1 then
+       ink(backgroundcolor): bar(x,y,x+w,y+h)
+       textclip(x+2,y,w,h,fontsize,value,pencolor)
+	state=2
+   end if
+   if state=3 then
+	state=4
+    end if
+end sub
+'_________________________________________________________________________________________________________________
+
+' draw_menu(control,state,x,y,w,h,value) draw a bar similar to list but the default state is 0
+sub draw_menu(control,state,x,y,w,h,value)
+'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+    l=getlistbind(control)
+
+    if state=-1 then
+		pasteicon(x,y,16000+1+control)
+		state=0
+    end if
+
+    if state>2 then :state=1:end if
+
+    if state=1 then
+		'vertical resize to menu item
+	    h=_listcount[l]*(fontsize)+2:setparam(control,_h,h)
+
+		if imageexists( 16000+1+control) then
+			pasteicon(x,y,16000+1+control)
+		end if
+		grab(16000+1+control,x,y,w+2,h+2)
+
+		if value <0 then :value=0 :end if
+		ink(backgroundcolor): bar(x,y,x+w,y+h)
+		for ild1 = _listindex[l] to _listcount[l]-1
+			ild=ild1-_listindex[l]
+			if ild1 = value then
+				ink(darkcolor): bar(x+2,y+(ild*fontsize+1),x+w,y+(ild*fontsize+1)+fontsize)
+				textclip(x+2,y+(ild*fontsize)-2,w,h,fontsize,_list[ l ,ild1 ],lightcolor)
+			else
+				ink(lightcolor): bar(x+2,y+(ild*fontsize+1),x+w,y+(ild*fontsize+1)+fontsize)
+				textclip(x+2,y+(ild*fontsize)-2,w,h,fontsize,_list[ l ,ild1 ],pencolor)
+			end if
+		next
+		ink(darkcolor): box(x,y,x+w,y+h)
+		state=2
+    end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+' draw_button(control,state,x,y,w,h,value): draw a control button
+sub draw_button(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+   if state=1 then
+       ink(forecolor): bar(x,y,x+w,y+h)
+       ink(lightcolor): box(x+1,y+1,x+w+1,y+h+1)
+       ink(darkcolor):  box(x,y,x+w,y+h)
+       textclip(x+2,y+(h/2)-(fontsize*2/3),w,h,fontsize,value,pencolor)
+	state=2
+   end if
+   if state=3 then
+       ink(backgroundcolor): bar(x,y,x+w,y+h)
+       ink(darkcolor): line(x,y,x+w,y):line(x,y,x,y+h)
+       ink(lightcolor):  line(x+w,y+h,x+w,y):line(x+w,y+h,x,y+h)
+       textclip(x+2,y+(h/2)-(fontsize*2/3),w,h,fontsize,value,pencolor)
+	state=4
+   end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+' draw_textentry(control,state,x,y,w,h,value): draw a textentry control (only one rows)
+sub draw_textentry(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+	if h<fontsize+6 then:	h=fontsize+6:setparam(control,_h,h) :end if
+
+
+   if state=1 then
+       ink(lightcolor): bar(x,y,x+w,y+h)
+       ink(darkcolor): box(x,y,x+w,y+h)
+       ink(darkcolor): textclip(x+2,y,w,h,fontsize,value,pencolor)
+	state=2
+    end if
+end sub
+'_________________________________________________________________________________________________________________
+
+' draw_textarea(control,state,x,y,w,h,value): NOT IMPLEMENTED
+sub draw_textarea(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+   if state=1 then
+       ink(lightcolor): bar(x,y,x+w,y+h)
+       ink(darkcolor): line(x,y,x+w,y):line(x,y,x,y+h)
+       ink(darkcolor):  line(x+w,y+h,x+w,y):line(x+w,y+h,x,y+h)
+       ink(darkcolor): textclip(x+2,y,w,h,fontsize,value,pencolor)
+	state=2
+    end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+' draw_check(control,state,x,y,w,h,value): draw a check control(value is a caption for veriyfy you must
+' use thee state property)
+sub draw_check(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+	h=fontsize+1:setparam(control,_h,h)
+	w=(fontsize*3/2)+glen(value,fontsize)+1::setparam(control,_w,w)
+
+	if state=1 then
+		ink(backgroundcolor): bar(x,y,x+w,y+h)
+		ink(lightcolor)
+        line(x+fontsize,y+fontsize,x+fontsize,y):line(x+fontsize,y+fontsize,x,y+fontsize)
+		ink(darkcolor)
+        line(x,y,x+fontsize,y):line(x,y,x,y+fontsize)
+        textclip(x+(fontsize*3/2),y-1,w,h,fontsize,value,pencolor)
+        state=2
+    end if
+    if state=3 then
+		ink(backgroundcolor): bar(x,y,x+w,y+h)
+		ink(lightcolor)
+        line(x+fontsize,y+fontsize,x+fontsize,y):line(x+fontsize,y+fontsize,x,y+fontsize)
+		ink(darkcolor)
+        line(x,y,x+fontsize,y):line(x,y,x,y+fontsize)
+		ink(pencolor)
+		line(x+(fontsize/4),y+(fontsize/2),x+(fontsize/2),y+(fontsize*5/6)):line(x+(fontsize/2),y+(fontsize*3/4),x+(fontsize*5/6),y+(fontsize/4))
+        line(x+(fontsize/6),y+(fontsize/2),x+(fontsize/2),y+(fontsize*5/6)):line(x+(fontsize/2),y+(fontsize*4/4),x+(fontsize*3/4),y+(fontsize/4))
+        textclip(x+(fontsize*3/2),y-1,w,h,(fontsize),value,pencolor)
+        state=4
+	end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+' draw_radio(control,state,x,y,w,h,value):draw a radio button At this time you can't create only one
+' series of radio controls)
+sub draw_radio(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+	h=fontsize+1:setparam(control,_h,h)
+	w=(fontsize*3/2)+glen(value,fontsize)+1::setparam(control,_w,w)
+
+	if state=1 then
+		ink(backgroundcolor)
+		bar(x,y,x+w,y+h)
+		ink(lightcolor)
+		line(x+fontsize,y+(fontsize*3/4),x+fontsize,y+(fontsize/4)):line(x+(fontsize*3/4),y+fontsize,x+(fontsize/4),y+fontsize)
+		line(x+fontsize,y+(fontsize*3/4),x+(fontsize*3/4),y+fontsize)
+		ink(darkcolor)
+		line(x+(fontsize/4),y,x+(fontsize*3/4),y):line(x,y+(fontsize/4),x,y+(fontsize*3/4))
+		dot(x+1,y+2):dot(x+2,y+1)
+		textclip(x+(fontsize*3/2),y-1,w,h,fontsize,value,pencolor)
+		state=2
+	end if
+	if state=3 then
+		ink(backgroundcolor)
+		bar(x,y,x+w,y+h)
+		ink(lightcolor)
+		line(x+fontsize,y+(fontsize*3/4),x+fontsize,y+(fontsize/4)):line(x+(fontsize*3/4),y+fontsize,x+(fontsize/4),y+fontsize)
+		line(x+fontsize,y+(fontsize*3/4),x+(fontsize*3/4),y+fontsize)
+		ink(darkcolor)
+		line(x+(fontsize/4),y,x+(fontsize*3/4),y):line(x,y+(fontsize/4),x,y+(fontsize*3/4))
+		dot(x+1,y+2):dot(x+2,y+1)
+		fillcircle(x+(fontsize/2),y+(fontsize/2),(fontsize/3))
+		textclip(x+20,y-1,w,h,fontsize,value,pencolor)
+		state=4
+	end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+'draw_list(control,state,x,y,w,h,value): draw a list control
+sub draw_list(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+    l=getlistbind(control)
+
+    if state>2 then :state=1:end if
+
+
+    if state=1 then
+
+	' if scrollbar then width is width-10 to not ovrwrite scroolbar when refresh
+		if _listcount[l]>(int(h/fontsize)) then
+			w=w-fontsize
+		end if
+	    ink(lightcolor): bar(x,y,x+w,y+h)
+
+
+		for ild1 = _listindex[l] to min(_listindex[l]+int(h/fontsize)-1,_listcount[l]-1)
+			ild=ild1-_listindex[l]
+			if ild1 = value then
+				ink(darkcolor): bar(x+2,y+(ild*fontsize),x+w,y+(ild*fontsize)+fontsize)
+				textclip(x+2,y+(ild*fontsize)-2,w,h,fontsize,_list[ l ,ild1 ],lightcolor)
+			else
+				ink(lightcolor): bar(x+2,y+(ild*fontsize),x+w,y+(ild*fontsize)+fontsize)
+				textclip(x+2,y+(ild*fontsize)-2,w,h,fontsize,_list[ l ,ild1 ],pencolor)
+			end if
+		next
+
+		if _listcount[l]>(int(h/fontsize)) then
+			w=w+fontsize
+			ink(backgroundcolor)
+			bar (x+w-fontsize,y,x+w,y+h)
+			ink(darkcolor)
+			line (x+w-fontsize,y,x+w,y):line (x+w-fontsize,y,x+w-fontsize,y+h)
+			ink(lightcolor)
+			line (x+w-fontsize,y+h,x+w,y+h):line (x+w,y,x+w,y+h)
+
+			ink(backgroundcolor)
+			bar(x+w-fontsize+1,y+1,x+w-1,y+fontsize)
+			ink(lightcolor)
+			line(x+w-fontsize+1,y+1,x+w-1,y+1):line(x+w-fontsize+1,y+1,x+w-fontsize+1,y+fontsize)
+			ink(darkcolor)
+			line(x+w-1,y+1,x+w-1,y+fontsize):line(x+w-fontsize+1,y+fontsize,x+w-1,y+fontsize)
+			'- draw uptriangle
+
+			ink(backgroundcolor)
+			bar(x+w-fontsize+1,y+h-fontsize,x+w-1,y+h-1)
+			ink(lightcolor)
+			line(x+w-fontsize+1,y+h-fontsize,x+w-1,y+h-fontsize):line(x+w-fontsize+1,y+h-fontsize,x+w-fontsize+1,y+h-1)
+			ink(darkcolor)
+			line(x+w-1,y+h-fontsize,x+w-1,y+h-1):line(x+w-fontsize+1,y+h,x+w-1,y+h-1)
+			'- draw downtriangle
+
+			'- bug: this slider handle goes a bit far from limit
+			sldx1=x+w-fontsize+1
+			sldx2=x+w-1
+			sldy1=y+1+fontsize+(_listindex[l]*(h-(fontsize*2))/_listcount[l])
+			sldy2=sldy1+max(int((h-(fontsize*2))*(h/fontsize)/_listcount[l])-2,1)
+			ink(backgroundcolor)
+			bar(sldx1,sldy1,sldx2,sldy2)
+			ink(lightcolor)
+			line(sldx1,sldy1,sldx2,sldy1):line(sldx1,sldy1,sldx1,sldy2)
+			ink(darkcolor)
+			line(sldx2,sldy1,sldx2,sldy2):line(sldx1,sldy2,sldx2,sldy2)
+		end if
+		ink(darkcolor): box(x,y,x+w,y+h)
+		state=2
+    end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+'draw_combo(control,state,x,y,w,h,value): NOT IMPLEMENTED
+sub draw_combo(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+ end sub
+'_________________________________________________________________________________________________________________
+
+'draw_slider(control,state,x,y,w,h,value): draw a slider control value can be in range 0-100
+sub draw_slider(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+
+	if state=1 then
+		if h<8 then :h=8:setparam(control,_h,h): end if
+		ink(backgroundcolor): bar(x-2,y,x+w+2,y+h+1)
+		ink(darkcolor): line(x,y+(h/2)-1,x+w,y+(h/2)-1):line(x,y+(h/2),x,y+(h/2)+1)
+		ink(lightcolor):  line(x+w,y+(h/2)-1,x+w,y+(h/2)+1):line(x,y+(h/2)+1,x+w,y+(h/2)+1)
+		v=(value*100)/w
+		ink(backgroundcolor): bar(x+v-2,y,x+v+2,y+h)
+		ink(lightcolor):line(x+v-2,y,x+v+2,y):line(x+v-2,y+0,x+v-2,y+h)
+		ink(darkcolor): line(x+v-2,y+h,x+v+2,y+h):line(x+v+2,y+0,x+v+2,y+h)
+		state=2
+    end if
+ end sub
+'_________________________________________________________________________________________________________________
+
+' draw_gauge(control,state,x,y,w,h,value): draw a gauge control value can be in range 0-100
+sub draw_gauge(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+	h=fontsize:setparam(control,_h,h)
+
+
+    if state=1 then
+		ink(backgroundcolor):bar(x,y,x+w,y+fontsize)
+		ink(lightcolor):line(x,y+fontsize,x+w,y+fontsize):line(x+w,y,x+w,y+fontsize)
+		ink(darkcolor)
+		line(x,y,x+w,y):line(x,y,x,y+fontsize)
+		bar(x+2,y+2,x+2+((w*value)/100),y+h)
+		state=2
+    end if
+  end sub
+'_________________________________________________________________________________________________________________
+
+' draw_image(control,state,x,y,w,h,value): draw a image control value is the path of a picture
+'if you set h =0 the border is not draw
+sub draw_image(control,state,x,y,w,h,value)
+	'get other properties
+	fontsize=_interface[control,_fontsize]
+	backgroundcolor=_interface[control,_backgroundcolor]
+	forecolor=_interface[control,_forecolor]
+	lightcolor=_interface[control,_lightcolor]
+	darkcolor=_interface[control,_darkcolor]
+	pencolor=_interface[control,_pencolor]
+
+    imagetemp=16000
+    border=1
+    if state=1 then
+		if fileexists(value) then
+			loadimage(value,imagetemp)
+			zx= (w-2) / imagewidth(imagetemp)
+			zoomimage(imagetemp,zx,zx)
+			if h=0 then : border=0 :else : border=1:end if
+			if h<imageheight(imagetemp)+2 and border=1 then
+			zy= (h-2) / imageheight(imagetemp)
+			zoomimage(imagetemp,zy,zy)
+			end if
+		end if
+		if border=1 then
+			ink(backgroundcolor): bar(x,y,x+w,y+h)
+			ink(lightcolor): line(x,y+h,x+w,y+h):line(x+w,y,x+w,y+h)
+			ink(darkcolor):	line(x,y,x+w,y):line(x,y,x,y+h)
+		end if
+
+		if fileexists(value) then
+			pasteicon(x+2,y+2,imagetemp)
+		end if
+	state=2
+    end if
+  end sub
+'_________________________________________________________________________________________________________________
+
+' drawobject(control): draw a control
+sub drawobject(control)
+    if _interface[control,_state]<>2 then
+    'and _interface[control,_state]<>0 then
+
+	'SETPARENT
+	parent=_interface[control,_parent]
+	if parent<>-1 and parent <> control then
+	    x=_interface[control,_x]+_interface[parent,_x]
+	    y=_interface[control,_y]+_interface[parent,_y]
+	    w=_interface[control,_w]
+	    h=_interface[control,_h]
+	    value=_interface[control,_value]
+
+	    oldparent=_interface[parent,_parent]
+	    if oldparent<>-1 and oldparent <> parent then
+		x=x+_interface[oldparent,_x]
+		y=y+_interface[oldparent,_y]
+	    end if
+
+	else
+	    x=_interface[control,_x]
+	    y=_interface[control,_y]
+	    w=_interface[control,_w]
+	    h=_interface[control,_h]
+	    value=_interface[control,_value]
+	end if
+
+	'WlNDOW
+	if _interface[control,_type]=window then
+	    draw_window(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'FRAME STATICBOX
+	if _interface[control,_type]=staticbox then
+	    draw_staticbox(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'BUTTON
+	if _interface[control,_type]=button then
+	    draw_button(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'MENU
+	if _interface[control,_type]=menu then
+	    draw_menu(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'LABEL
+	if _interface[control,_type]=label then
+	    draw_label(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'TEXTENTRY
+	if _interface[control,_type]=textentry then
+	    draw_textentry(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'CHECK
+	if _interface[control,_type]=check then
+	    draw_check(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'RADIO
+	if _interface[control,_type]=radio then
+	    draw_radio(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'SLIDER
+	if _interface[control,_type]=slider then
+	    draw_slider(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'TEXTAREA
+	if _interface[control,_type]=textarea then
+	    draw_textarea(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'GAUGE
+	if _interface[control,_type]=gauge then
+	    draw_gauge(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'IMAGE
+	if _interface[control,_type]=image then
+	    draw_image(control,_interface[control,_state],x,y,w,h,value)
+	end if
+
+	'LIST
+	if _interface[control,_type]=list then
+	    draw_list(control,_interface[control,_state],x,y,w,h,value)
+	end if
+    end if
+end sub
+'_________________________________________________________________________________________________________________
+
+'redrawobject(control) redraw with sync single object
+sub redrawobject(control)
+    autoback(0)
+    drawobject(control)
+    screenswap
+    autoback(25)
+end sub
+'_________________________________________________________________________________________________________________
+
+' draw(): draw all controls set
+sub draw
+    for i =first_control to 256
+	drawobject(i)
+    next
+ end sub
+'_________________________________________________________________________________________________________________
+
+' refresh(): redraw all controls
+sub refresh
+    autoback(0)
+    screenswap
+    for i =first_control to 256
+	if _interface[i,_state]=4 then
+	    _interface[i,_state]=3
+	else
+	    if _interface[i,_state]>0 then
+		 _interface[i,_state]=1
+	    end if
+	end if
+	drawobject(i)
+    next
+    screenswap
+    autoback(25)
+ end sub
+'_________________________________________________________________________________________________________________
+
+' EVENT SYSTEM
+' Event system provide to verify all object event
+' At this time not work well and doesn't optimizes routine
+' The logic is similar to drawing system
+'_________________________________________________________________________________________________________________
+
+' event_window(control,state,x,y,w,h,value): check the specific windows events
+function event_window(control,state,x,y,w,h,value)
+
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				'clicked_control=control
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_menu(control,state,x,y,w,h,value): check the menu controls events
+function event_menu(control,state,x,y,w,h,value)
+	fontsize=_interface[control,_fontsize]
+
+    l=getlistbind(control) :'find the list associate at control
+
+   if state=3 then
+	state=1
+	redrawobject(control)
+    end if
+
+   if state=4 then
+	state=1
+	redrawobject(control)
+    end if
+
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				value=int((ymousescreen(screen)-y) /fontsize)+_listindex[l]
+				setparam(control,_value,value)
+				redrawobject(control)
+				'while bmouse:end while
+				state=4
+				return 4
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				setparam(control,_value,value)
+				redrawobject(control)
+				while key(k_return):waitvbl:end while
+				state=4
+				return 4
+				exit function
+			end if
+			if key(k_up) then
+				value-=1
+				if value <0 then:value=0:end if
+				setparam(control,_value,value)
+				while key(k_up):end while
+				state=3
+				redrawobject(control)
+			end if
+			if key(k_down) then
+				value+=1
+				if value > _listcount[l] -1 then :value=_listcount[l]-1 : end if
+				setparam(control,_value,value)
+				while key(k_down):end while
+				state=3
+				redrawobject(control)
+			end if
+		end if
+
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_button(control,state,x,y,w,h,value): check the specific buttons events
+function event_button(control,state,x,y,w,h,value)
+    if state=4 then
+	state=1
+	redrawobject(control)
+    end if
+
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_label(control,state,x,y,w,h,value): check the label events
+function event_label(control,state,x,y,w,h,value)
+
+    if state=4 then
+		state=1
+		redrawobject(control)
+    end if
+
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_textentry(control,state,x,y,w,h,value): check the textentry events
+function event_textentry(control,state,x,y,w,h,value)
+
+    if state=4 then
+		state=1
+		redrawobject(control)
+    end if
+
+    if state=3 then
+		state=1
+		redrawobject(control)
+    end if
+
+
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				state=3
+				fontsize=_interface[control,_fontsize]
+				light_color=_interface[control,_lightcolor]
+				pen_color=_interface[control,_pen_color]
+				mousehide
+				value=gzoneinputs(x+2,y,w-4,fontsize,value,light_color,pen_color)
+				while key(k_return)<>0:end while
+				mouseshow
+				setparam(control,_value,value)
+				state=4
+				redrawobject(control)
+				return 4
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				while key(k_return)<>0:end while
+				state=3
+				fontsize=_interface[control,_fontsize]
+				light_color=_interface[control,_lightcolor]
+				pen_color=_interface[control,_pen_color]
+				mousehide
+				value=gzoneinputs(x+2,y,w-4,fontsize,value,light_color,pen_color)
+				while key(k_return)<>0:end while
+				mouseshow
+				setparam(control,_value,value)
+				state=4
+				redrawobject(control)
+				return 4
+				exit function
+			end if
+		end if
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_check(control,state,x,y,w,h,value): check the check controls events
+function event_check(control,state,x,y,w,h,value)
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				state=3
+				setparam(control,_state,3)
+				redrawobject(control)
+				while bmouse <>0:end while
+				return 3
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				state=3
+				setparam(control,_state,3)
+				redrawobject(control)
+				while key(k_return)<>0:end while
+				return 3
+				exit function
+			end if
+		end if
+
+    end if
+
+    if state=4 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				state=1
+				setparam(control,_state,1)
+				redrawobject(control)
+				while bmouse <>0:end while
+				return 1
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				state=1
+				setparam(control,_state,1)
+				redrawobject(control)
+				while key(k_return) <>0:end while
+				return 1
+				exit function
+			end if
+		end if
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_radio(control,state,x,y,w,h,value): check the radio controls events
+function event_radio(control,state,x,y,w,h,value)
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				state=3
+				redrawobject(control)
+				for i1 =0 to 256
+					if _interface[i1,_type]=radio and _interface[i1,_state]=activated and i1<>control then
+						_interface[i1,_state]=1:redrawobject(i1)
+					end if
+				next
+				return 3
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				state=3
+				redrawobject(control)
+				for i1 =0 to 256
+					if _interface[i1,_type]=radio and _interface[i1,_state]=activated and i1<>control then
+						_interface[i1,_state]=1:redrawobject(i1)
+					end if
+				next
+				return 3
+				exit function
+			end if
+		end if
+
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_slider(control,state,x,y,w,h,value): check the slider controls events
+function event_slider(control,state,x,y,w,h,value)
+    if state=3 then
+		state=1
+		redrawobject(control)
+    end if
+
+    if state=2 then
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				value=(xmouse()-x) *w/100
+				setparam(control,_value,value)
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				'value=(xmouse()-x) *w/100
+				setparam(control,_value,value)
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+			if key(k_left) then
+				value-=1
+				if value < 0 then :value=0: end if
+				setparam(control,_value,value)
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+
+			if key(k_right) then
+				value+=1
+				if value > 100 then :value=100: end if
+				setparam(control,_value,value)
+				state=3
+				redrawobject(control)
+				return 3
+				exit function
+			end if
+
+
+		end if
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event_list(control,state,x,y,w,h,value): check the list controls events
+function event_list(control,state,x,y,w,h,value)
+	fontsize=_interface[control,_fontsize]
+
+    l=getlistbind(control) :'find the list associate at control
+
+	if state=3 then
+		state=1
+		redrawobject(control)
+    end if
+
+	if state=4 then
+		state=1
+		redrawobject(control)
+    end if
+
+
+
+    if state=2 then
+		if mousezone(x+w-fontsize,y,fontsize,fontsize)and bmouse=1 then
+				clicked_control=control
+			_listindex[l]-=1
+			if _listindex[l]<0 then :_listindex[l]=0:end if
+			redrawobject(control)
+			state=3
+			return 3
+			exit function
+		end if
+
+
+		if mousezone(x+w-fontsize,y+h-fontsize,fontsize,fontsize)and bmouse=1 then
+				clicked_control=control
+			_listindex[l]+=1
+			if _listindex[l]>(_listcount[l]-int(h/fontsize)) then :_listindex[l]=(_listcount[l]-int(h/fontsize)):end if
+			redrawobject(control)
+			state=3
+			return 3
+			exit function
+		end if
+
+		if mousezone(x+w-fontsize,y+fontsize,fontsize,h-fontsize)and bmouse=1 then
+				clicked_control=control
+			_listindex[l]=int(((ymousescreen(screen)-(y+fontsize))*_listcount[l])/(h-(fontsize*2)))
+			if _listindex[l]>(_listcount[l]-int(h/fontsize)) then :_listindex[l]=(_listcount[l]-int(h/fontsize)):end if
+			redrawobject(control)
+			state=3
+			return 3
+			exit function
+		end if
+
+		if mousezone(x,y,w,h)then
+			if bmouse=1 then
+				clicked_control=control
+				value=int((ymousescreen(screen)-y)/fontsize)+_listindex[l]
+				setparam(control,_value,value)
+				redrawobject(i)
+				state=4
+				return 4
+				exit function
+			end if
+		end if
+		if control=selected_control then
+			if key(k_return) then
+				'value=int((ymousescreen(screen)-y)/fontsize)+_listindex[l]
+				setparam(control,_value,value)
+				redrawobject(i)
+				state=4
+				return 4
+				exit function
+			end if
+			if key(k_up) then
+				value-=1
+				if value<0 then :value=0:end if
+				if value<_listindex[l] then : _listindex[l]-=1 :end if
+				setparam(control,_value,value)
+				redrawobject(i)
+				state=3
+				return 3
+				exit function
+			end if
+			if key(k_down) then
+				value+=1
+				if value>_listcount[l]-1 then :value=_listcount[l]-1:end if
+				if value>_listindex[l]+int(h/fontsize)-1 then : _listindex[l]+=1 :end if
+				setparam(control,_value,value)
+				redrawobject(i)
+				state=3
+				return 3
+				exit function
+			end if
+		end if
+
+
+    end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' eventobject(i): check thevents of control.param is the number of the control
+function eventobject(i)
+      	'SETPARENT
+	parent=_interface[i,_parent]
+	if Parent<>-1 and parent <> i then
+	    x=_interface[i,_x]+_interface[parent,_x]
+	    y=_interface[i,_y]+_interface[parent,_y]
+	    w=_interface[i,_w]
+	    h=_interface[i,_h]
+	    value=_interface[i,_value]
+
+	    oldparent=_interface[parent,_parent]
+	    if oldparent<>-1 and oldparent <> parent then
+		x=x+_interface[oldparent,_x]
+		y=y+_interface[oldparent,_y]
+	    end if
+
+	else
+	    x=_interface[i,_x]
+	    y=_interface[i,_y]
+	    w=_interface[i,_w]
+	    h=_interface[i,_h]
+	    value=_interface[i,_value]
+	end if
+
+	'WINDOW
+	if _interface[i,_type]=window then
+	    return event_window(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'MENU
+	if _interface[i,_type]=menu then
+	    return event_menu(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'BUTTON
+	if _interface[i,_type]=button then
+	    return event_button(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'LABEL
+	if _interface[i,_type]=label then
+	    return event_label(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'TEXTENTRY
+	if _interface[i,_type]=textentry then
+	    return event_textentry(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'CHECK
+	if _interface[i,_type]=check then
+	    return event_check(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'RADIO
+	if _interface[i,_type]=radio then
+	    return event_radio(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'SLIDER
+	if _interface[i,_type]=slider then
+	    return event_slider(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+
+	'LIST
+	if _interface[i,_type]=list then
+	    return event_list(i,_interface[i,_state],x,y,w,h,value)
+	    exit function
+	end if
+    return 0
+end function
+'_________________________________________________________________________________________________________________
+
+' event(): check all control: return 0 if not found events
+function event
+    x=0
+	'if selected_control<first_control then: selected_control=first_control:end if
+    for i =first_control to 256
+		if getparam(i,_state)>0 then
+			if i=selected_control  then
+
+				parent=_interface[i,_parent]
+				if Parent<>-1 and parent <> i then
+					x=_interface[i,_x]+_interface[parent,_x]
+					y=_interface[i,_y]+_interface[parent,_y]
+					w=_interface[i,_w]
+					h=_interface[i,_h]
+					value=_interface[i,_value]
+
+					oldparent=_interface[parent,_parent]
+					if oldparent<>-1 and oldparent <> parent then
+						x=x+_interface[oldparent,_x]
+						y=y+_interface[oldparent,_y]
+					end if
+				else
+					x=_interface[i,_x]
+					y=_interface[i,_y]
+					w=_interface[i,_w]
+					h=_interface[i,_h]
+					value=_interface[i,_value]
+				end if
+				ink(0xff0000): box(x,y,x+w, y+h )
+			end if
+
+			if key(k_tab) then
+				if key(k_rshift) or key(k_lshift)  then
+					do
+						selected_control-=1
+						if getparam(selected_control,_state)=2 then :exit do :end if
+						if selected_control <first_control then: selected_control=255 :end if
+					loop
+					while (key(k_tab)<>0):waitvbl: end while
+					clicked_control=selected_control
+					refresh()
+				else
+					do
+						selected_control+=1
+						if getparam(selected_control,_state)=2 then :exit do :end if
+						if selected_control >255 then: selected_control=first_control :end if
+					loop
+					while (key(k_tab)<>0):waitvbl: end while
+					clicked_control=selected_control
+					refresh()
+				end if
+			end if
+
+			if clicked_control<>selected_control  then
+				selected_control=clicked_control
+				refresh()
+			end if
+		end if
+		x=x+eventobject(i)
+    next
+    waitvbl
+    return x
+ end function
+'_________________________________________________________________________________________________________________
+
+' waitevent(t): wait an event for t cycle. With -1 for ever or event occurred
+sub waitevent(t)
+    'refresh
+    while 0=0
+	if event() <> 0 then :exit while:end if
+	if t=0 then :exit while:end if
+	t-=1
+    end while
+end sub
+
+'_________________________________________________________________________________________________________________
+'hide menu
+
+sub hidemenu(menucontrol)
+    setparam(menucontrol,_state,-1)
+    drawobject(menucontrol)
+end sub
+
+'_________________________________________________________________________________________________________________
+
+'getmenu(menu): wait specific event menu and block others control if click out of control menu will be disabled
+'return menu entry selected
+
+function getmenu(menucontrol)
+    gm=""
+    setparam(menucontrol,_state,1)
+    setparam(menucontrol,_value,0)
+	selected_control=menucontrol
+	redrawobject(menucontrol)
+	while key(K_return)<>0 or bmouse<>0 :end while
+    while 0=0
+		eventobject(menucontrol)
+		if was(menucontrol,activated) then
+			gm=getlist(menucontrol,getparam(menucontrol,_value))
+		end if
+		if gm<>"" then: exit while: end if
+		if bmouse then: hidemenu(menucontrol): exit while: end if
+		if key(k_esc) then: hidemenu(menucontrol): exit while:end if
+		redrawobject(menucontrol)
+		waitvbl
+    end while
+	redrawobject(menucontrol)
+	return gm
+end function
+
+'_________________________________________________________________________________________________________________
+'
+' COMMON DIALOG INTERFACE
+'
+'
+'_________________________________________________________________________________________________________________
+
+
+common _ok=1,_cancel=2,_yes=3,_no=4
+common OkOnly=0,OkCancel=1,YesNo=2,YesNoCancel=3
+
+'_________________________________________________________________________________________________________________
+
+' msgBox(prompt,type,title): display a simple message box dialog interface
+function msgBox(prompt,type,title)
+    oldfirst=first_control
+    screenopen(7,320,150,displaywidth / 2- 160,displayheight/2-75,320,150,0)
+    window1=newcontrol(window,0,1,1,317,147,title)
+    label1=newcontrol(label,window1,10,20,280,15,prompt)
+    select case type
+	case OkOnly
+	    Ok = newcontrol(button,window1,140,100,40,18,"  ok  ")
+	case OkCancel
+	    Ok = newcontrol(button,window1,110,100,40,18,"  ok  ")
+	    Cancel = newcontrol(button,window1,170,100,60,18,"  Cancel  ")
+	case YesNo
+	    Yes = newcontrol(button,window1,110,100,40,18,"  Yes  ")
+	    No = newcontrol(button,window1,170,100,40,18,"  No  ")
+	case YesNoCancel
+	    Yes = newcontrol(button,window1,90,100,40,18,"  Yes  ")
+	    No = newcontrol(button,window1,140,100,40,18,"  No  ")
+	    Cancel = newcontrol(button,window1,190,100,60,18,"  Cancel  ")
+    end select
+	first_control=window1
+	clicked_control=first_control
+	selected_control=first_control
+    draw
+
+    while key(27)=0
+	waitevent(1)
+	if getparam(Ok ,_state)=activated then
+	    refresh
+	    msgbox=_ok
+	    exit while
+	end if
+
+	if getparam(Cancel ,_state)=activated then
+	    refresh
+	    msgbox=_cancel
+	    exit while
+	end if
+
+	if getparam(Yes ,_state)=activated then
+	    refresh
+	    msgbox=_yes
+	    exit while
+	end if
+
+	if getparam(No ,_state)=activated then
+	    refresh
+	    msgbox=_no
+	    exit while
+	end if
+    end while
+
+    destroycontrol(window1)
+    destroycontrol(label1)
+    select case type
+	case OkOnly
+	    destroycontrol(Ok)
+	case OkCancel
+	    destroycontrol(Ok)
+	    destroycontrol(Cancel)
+	case YesNo
+	    destroycontrol(Yes)
+	    destroycontrol(No)
+	case YesNoCancel
+	    destroycontrol(Yes)
+	    destroycontrol(No)
+	    destroycontrol(Cancel)
+    end select
+    screenclose(7)
+    first_control=oldfirst
+
+end function
+'_____________________________________________________________________________________________________________________
+
+'inputBox(prompt$,title$)
+function inputBox(prompt$,title$,default$)
+    oldfirst=first_control
+    screenopen(7,360,100,displaywidth / 2- 160,displayheight/2-50,360,100,0)
+    ib_window=newcontrol(window,0,0,0,359,99,title$)
+	first_control=ib_window
+    ib_label=newcontrol(label,window1,10,25,280,18,prompt$)
+    ib_text=newcontrol(textentry,window1,10,50,340,15,default$)
+    ib_Ok = newcontrol(button,window1,220,75,40,18,"  ok  ")
+    ib_Cancel = newcontrol(button,window1,280,75,60,18,"  Cancel  ")
+	clicked_control=first_control
+	selected_control=first_control
+    draw
+       while 0=0
+	waitevent(1)
+
+	if was(ib_Ok,activated)then
+	    inputBox= getparam(ib_text,_value)
+	    exit while
+	end if
+
+	if was(ib_Cancel,activated)then
+	    inputBox= ""
+	    exit while
+	end if
+    end while
+
+    destroycontrol(ib_Cancel)
+    destroycontrol(ib_Ok)
+    destroycontrol(ib_text)
+    destroycontrol(ib_label)
+    destroycontrol(ib_window)
+    cls
+    screenclose(7)
+    first_control=oldfirst
+
+end function
+'__________________________________________________________________________________________________________________
+
+' readdir(listcontrol,path$): read directory path and get the file and subdirectory names in a listcontrol
+sub readdir(listcontrol,path$,ext$)
+    mousehide
+	if direxists(path$) then
+		clearlist(listcontrol)
+		a$=dirfirst(path$)
+		while (a$<>"")
+			if direxists(path$+a$) then
+				addlist(listcontrol,"(dir)"+a$)
+			end if
+			if fileexists(path$+a$) then
+				if right$(a$,len(ext$))=ext$ then
+					addlist(listcontrol,a$)
+				end if
+			end if
+			a$=dirnext
+		end while
+		sortlist(listcontrol)
+	end if
+	mouseshow
+end sub
+'__________________________________________________________________________________________________________________
+
+' fsel(path$,ext$,default$,title$): file selector dialog box
+function fsel(path$,ext$,default$,title$)
+    oldfirst=first_control
+
+    if right$(path$,1)<>"/" then : path$+="/" : end if
+	if left$(ext$,1)<>"." then : ext$="."+ext$ : end if
+
+    screenopen(7,400,300,displaywidth/2-200,displayheight/2-150,400,300,0)
+	fsel_win1=newcontrol(window,0,0,0,399,299,title$)
+    first_control=fsel_win1
+    fsel_path = newcontrol(textentry,fsel_win1,8,18,385,15,path$)
+    fsel_filelist = newcontrol(list,fsel_win1,8,36,300,192,0)
+    readdir(fsel_filelist,""+path$,""+ext$)
+    fsel_ok = newcontrol(button,fsel_win1,320,40,60,18,"    OK    ")
+    fsel_cancel = newcontrol(button,fsel_win1,320,60,60,18," Cancel ")
+    fsel_makedir = newcontrol(button,fsel_win1,320,90,60,18," mkdir ")
+    fsel_parent = newcontrol(button,fsel_win1,320,120,60,18," Parent")
+
+    fsel_filename = newcontrol(textentry,fsel_win1,8,235,385,15,default$)
+    fsel_ext = newcontrol(textentry,fsel_win1,8,260,100,15,ext$)
+	clicked_control=first_control
+	selected_control=first_control
+
+	draw
+
+
+    while 0=0
+	waitevent(0)
+
+	if was(fsel_filelist,activated)then
+	    a$= getlist(fsel_filelist,getparam(fsel_filelist,_value))
+	    if left$(a$,5)="(dir)" then
+		a$=mid$(a$,6)
+		select case(a$)
+		    case "..":
+			a$=getparam(fsel_path,_value)
+			a$=left$(a$,len(a$)-1)
+			a$=left$(a$,rinstr(a$,"/"))
+			if a$="/" then: a$="//":end if
+			setparam(fsel_path,_value,a$)
+		    case ".":
+			a$=getparam(fsel_path,_value)
+			a$=left$(a$,instr(a$,"/"))
+			if a$="/" then: a$="//":end if
+			setparam(fsel_path,_value,a$)
+		    case else
+			setparam(fsel_path,_value,getparam(fsel_path,_value)+a$+"/")
+		end select
+		readdir(fsel_filelist,getparam(fsel_path,_value),ext$)
+	    else
+		setparam(fsel_filename,_value,a$)
+	    end if
+	    waitvbl
+	    refresh
+	end if
+
+	if was(fsel_path,activated)then
+	    path$=getparam(fsel_path,_value)
+	    if right$(path$,1)<>"/" then :path$+="/":setparam(fsel_path,_value,path$):end if
+	    if path$="/" then : path$="//":end if
+	    readdir(fsel_filelist,path$,ext$)
+	    refresh
+	end if
+
+	if was(fsel_ext,activated)then
+	    ext$=getparam(fsel_ext,_value)
+	    path$=getparam(fsel_path,_value)
+	    readdir(fsel_filelist,path$,ext$)
+	    refresh
+	end if
+
+	if was(fsel_ok,activated)then
+	    fsel= getparam(fsel_path,_value)+ getparam(fsel_filename,_value)
+	    exit while
+	end if
+
+	if was(fsel_cancel,activated)then
+	    fsel= ""
+	    exit while
+	end if
+
+	if was (fsel_parent,activated)then
+	    a$=getparam(fsel_path,_value)
+	    a$=left$(a$,len(a$)-1)
+	    a$=left$(a$,rinstr(a$,"/"))
+	    if a$="/" then: a$="//":end if
+	    setparam(fsel_path,_value,a$)
+	    readdir(fsel_filelist,getparam(fsel_path,_value),ext$)
+	    refresh
+	end if
+
+	if was(fsel_makedir,activated) then
+	    mkdir_win=newcontrol(window,0,2,130,385,50,"make dir")
+	    namedir=newcontrol(textentry,mkdir_win,15,15,300,18,"new dir")
+	    okmkdir = newcontrol(button,mkdir_win,320,5,60,18,"    OK    ")
+	    cancelmkdir = newcontrol(button,mkdir_win,320,25,60,18," Cancel ")
+	    refresh
+	    while 0=0
+		    eventobject(okmkdir)
+		    eventobject(cancelmkdir)
+    		    eventobject(namedir)
+
+		if was(okmkdir,activated) then
+			mkdir(getparam(namedir,_value))
+			exit while
+		end if
+
+		if was(cancelmkdir,activated) then
+			exit while
+		end if
+	    end while
+
+	    destroycontrol(okmkdir)
+	    destroycontrol(cancelmkdir)
+	    destroycontrol(namedir)
+	    destroycontrol(mkdir_win)
+	    wait(50)
+	    readdir(fsel_filelist,getparam(fsel_path,_value),ext$)
+	    refresh
+	end if
+    end while
+    destroycontrol(fsel_ext)
+    destroycontrol(fsel_filename)
+    destroycontrol(fsel_parent)
+    destroycontrol(fsel_makedir)
+    destroycontrol(fsel_cancel)
+    destroycontrol(fsel_ok)
+    destroycontrol(fsel_filelist)
+    destroycontrol(fsel_path)
+    destroycontrol(fsel_win1)
+	selected_control=first_control
+    cls
+    screenclose(7)
+    first_control=oldfirst
+end function
+'__________________________________________________________________________________________________________________
+

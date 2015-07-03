@@ -1,0 +1,5 @@
+'esp sdlBasic ver
+
+setautoback(50)
+prints(k_up)
+waitkey

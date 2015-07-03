@@ -1,0 +1,120 @@
+
+xed=320:yed=240:wdwd=1
+
+function mousezonedp(x,y,w,h)
+      tmpr=0:xq=xmouse-x:yq=ymouse-y
+   if (yq>0) and (xq>0) and (xq<=w) and (yq<=h) then: tmpr=1
+      if (xq+yq)>((w+h)/2) then:tmpr=2:end if
+    end if
+      mousezonedp=tmpr
+ end function
+
+'- palbdep : bitdepth of the available palette on toolbox (6=64, 5=32, 4=16, etc.)
+
+palbdep=6:aramt=32+(2^palbdep)
+
+ndvx=2^((palbdep-1)\2):ndvy=2^(1+(palbdep\2))
+dim mzx[aramt],mzy[aramt],mzw[aramt],mzh[aramt],slcd[aramt]
+dim bknd$[aramt],bslc$[aramt],brbt$[aramt]
+
+'- bknd$
+for i=1 to aramt:bknd$[i]="(unknown) ":next
+bknd$[ 1]="DefaultBrush:Dot    ":bknd$[ 2]="DefaultBrush:Round1 "
+bknd$[ 3]="DefaultBrush:Round2 ":bknd$[ 4]="DefaultBrush:Round3 "
+bknd$[ 5]="DefaultBrush:Square4":bknd$[ 6]="DefaultBrush:Square3"
+bknd$[ 7]="DefaultBrush:Square2":bknd$[ 8]="DefaultBrush:Square1"
+bknd$[ 9]="DefaultBrush:Extra1 ":bknd$[10]="DefaultBrush:Extra2 "
+bknd$[11]="Dot                 ":bknd$[12]="StreamLine          "
+bknd$[13]="StraightLine        ":bknd$[14]="CurvedLine          "
+bknd$[15]="Fill                ":bknd$[16]="Spray               "
+bknd$[17]="Rectangle           ":bknd$[18]="Circle              "
+bknd$[19]="Ellipse             ":bknd$[20]="Polygon             "
+bknd$[21]="GetBrush            ":bknd$[22]="Text                "
+bknd$[23]="Grid                ":bknd$[24]="Simmetry            "
+bknd$[25]="Magnify             ":bknd$[26]="ZoomMagnify-        "
+bknd$[27]="UnDo                ":bknd$[28]="Clear               "
+bknd$[29]="PickColour          ":bknd$[30]="BrowsePalette-      "
+bknd$[31]="BrowsePalette+      "
+for i=0 to 63:bknd$[32+i]="ColourFgnd"+str$(i)+" ":next
+
+'- bslc$
+for i=1 to aramt:bslc$[i]="(NotApplyable)":next
+bslc$[12]="Empty/Filled   ":bslc$[17]="Empty/Filled   "
+bslc$[18]="Empty/Filled   ":bslc$[19]="Empty/Filled   "
+bslc$[20]="Empty/Filled   "
+
+'- brbt$
+for i=1 to aramt:brbt$[i]= "(null)          ":next
+for i=1 to 10:brbt$[i]= "Size         ":next
+brbt$[11]="Dot              ":brbt$[12]="FillType         "
+brbt$[13]="Spacing          ":brbt$[14]="Spacing          "
+brbt$[15]="FillType         ":brbt$[16]="Size             "
+brbt$[17]="Spacing/FillType ":brbt$[18]="Spacing/FillType "
+brbt$[19]="Spacing/FillType ":brbt$[20]="Spacing/FillType "
+brbt$[22]="ChooseFont       ":brbt$[23]="GridSettings     "
+brbt$[24]="SimmetrySettings ":brbt$[26]="ZoomMagnify+     "
+brbt$[28]="Clear            ":brbt$[29]="ColourPalette    "
+brbt$[30]="BrowsePalette-   ":brbt$[31]="BrowsePalette+   "
+for i=0 to 63:brbt$[32+i]="ColourBgnd"+str$(i)+" ":next
+
+'- mousezones - default brushes
+ slcd[12]=1:slcd[17]=1:slcd[18]=1:slcd[19]=1:slcd[20]=1
+ mzx[ 1]=  0:mzy[ 1]= 0:mzw[ 1]= 4:mzh[ 1]= 8
+  mzx[ 2]= 4:mzy[ 2]= 0:mzw[ 2]= 4:mzh[ 2]= 8
+  mzx[ 3]= 8:mzy[ 3]= 0:mzw[ 3]= 7:mzh[ 3]= 8
+  mzx[ 4]=15:mzy[ 4]= 0:mzw[ 4]= 9:mzh[ 4]= 8
+ mzx[ 5]=  0:mzy[ 5]= 8:mzw[ 5]= 7:mzh[ 5]= 6
+  mzx[ 6]= 7:mzy[ 6]= 8:mzw[ 6]= 6:mzh[ 6]= 6
+  mzx[ 7]=13:mzy[ 7]= 8:mzw[ 7]= 5:mzh[ 7]= 5
+  mzx[ 8]=18:mzy[ 8]= 8:mzw[ 8]= 6:mzh[ 8]= 5
+ mzx[ 9]=  0:mzy[ 9]=14:mzw[ 9]=12:mzh[ 9]= 7
+  mzx[10]=12:mzy[10]=13:mzw[10]=12:mzh[10]= 8
+
+'- mousezones - tools
+ for y=0 to 8:for x=0 to 1
+    n=11+x+(y*2)
+    mzx[ n]= x*12:mzy[ n]=21+(y*12):mzw[ n]=12:mzh[ n]=12
+  next:next
+
+palypos=21+(12*8)+12
+
+ mzx[29]= 0:mzy[29]=palypos:mzw[29]=24:mzh[29]=12
+  mzx[30]=0:mzy[30]=yed-12:mzw[30]=8:mzh[30]=12
+  mzx[31]=16:mzy[31]=yed-12:mzw[31]=8:mzh[31]=12
+
+'- mousezones - palette
+
+palypos=21+(12*8)+12+12:palysiz=yed-12-palypos
+pxcelsz=24/ndvx:pycelsz=palysiz/ndvy
+
+for x=0 to ndvx-1:for y=0 to ndvy-1
+   mzid=y+(x*ndvy)+32
+   mzx[mzid]= (x*pxcelsz):mzy[mzid]=palypos+(y*pycelsz)
+   mzw[mzid]=pxcelsz:mzh[mzid]=pycelsz
+ next:next
+
+'- starting
+
+setdisplay (xed,yed,32,wdwd):paper(8^8-1):ink(0):pen(0):cls
+setcaption("DpaintClone:mousezones")
+tbofx=xed-24
+
+for i=0 to aramt
+ink(0xDDDDDD):if slcd[i]<>0 then:ink(0):end if
+  line(mzw[i]+mzx[i]+tbofx,mzy[i],mzx[i]+tbofx,mzy[i]+mzh[i])
+ink(0):box(mzx[i]+tbofx,mzy[i],mzx[i]+mzw[i]+tbofx,mzy[i]+mzh[i])
+next
+
+while key(k_esc)=0
+  for i=0 to aramt
+   locate (2,11):prints("bmouse:"+str$(bmouse))
+   mzdpv=mousezonedp(mzx[i]+tbofx,mzy[i],mzw[i],mzh[i])
+if mzdpv<>0 then
+   locate (2,10):prints("slice:"+str$(mzdpv))
+   locate (2,7):prints("button:"+str$(i)+":"+bknd$[i])
+   locate (2,8):prints("avlbslices:"+bslc$[i])
+   locate (2,9):prints("rclick:"+brbt$[i])
+ end if
+next:wend
+waitkey
+

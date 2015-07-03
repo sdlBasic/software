@@ -1,0 +1,45 @@
+'
+' sdlBasic library: fileGraphics  
+' 
+'   Name:      filegraphics.sdlblib
+'   Purpose:   basic library to implements 
+'	loadimages 100%
+'	
+'	
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+' Bugs:
+'
+' Todo:
+' 
+' 
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+' loadimages     carica da un immagine con piu'frames tutti i frames a partiredal banco startbank
+function loadimages_soft(file$,w,h,startbank)
+	if fileexists(file$)=0 then
+		return -1
+	end if
+
+	loadimage(file$,startbank)
+        'prints(str$(imagewidth(startbank))+":"+str$(imageheight(startbank)))
+	screenopen(7,imagewidth(startbank),imageheight(startbank),0,0,0,0,0)
+	'screen(7)
+	pasteicon(0,0,startbank)
+	x=0:y=0:s=startbank
+	while (y+h)<=screenheight
+		grab(s,x,y,w,h)
+		s=s+1
+		x=x+w+2
+		if (x+w)>screenwidth then
+			x=0
+			y=y+h+2
+		end if
+	end while
+	screenclose(7)
+	return s-1
+	
+
+end function

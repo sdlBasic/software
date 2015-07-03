@@ -1,0 +1,770 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                           STEP FIVE: the robot 
+'----------------------------------------------------------------------------
+'
+' This kind of game is great fun to play when there are two of you,  
+' but it must also be equally playable on your own. We will therefore need 
+' to create a 'robot' opponent to pit against our player.      
+'
+' This is NOT an easy task, as the robot has to be quite intelligent. It has 
+' to be able work out just where to hit the ball so as to move it into the       
+' opponent's goal. The robot must also react sensibly according to the 
+' opponents current stratagy. It must be good enough to be challenging,  
+' but weak enough to give the player a reasonable chance of winning. 
+' So it's a TOUGH assignment!  
+'  
+'
+' The solution I have chosen is quite general, and can also be used for other  
+' kinds of robots. I've split the workload between several different routines, 
+' each with it's own special label. These labels are stored in  a string,  
+' which can be called inside my animation loop using a simple GOSUB.     
+' Since the routine is coded as a string, we can easily change it at any time  
+' inside our program. This allows us to move the robot through a range of  
+' strategies depending on the current reactions of the human player. 
+'  
+' Anyway,  now for the most difficult part of this game! 
+'----------------------------------------------------------------------------  
+Close Editor 
+Hide On 
+PATH$="Easy_Examples:"
+'
+' As before  
+Dim XP(1),YP(1),XDP(15),YDP(15),DB(1),DP(1),SP(1),IP(15,1),FL(1)
+Dim XR(1),YR(1)
+Dim XH(15),YH(15)
+Dim XHH(15),YHH(15)
+Dim CP(1),CB(1),CC(1),XC(1),YC(1)
+Dim BOUNCE(8,15)
+' ***  
+' There's an entry in the ROBOT() array for each player. 
+' If it's set to one, the selected player will be controlled by the program,     
+' otherwise, it will be moved by a human.
+Dim ROBOT(1)
+' ***
+' ROBOT$() holds the label used by the CURRENT robot action  
+' AFTER$() selects the action to be called when the present one has finished 
+' WHERE$() stores the name of a routine which targets the robot to   
+'          a specific point on the screen. See later.  
+' CHECK$() holds the name of a routine to check that the target point has been   
+'          reached.  
+'
+Dim ROBOT$(1),WHERE$(1),CHECK$(1),AFTER$(1)
+' ***
+' GX() and GY() stores the coordinates of the robots selected target 
+' ODX() and ODY() contain the distance between the robot's last position and 
+'                 its destination  
+Dim GX(1),GY(1),ODX(1),ODY(1)
+' ***
+' These variables control the robot's actions. See later.  
+Dim ROBGOAL(1),ROBHIT(1),ROBWAIT(1),RPAR(1),BUMP(1)
+' ***
+' These ones control the robot's speed   
+Dim ROBSPEED(1),ROBSP(1),ROBD(1)
+' ***
+' ROBDIR() is a small array which is used to calculate the robot's 
+' movement direction.  
+Dim ROBDIR(20)
+'
+' Let's make all our arrays global 
+Global XP(),YP(),XDP(),YDP(),DB(),DP(),SP(),IP(),FL()
+Global XR(),YR()
+Global P2BOB,BBP,BBB,PSIZE
+Global PLA
+Global XC(),YC()
+Global XH(),YH(),XHH(),YHH(),CP(),CB(),CC()
+Global P2BOB,BBP,BBB,PSIZE
+Global XB,YB,ZB
+Global DB,SB
+Global SZB
+Global ZBALL
+Global BBALL
+Global CPT,BOUNCE()
+Global YTOP,YBOTTOM,XCENTER,YCENTER
+Global GX,GY,GX(),GY(),ROBDIR(),ODX(),ODY()
+Global ROBOT$(),WHERE$(),CHECK$(),AFTER$()
+Global ROBGOAL(),ROBHIT(),ROBWAIT(),ROBOT(),RPAR(),ROBSPEED()
+Global ROBSP(),ROBD(),BUMP()
+' ***
+' GOAL will be zero when the goal for player 1 is at the bottom of the screen,   
+' (first half), and 1 when it's at the top (second half).
+Global GOAL
+'
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+Load PATH$+"Pictures/Tricycle_Screen.Abk",10
+Load PATH$+"Pictures/Tricycle_Playfield.Abk",11
+'
+GAME_INIT
+'
+For P=0 To 1
+   XP(P)=XCENTER : YP(P)=YCENTER-25*32+P*50*32
+Next 
+'
+XB=XCENTER : YB=YCENTER : DB=0 : SB=0
+ZB=0 : SZB=Rnd(15)+16
+' ***
+' First set up player 2 as a robot 
+ROBOT(1)=1
+' ***
+' Define its character as "not easy!"  
+' ROBWAIT(),ROBHIT(), and ROBGOAL() set the chance of the robot
+' waiting, trying to hit the player, or attempting to score a goal 
+ROBWAIT(1)=10 : ROBHIT(1)=50 : ROBGOAL(1)=50
+' ROBSPEED() sets the maximum speed
+ROBSPEED(1)=12
+' ROBOT$ chooses the first action
+ROBOT$(1)="THINK"
+'
+' Play the game
+GAME
+'
+ALL_ERASE
+Edit 
+'
+Procedure GAME_INIT
+   '
+   BBP=1 : P2BOB=10 : BBB=4
+   PSIZE=10
+   BBALL=3
+   ZBALL=30
+   YTOP=64*32 : YBOTTOM=432*32
+   XCENTER=124*32 : YCENTER=236*32
+   '
+   Restore _DIRECTIONS
+   ANGLE#=Pi#/2.0 : A=32 : B=3 : S=8
+   For D=0 To 15
+      XDP(D)=S*Cos(ANGLE#) : YDP(D)=-S*Sin(ANGLE#)
+      XH(D)=A*Cos(ANGLE#) : YH(D)=-A*Sin(ANGLE#)
+      XHH(D)=B*Cos(ANGLE#-Pi#/2) : YHH(D)=-B*Sin(ANGLE#-Pi#/2)
+      ANGLE#=ANGLE#-Pi#/8.0
+      Read IP(D,0),IP(D,1)
+   Next 
+   '
+   Restore _BOUNCE
+   For Z=1 To 8
+      For B=0 To 15
+         Read BOUNCE(Z,B)
+      Next 
+   Next 
+   ' ***
+   ' Here we'll read the robot movement table into the ROBDIR array.  
+   ' Like the bounce table, this table was initially drawn up on a bit paper. 
+   ' I'll explain the precise format in the ROBOT_PLAYER procedure... 
+   Restore _ROBOT
+   For D=0 To 19
+      Read ROBDIR(D)
+   Next 
+   '
+   Unpack 11 To 1
+   Reserve Zone 10
+   Set Zone 1,21,0 To 223,24 : Set Zone 2,21,487 To 220,511
+   Set Zone 3,0,21 To 25,487 : Set Zone 4,220,24 To 256,487
+   Set Zone 5,0,0 To 21,24 : Set Zone 6,220,0 To 256,24
+   Set Zone 7,0,486 To 24,511 : Set Zone 8,220,487 To 256,511
+   '
+   Unpack 10 To 0
+   Get Palette 1
+   Screen Display 0,,,,200
+   Double Buffer 
+   Bob Update Off 
+   Autoback 1
+   '
+   CLR_DISPLAY
+   '
+   Screen 1
+   '
+   Pop Proc
+   '
+   _DIRECTIONS:
+   Data 1,2
+   Data 3,4
+   Data 5,6
+   Data 7,8
+   Data 9,10
+   Data Vrev(7),Vrev(8)
+   Data Vrev(5),Vrev(6)
+   Data Vrev(3),Vrev(4)
+   Data Vrev(1),Vrev(2)
+   Data Rev(3),Rev(4)
+   Data Rev(5),Rev(6)
+   Data Rev(7),Rev(8)
+   Data Hrev(9),Hrev(10)
+   Data Hrev(7),Hrev(8)
+   Data Hrev(5),Hrev(6)
+   Data Hrev(3),Hrev(4)
+   '
+   _BOUNCE:
+   Data 8,7,6,5,5,5,6,7,8,9,10,11,11,11,10,9
+   Data 0,1,2,3,3,3,2,1,0,15,14,13,13,13,14,15
+   Data 1,1,2,3,4,5,6,7,7,7,6,5,4,3,2,1
+   Data 15,15,14,13,12,11,10,9,9,9,10,11,12,13,14,15
+   Data 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
+   Data 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+   Data 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+   Data 14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+   ' ***
+   ' This table is used by the robot to calculate it's direction  
+   _ROBOT:
+   Data 8,7,6,5,4
+   Data 0,1,2,3,4
+   Data 8,9,10,11,12
+   Data 0,15,14,13,12
+   '
+End Proc
+Procedure GAME
+   '
+   Repeat 
+      '
+      CPT=CPT+1
+      '
+      Bob Clear 
+      '
+      BALL_ANIM
+      '  
+      MOVE_PLAYER[0]
+      MOVE_PLAYER[1]
+      '
+      Bob Draw 
+      '  
+      DISPLAY_FIELD
+      '
+      Screen Swap 
+      '
+      A$=Inkey$
+      If A$=Chr$(27) : Exit : End If 
+      If A$=" " : PLA=1-PLA : End If 
+      '
+      Wait Vbl 
+      '
+   Until 0
+   '
+End Proc
+Procedure C0LLIDE[P,C]
+   '
+   On C Goto CYCLE,CYCLE,BALL
+   Pop Proc
+   '
+   ' Collision with other player    
+   CYCLE:
+   Q=1-P
+   CP(Q)=1 : SP(Q)=SP(P)+4*Sgn(SP(P)) : DP(Q)=DP(P) : Bob Off BBB+Q
+   CB(P)=B : CP(P)=1 : CC(P)=CC(P)+1 : SP(P)=-Min(SP(P),8)
+   Pop Proc
+   '
+   ' Collision with the ball  
+   BALL:
+   '
+   If ZB<32
+      If SP(P)>2
+         DB=DP(P)
+         SB=SP(P)+6
+         SZB=SP(P)/2+Rnd(SP(P)/2)
+      End If 
+      If SP(P)<2
+         DB=(DP(P)+8+1-Rnd(2)) mod 16
+         SB=-(SP(P)*3)/2+4
+         SZB=-SP(P)/2+Rnd(SP(P)/2)
+      End If 
+      If Abs(SP(P))<=2
+         SB=Max(SB,8)
+         DB=(DB-1+Rnd(2)) mod 16 : SZB=Rnd(8)
+      End If 
+      ' ***  
+      ' Small change:  
+      ' We'll note the collision for use by our robot routines 
+      BUMP(P)=1 : CB(P)=0 : CC(P)=CC(P)+1
+   '
+   End If 
+End Proc
+Procedure BALL_ANIM
+   '
+   XB=XB+XDP(DB)*SB : YB=YB+YDP(DB)*SB
+   '
+   If ZB=0
+      SB=Max(SB-3,0)
+   Else 
+      SB=Max(SB-1,0)
+   End If 
+   '
+   ZB=ZB+SZB
+   '
+   If ZB<=0
+      SZB=-SZB/2
+      ZB=SZB
+   End If 
+   '
+   If ZB : SZB=SZB-2 : End If 
+   '
+   X=XB/32 : Y=YB/32
+   '  
+   Z=Max(Zone(X,Y-4),Max(Zone(X-4,Y+4),Zone(X+4,Y+4)))
+   '
+   If Z
+      DB=BOUNCE(Z,DB)
+   End If 
+   '
+   If SB+SZB
+      I=Min(22+ZB/ZBALL*2+(CPT mod 2),31+(CPT mod 2))
+   Else 
+      I=22
+   End If 
+   '
+   Bob BBALL,XB/32,YB/32,I
+   '
+End Proc
+Procedure MOVE_PLAYER[P]
+   '
+   FL(P)=FL(P)+1
+   '
+   If CP(P)
+      If SP(P)
+         SP(P)=SP(P)-Sgn(SP(P))
+      Else 
+         CP(P)=CP(P)-1 : DP(P)=DB(P)
+      End If 
+   End If 
+   ' ***  
+   ' If the player is a robot, call the robot procedure 
+   If ROBOT(P)=1 : ROBOT_PLAYER[P] : End If 
+   ' ***
+   ' If it is not a robot, we read the joystick   
+   If ROBOT(P)=0
+      '
+      If CP(P)=0
+         '  
+         If P=PLA : J=Joy(1) : End If 
+         '  
+         CB(P)=0 : CC(P)=0
+         ' Go faster? 
+         If J and 1 : If SP(P)<16 : SP(P)=SP(P)+3 : End If : End If 
+         ' Go slower? 
+         If J and 2 : If SP(P)>-16 : SP(P)=SP(P)-3 : End If : End If 
+         ' Turn left? 
+         If J and 4 : DP(P)=DP(P)-1 : If DP(P)<0 : DP(P)=15 : End If : DB(P)=DP(P) : End If 
+         ' Turn right?
+         If J and 8 : DP(P)=DP(P)+1 : If DP(P)>15 : DP(P)=0 : End If : DB(P)=DP(P) : End If 
+         ' Brake? 
+         If J and 16 : SP(P)=0 : End If 
+         '  
+      End If 
+   End If 
+   '
+   XP(P)=XP(P)+XDP(DP(P))*SP(P)
+   YP(P)=YP(P)+YDP(DP(P))*SP(P)
+   '
+   XR(P)=XP(P)/32 : YR(P)=YP(P)/32
+   '
+   S=Sgn(SP(P))
+   I=IP(DB(P),Abs(S)*(FL(P) mod 2))
+   Bob BBP+P,XR(P),YR(P),I+P2BOB*P
+   '
+   XD=XR(P)+S*(XH(DP(P))*PSIZE)/32 : YD=YR(P)+S*(YH(DP(P))*PSIZE)/32
+   '
+   C=Bob Col(BBP+P,BBP To 5)
+   '
+   A=Max(Zone(XD,YD),Max(Zone(XD+XHH(DP(P)),YD+YHH(DP(P))),Zone(XD-XHH(DP(P)),YD-YHH(DP(P)))))
+   '
+   ' If we are bouncing too much, we'd better stop! 
+   If CC(P)>3
+      SP(P)=0 : CP(P)=0 : CC(P)=1
+      A=0 : C=0 : Bob Off BBB+P
+   End If 
+   '  
+   If A
+      CP(P)=3 : XC(P)=XD : YC(P)=YD : CC(P)=CC(P)+1
+      SP(P)=-S*Min(Max(Abs(SP(P)+6),4),8)
+   Else 
+      If C
+         B=Col(-1) : If B<>CB(P) : C0LLIDE[P,B] : End If 
+      End If 
+   End If 
+   '
+   If CP(P)=3 : Bob BBB+P,XC(P)+Rnd(4),YC(P)+Rnd(4),21 : End If 
+   If CP(P)=2 : Bob Off BBB+P : End If 
+   '
+End Proc
+Procedure ROBOT_PLAYER[P]
+   ' ***
+   ' The big procedure. Get ready for a lot of explanations.
+   '
+   ' The first thing I needed for my robot, was a simple system 
+   ' to tell the robot to "GO THERE". Depending on the circumstances, 
+   ' "THERE" could be the ball, the other player, or a specific position on 
+   ' the playing area. So I started by creating the "GO_THERE" routine, and     
+   ' the WHERE$ routines to find the robot's current location.  
+   '
+   ' That was the HARD part. Have a look at them now. 
+   '
+   ' After that, I had to work out how a robot player could score a goal. 
+   ' Imagine the robot is player number 2. It's aim is to move the  
+   ' ball to the top of the screen. So it MUST hit the ball from the bottom 
+   ' to the top, with enough speed to kick the ball upwards.
+   '
+   ' The only easy way to perform this,  was to split the task in two steps:  
+   '
+   '   - step 1: the robot tries to move UNDER the ball in the direction
+   '             of the goal.   
+   '
+   '   - step 2: the robot just runs toward the ball and hits it. 
+   '             As the robot's already facing towards the goal,      
+   '             the ball will move in the appropriate direction.   
+   '
+   '
+   ' That's why I programmed the GOAL1 and GOAL2 routines.
+   '
+   ' A robot has to take decisions. That's the job of the THINK routine!  
+   ' The name is actually a little misleading.  
+   ' THINK chooses between 3 options: WAIT, HIT the other player, and GOAL. 
+   '
+   ' Ok, lets go. 
+   '
+   ' This procedure is called by MOVE_PLAYER. Like the human player,  
+   ' the robot is not controlled if a collision has occurred. So we'll
+   ' need to check for this possibility before going any further
+   If CP(P)
+      '
+      ' A collision is happening: Do nothing in the current step,  
+      ' and jump straight to the NEXT step of robot's commands to make   
+      ' it react to the collision. 
+      ROBOT$(P)=AFTER$(P)
+      ' This flag tells the other routines that a collision has occurred 
+      BUMP(P)=1
+      '
+      ' Exit 
+      Pop Proc
+   End If 
+   '
+   ' Set the collision flags to zero, as there's no collision 
+   CB(P)=0 : CC(P)=0
+   '
+   ' ROBSP() holds the speed at which the robot SHOULD go. As we cannot 
+   ' accelerate him instantly (it would not be fair), the next line 
+   ' performs a smooth acceleration.
+   SP(P)=SP(P)+Sgn(ROBSP(P)-SP(P))
+   '
+   ' Now, we DIRECTLY branch to the robot routine. This is very fast! 
+   Goto ROBOT$(P)
+   ' ***
+   '----------------------------------------------------------------
+   ' This routine decides of what to do next depending on 
+   ' the contents of three variables: ROBGOAL, ROBHIT and ROBWAIT 
+   THINK:
+   '
+   BUMP(P)=0 : ROBSP(P)=0
+   '
+   ' Just throw three dice, according to the values in our variables  
+   W=Rnd(ROBWAIT(P)) : H=Rnd(ROBHIT(P)) : G=Rnd(ROBGOAL(P))
+   ' Get the maximum of the 3 variables 
+   M=Max(W,Max(H,G))
+   '
+   ' Maximum=ROBGOAL. So the robot will try to score a goal   
+   If G=M
+      '
+      ' Initialise first step of the GOAL process. See above!
+      ROBOT$(P)="GO_THERE"
+      '
+      ' The WHERE$ routine, UBALL1 returns the position UNDER the ball 
+      WHERE$(P)="UBALL1"
+      '
+      ' The CHECK$() routine will be put in ROBOT$() when the choice of
+      ' direction has been made. So the robot will constantly check  
+      ' for its destination
+      CHECK$(P)="CHECK_POSITION"
+      '
+      ' What do we do when we are under the ball? We rush on the ball    
+      ' my dear! 
+      AFTER$(P)="GO_GOAL1"
+      '
+      ' That's it. We can leave now. 
+      Pop Proc
+   End If 
+   '
+   ' Maximum= ROBHIT. The robot will now try to hit the other player  
+   If H=M
+      '  
+      ' Find the other players position to see if he's not too far away  
+      Gosub GPLAY
+      '  
+      If GX>64*32 and GY>64*32
+         '
+         ' He's quite near. We can rush on him!!
+         ' As you can see, we'll use many of the same routines as before  
+         ROBOT$(P)="GO_THERE"
+         WHERE$(P)="GPLAY"
+         CHECK$(P)="CHECK_POSITION"
+         '
+         ' When he has hit the player, he is happy, and takes a new 
+         ' decision!
+         AFTER$(P)="THINK"
+         '
+         ' He feels a bit better after this action. Let's put the 
+         ' stress down a bit  
+         ROBHIT(P)=Max(1,ROBHIT(P)-5)
+         Pop Proc
+      End If 
+   End If 
+   '
+   ' Maximum= ROBWAIT. The robot just waitd a while.  
+   If W=M
+      '
+      ' Much simpler this time 
+      ROBOT$(P)="GO_NOWHERE"
+      AFTER$(P)="THINK"
+      '
+      ' We just get a random value for the delay?  
+      RPAR(P)=Rnd(ROBWAIT(P)+50)
+      Pop Proc
+   End If 
+   '
+   Pop Proc
+   ' ***
+   '------------------------------------------------------------------
+   ' This routine handles the WAITING state. A counter just goes down to zero.
+   GO_NOWHERE:
+   '
+   ' Stop the robot   
+   ROBSP(P)=0
+   ' Count down to zero 
+   RPAR(P)=RPAR(P)-1
+   ' If wait is finished the robot will perform THINK as the next command   
+   If RPAR(P)<0 : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   ' ***
+   '----------------------------------------------------------------------- 
+   ' This is the second step when scoring a GOAL: We rush to the ball!  
+   GO_GOAL1:
+   '
+   ' GO to the ball 
+   ROBOT$(P)="GO_THERE"
+   WHERE$(P)="GBALL"
+   CHECK$(P)="CHECK_BALL"
+   '
+   ' And then, think! 
+   AFTER$(P)="THINK"
+   Pop Proc
+   ' ***
+   '------------------------------------------------------------------------- 
+   ' The main routine: It directs the robot to a new position,  
+   ' calculates the direction, turns the bob, and accelerates the tricycle! 
+   GO_THERE:
+   '
+   ' Where do we have to go???
+   Gosub WHERE$(P)
+   '
+   ' If GX is zero, the movement is aborted.
+   ' We branch straight to the routine in AFTER$    
+   If GX=0 : ROBOT$(P)=AFTER$(P) : Pop Proc : End If 
+   '
+   ' Now, we get the distance to be moved in the X and Y directions.  
+   DX=GX-XP(P) : DY=GY-YP(P)
+   '
+   ' The movement table is quite involved, so the explanation is LONG!    
+   ' The robot can turn anywhere within a simple circle.  
+   ' For the purposes of our movement routines, we divide this circle 
+   ' into four separate 'quadrants', each containing a total of five    
+   ' possible directions. The only complication, is that the quadrants  
+   ' overlap slightly. So the resulting table appears rather strange.   
+   '  
+   ' Quadrant 1  Quadrant 2  Quadrant 3 Quadrant 4
+   '     5       6 7 8       15         18 19 20
+   '     4           9       14         17
+   ' 1 2 3           10      13 12 11   16
+   '
+   ' The first job is to work out the quadrant number for our required
+   ' movement direction. We do this, by checking the values of DX and DY
+   '
+   ' Quadrants 1 and 2 are used to handle a movement to the RIGHT     
+   ' and Quadrants 3 and 4 control a movement to the LEFT . DX is positive  
+   ' for a RIGHT movement, and negative for a LEFT. So we can immediately 
+   ' reduce our choice to down to just two quadrants. 
+   '
+   ' Similarly, Quadrants 1 and 3 denote a DOWNWARD direction, and 2 and 4  
+   ' indicate an UPWARD movement. We use this to divide our choice down to  
+   ' exactly one quadrant.  
+   '  
+   ' If DX<0, the destination is on the RIGHT and  lies in quadrant 1 or 2  
+   ' otherwise it's in quadrants 3 or 4. The directions are carefully arranged  
+   ' so that the numbers in quadrants 3 and 4 are exactly 10 larger than those    
+   ' in 1 and 2. So we can choose our two quadrants by setting an offset in D1    
+   ' to ten.
+   '
+   If DX<0 : D1=10 : DX=-DX : End If 
+   '
+   ' If DY<0, the destination is ABOVE us 
+   ' We are therefore in quadrant 2 or 4. All the direction numbers in these  
+   ' quadrants are 5 larger than those in 1 or 3  
+   ' D1 will be therefore loaded with a value of five to point to the right 
+   ' direction numbers. 
+   '
+   If DY<0 : D1=D1+5 : DY=-DY : End If 
+   '
+   ' Divide the distance in Y by the distance in X, to find the 
+   ' slope of the line we'd need to draw in order to go there 
+   D=(DY*32)/Max(DX,1)
+   '
+   ' Convert the slope into one of five angles.   
+   ' The higher the slope (D), the steeper the angle. 
+   '
+   If D>160 Then D2=0 : Goto SKIP
+   If D>47 Then D2=1 : Goto SKIP
+   If D>21 Then D2=2 : Goto SKIP
+   If D>6 Then D2=3 : Goto SKIP
+   If D<=6 Then D2=4
+   SKIP:
+   '
+   ' Everything is now ready to read the ROBDIR table,which holds the 
+   ' required movenent direction for each angle.  
+   ' The value if calculated by adding the quardant offset in D1  
+   ' to the angle number in D2
+   '
+   DB(P)=ROBDIR(D1+D2) : DP(P)=DB(P)
+   '
+   ' Whew!
+   '
+   ' Set the speed of the robot to maximum! 
+   ROBSP(P)=ROBSPEED(P)
+   '
+   ' Store the distance for the CHECK routine   
+   ODX(P)=DX : ODY(P)=DY : BUMP(P)=0
+   '
+   ' Branch to the CHECK routine as main routine
+   ROBOT$(P)=CHECK$(P)
+   '
+   ' Finished, the robot is set in the required direction!
+   Pop Proc
+   ' ***
+   '------------------------------------------------------------------------- 
+   ' First CHECK$ routine: This constantly checks the robot to see  
+   ' if it has not already reached the ball 
+   CHECK_BALL:
+   '
+   ' Where do we have to go?
+   Gosub WHERE$(P)
+   '
+   ' Get the distance from the ball 
+   DX=Abs(GX-XP(P)) : DY=Abs(GY-YP(P))
+   '
+   ' Are we moving in the wrong direction?  
+   ' If the ball has moved, we need to calculate a NEW direction.   
+   ' We can check this by looking at the previous distance. 
+   ' If the distance has increased, we are NOT going in the right direction!  
+   If DX>ODX(P)+32 or DY>ODY(P)+32
+      '  
+      ' We'll have to re-calculate the direction next time!  
+      ROBOT$(P)="GO_THERE"
+   End If 
+   '
+   ' Set the previous direction for the next time 
+   ODX(P)=DX : ODY(P)=DY
+   '
+   ' This flag is set when the robot hits the ball.   
+   ' So if it's set, here we are! 
+   If BUMP(P) : ROBOT$(P)=AFTER$(P) : End If 
+   '
+   ' If nothing has been detected, we are still rolling toward the ball!  
+   Pop Proc
+   ' ***
+   '----------------------------------------------------------------------
+   ' This routine continually checks the robot to see if it has reached the   
+   ' destination coordinates. The coordinate can be anything from a point 
+   ' on the playfield,to another player...  
+   CHECK_POSITION:
+   '
+   ' Where does it have to go?
+   Gosub WHERE$(P) : DX=Abs(GX-XP(P)) : DY=Abs(GY-YP(P))
+   '
+   ' Is it still moving in the right direction? (see before)
+   If DX>ODX(P) or DY>ODY(P) : ROBOT$(P)="GO_THERE" : End If : ODX(P)=DX : ODY(P)=DY
+   '
+   ' If it has been hit, take a new decision! 
+   If BUMP(P) : ROBOT$(P)=AFTER$(P) : End If 
+   '
+   ' Here we are!. Back to THINK  
+   If DX<4*32 and DY<4*32 : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   ' ***
+   '----------------------------------------------------------------------
+   ' Now follow the small WHERE$ procedures. These just return
+   ' a coordinate in GX and GY
+   '  
+   ' If ROBHIT has been chosen, this routine is called: it returns the  
+   ' other player's position. 
+   GPLAY: GX=XP(1-P) : GY=YP(1-P) : Return 
+   '
+   ' To score a goal, the robot has FIRST to go UNDER the ball, and THEN  
+   ' drive into it. This is the first step in our control strategy. 
+   ' It returns a coordinate  at a safe position under the ball,  
+   ' in the right direction, toward the goal... 
+   UBALL1:
+   '
+   ' have we got to go UPWARD?
+   If P<>GOAL
+      '  
+      ' YES. If we are close enough from the ball, there's no need to move!
+      If YP(P)>YB+32*32 : GX=0 : Return : End If 
+      '
+      If YP(P)>YB
+         '
+         ' We are already under the ball, so let's get the best possible angle
+         GX=XB+Sgn(128*32-XB)*Rnd(16)*32
+      Else 
+         '
+         ' We are now ABOVE the ball. We'll have to go UNDER it, but we'll try  
+         ' to avoid hitting it when going downward... 
+         GX=XB+Sgn(128*32-XB)*(Rnd(32)+16)*32
+      End If 
+      '
+      ' If we are in the bottom of the screen, well, we'll just  
+      ' run into the ball to make it bounce... 
+      GY=YB+24*32 : If GY>YBOTTOM : GY=YBOTTOM+16*32 : End If 
+   Else 
+      '
+      ' NO, the goal is downward! Anyway, this is the same 
+      ' routine, just reversed!
+      If YP(P)<YB-32*32 : GX=0 : Return : End If 
+      If YP(P)<YB
+         GX=XB+Sgn(128*32-XB)*Rnd(16)*32
+      Else 
+         GX=XB+Sgn(128*32-XB)*(Rnd(32)+16)*32
+      End If 
+      GY=YB-24*32 : If GY<YTOP : GY=YTOP-16*32 : End If 
+   End If 
+   Return 
+   '
+   ' When the previous position is reached, this routine is called. 
+   ' It simply returns the coordinates of the ball on the screen!   
+   GBALL: GX=XB : GY=YB : Return 
+   '
+   ' This routine returns a starting position, when players 
+   ' have to go to the center of the playfield for example... 
+   CFIXED: GX=GX(P) : GY=GY(P) : Return 
+   '
+End Proc
+Procedure DISPLAY_FIELD
+   '  
+   X=XR(0)-78 : Y=YR(0)-67
+   Screen Copy 1,X,Y,X+156,Y+135 To Logic(0),2,2
+   '
+   X=XR(1)-78 : Y=YR(1)-67
+   Screen Copy 1,X,Y,X+156,Y+135 To Logic(0),162,2
+   '
+   X=XB/32-58 : Y=YB/32-29
+   Screen Copy 1,X,Y,X+117,Y+59 To Logic(0),102,139
+   '
+End Proc
+Procedure CLR_DISPLAY
+   '
+   Screen 0
+   For S=0 To 1
+      Cls 0,2,2 To 158,137
+      Cls 0,162,2 To 318,137
+      Cls 0,102,139 To 102+117,139+59
+      Screen Swap : Wait Vbl 
+   Next 
+   Screen 1
+   '
+End Proc
+Procedure ALL_ERASE
+   For B=1 To 15 : Erase B : Next 
+End Proc

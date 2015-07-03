@@ -1,0 +1,31 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.10        *   
+Rem *   Triangle with screen switching * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Cls 0
+Rem Define corners of triangle 
+X1=50 : Y1=50 : X2=75 : Y2=100 : X3=25 : Y3=100
+Rem Create a separate logical screen 
+Double Buffer 
+Rem Turn off Autoback (Autoback 0 and not AUTOBACK OFF. OOPS!)   
+Autoback 0
+Rem Swap phyiscal and logical screens
+Screen Swap 
+Rem Move trianagle across screen 
+Do 
+For S=0 To 244 Step 8
+   Rem Erase old triangle 
+   Ink 0
+   Polygon X1+S-16,Y1 To X2+S-16,Y2 To X3+S-16,Y3 To X1+S-16,Y1
+   Ink 2
+   Rem Draw new triangle  
+   Polygon X1+S,Y1 To X2+S,Y2 To X3+S,Y3 To X1+S,Y1
+Screen Swap : Wait Vbl 
+Next S
+   Rem Remove old triangles from the screen 
+   Ink 0 : Polygon X1+S-16,Y1 To X2+S-16,Y2 To X3+S-16,Y3 To X1+S-16,Y1
+   Screen Swap : Wait Vbl 
+   Ink 0 : Polygon X1+S-8,Y1 To X2+S-8,Y2 To X3+S-8,Y3 To X1+S-8,Y1
+Loop 

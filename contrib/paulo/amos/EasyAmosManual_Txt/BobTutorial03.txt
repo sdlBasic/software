@@ -1,0 +1,16 @@
+'
+'      Bob tutorial #03 - The Bob flicker problem solved!    
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0
+'
+'The Double Buffer command sets up another copy of screen zero.
+Double Buffer 
+'
+'Now when we move Bob 1, no flicker is present.  
+For X=200 To 100 Step -1
+   Bob 1,X,130,1
+Wait Vbl 
+Next X

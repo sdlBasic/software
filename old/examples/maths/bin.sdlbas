@@ -1,0 +1,7 @@
+n=32000
+for i =0 to n
+    prints(str$(i)+" "+bin$(i))
+next
+prints( sqr(n))
+
+waitkey

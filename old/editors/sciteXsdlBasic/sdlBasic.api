@@ -1,0 +1,495 @@
+#sdlBasic is a little basic for make simple games in 2d
+
+#This basic is a dimostrtion to the power of GPL
+#the interpreter basic is wxbasic of David Cuny ("http://wxbasic.sourceforge.net") distribuited on lGPL
+#The graphics library  SDL ("http://www.libsdl.org")are distribuited on GPL
+#the graphics engine was started on a demo games aliens ("http://www.libsdl.org/projects/aliens")
+#written in  c and distribuited on GPL
+#the rutine putpixel getpixel  directly derivated from SDL tutorial
+#the original rutine line wasimported from the sourceof library python pygame("http://www.pygame.org")
+#always GPL
+#i have used again the source of library sdldraw ("http://sdl-draw.sourceforge.net/")
+
+#i have cut paste and adapt  code distribuited on GPL.
+#This software is subject at GPL is gratis as every program use to create it
+
+#_______________________________________________________________________________________________
+#sdlBasic comand and sintax list:
+
+#i suggest to download wxbasic for specific help
+
+#sections:
+#    Run time
+#    Sub and function
+#    Control structures
+#    Operator
+#    Array
+#    Strings
+#    Maths
+#    Files
+#    Dirs
+#    console output
+#    Date and time
+#    Memory Bank
+
+#    Screen
+#    Graphics
+#    File graphics input output
+#    Image manipulation
+#    Blitting
+#    Sprite system
+#    Bob system
+#    Text draw
+#    Print screen
+#    Sounds and music
+#    Keyboard
+#    Mouse
+#    Joystick
+#    SDLtime
+
+
+
+
+#_________________________________________________________________________________________________________________________
+#Run time
+
+const
+option explicit				: must declare variable
+option qbasic				: qbasic mode you can use a function before create in a code
+include(filename)			: inclusion of extern source file
+argc					: return number of args in caller
+argv					: copy arg onto stack
+command command$			: returns requested arg from command line
+*run					: run command on new thread
+shell					: execute command, wait until finished
+end					: terminate program and exit
+os					: give the operative system in work (linux or windows)
+
+#_________________________________________________________________________________________________________________________
+#Sub and function
+
+declare
+sub
+function
+return
+
+#_________________________________________________________________________________________________________________________
+#Control structures
+
+while
+wend
+exit while
+end while
+continue
+
+if
+then
+else
+elseif
+end if
+
+select
+case
+case else
+end case
+
+for
+each
+step
+next
+to
+continue
+
+
+*do
+*loop
+*until
+*continue
+#_________________________________________________________________________________________________________________________
+#Operator
++
+-
+*
+/
+^
+mod					:
+shl					: shift left
+shr					: shift right
+or
+and
+xor
+not
+
+#_________________________________________________________________________________________________________________________
+#Array
+
+dim
+*redim
+shared
+common
+lbound					: returns lower bound of array
+*quicksort				: sort an array
+ubound					: upperbound of array
+erase
+#_________________________________________________________________________________________________________________________
+#Strings
+
+asc					: returns ascii value of first char in string
+chr chr$				: return string corresponding to ascii key value
+*format format$				: returns formatted string with embedded args
+insert insert$				: insert source string to target at index
+instr					: returns position in source that target was found
+lcase lcase$				: convert string to lower case
+left left$				: returns leftmost chars in string
+len length				: return length of string
+ltrim ltrim$				: returns string with left whitespace removed
+mid mid$				: returns string with chars 1..n from source
+replace replace$			: replace string from source with replace starting at index
+replacesubstr replacesubstr$		: replace substring in source with withstring
+reverse reverse$			: reverse a string
+right right$				: returns rightmost chars in string
+rinstr					: reverse Instr function, search from end to start
+rtrim rtrim$				: right trim string
+space space$				: return string with n spaces in it
+str str$				: return string representation of numeric expression
+strf strf$				: converts a floating point or number value to a string
+string string$				: returns string m chars wide with n in it
+tally					: returns number of occurances of matchstring
+trim trim$				: trim string
+typeof typeof$				: returns string with datatype
+ucase ucase$				: convert string to upper case
+val					: returns closest numeric representation of number
+
+#_________________________________________________________________________________________________________________________
+#Maths
+
+abs					: returns absolute value of number
+acos					: returns arccos of number
+asin					: returns arcsin of number
+atan					: returns arctan of number
+cos					: returns cos of number
+exp					: returns exponential function
+fix floor				: truncate fractional number, rounding down towards zero
+frac					: return fractional portion of number
+hex hex$				: returns hexidecimal representation of number
+int					: convert to 32 bit integer, truncating decimals
+log					: returns natural log of expression
+randomize				: reseed the random number generator
+rnd					: return an random number
+round					: round to nearest integer
+sgn					: returns sign of numeric expression
+sin					: returns sine of given angle in radians
+sqr					: return square root - make sure it's non-negative
+tan					: return tanget of given angle in radians
+min   					: return min number of the operands
+max					: return max number of the operands
+bitwiseand andbit			: return the logic and of the operands
+bitwiseor  orbit			: return the logic or of the operands
+bitwisexor xorbit			: return the logic xor of the operands
+
+#________________________________________________________________________________________________________________________
+#Files
+
+open as
+file input
+close
+output
+append
+
+eof					: returns nonzero if Eof
+fileexists				: returns true if the file exists
+filecopy				: copy a file
+filemove				: move a file
+filerename				: rename a file
+freefile				: return the handle of the next free file
+kill					: delete filename
+loc					: returns position in file
+lof					: returns length of file
+readbyte				: return a byte from the file
+rename					: rename file
+seek					: seek file position/return current file position
+writebyte				: write a byte in the file
+
+#_________________________________________________________________________________________________________________________
+#Dirs
+
+chdir(path)				: change directory
+dir dir$				: returns current path
+direxists(path)				: returns true if directory exists
+dirfirst(path)				: returns first entry in path dir
+dirnext					: returns next entry in path dir
+mkdir(path)				: create a new directory
+rmdir(path)				: remove directory
+
+#_________________________________________________________________________________________________________________________
+#console output
+
+print
+
+#_________________________________________________________________________________________________________________________
+#Date and time
+
+date date$				: returns date in MM-DD-YYYY format
+time time$				: return time in HH:MM:SS format
+ticks					: returns current timer value
+
+#_________________________________________________________________________________________________________________________
+#Memory Bank
+
+
+reservebank(bank,size)			: make a raw memory bank. there are 256 bank ( 0 - 255)
+freebank(bank)				: destroy a memory bank
+copybank(s,d)				: copy the banco s in d
+loadbank(filename,optional bank)	: load a file in memory bank (if omitted the current )
+savebank(filename,optional bank)	: save memory bank in a file
+
+setbank(optional bank)			: set the current bank (if omitted return the current)
+sizebank(optional bank)			: return the bank memory size (if omitted return the value of current bank)
+
+poke(optional bank,address,value)	: write a byte value in memory bank at specific address
+doke(optional bank,address,value)       : write a 16bit value in memory bank at specific address
+loke(optional bank,address,value)	: write a 32bit value in memory bank at specific address
+
+peek(optional bank,address)		: read a byte value in memory bank at specific address
+deek(optional bank,address)		: read a 16bit value in memory bank at specific address
+leek(optional bank,address)		: read a 32bit value in memory bank at specific address
+
+memcopy(sbank,s,dbank,d,size)		: copy a part of bank memory s in d
+#_________________________________________________________________________________________________________________________
+#Screen
+
+setdisplay(w,h,bpp,m)		 	: open the screen/window in double buffer. 0=screen|1=window|2=resizable
+setcaption(title)			: change the display window title
+caption()				: return the display window title
+displaywidth				: give the display width
+displayheight				: give the display height
+displaybpp				: give the display color depth
+
+screen(n)				: attivated the logic screen n
+directscreen 				: direct drawing on display like a screen(more fast but sprite and offset does not works)
+screenopen(n,w,h,dx,dy,dw,dh,flag)	: open the logic screen n of dimension w,h in display coordinates dx,dy,dw,dh
+screenclose(n)				: close the logic screen n
+
+screenclone(n,s,x,y,w,h,flag)		: create a  new viewport in logic screen s
+screencopy(n,x,y,w,h,nd,xd,yd)          : copy a portion of screen n in a screen nd
+screenfade(n,t)				: fade the screen n in t time
+screenfadein(n,i,t)			: fade the screen n to image i in t time
+screencrossfade(n,i,t)			: fade the screen n from current screen  to image i in t time
+screenalpha(n,a)			: set alpha(trasparency) of screen n
+screenlock(n)				: lock the  screen n for direct graphics access
+screenunlock(n)				: unlock the  screen n for direct graphics access
+
+screenrect(x,y,w,h,flag)		: change the display output coordinates of the current screen
+xscreenrect				: give the x coordinate of current screen viewport
+yscreenrect				: give the y coordinate of current screen viewport
+wscreenrect				: give the w value of current screen viewport
+hscreenrect				: give the h value of current screen viewport
+flagscreenrect				: give the flag value of current screen viewport
+
+screenwidth				: give the current screen width
+screenheight				: give the current screen height
+
+offset(x,y)				: set the logical current screen position
+xoffset					: give the x coordinate offset in current screen
+yoffset					: give the y coordinate offset in current screen
+
+cls 					: clear the current logic screen
+
+screenswap				: update display,bobsystem,spritesystem
+autoback setautoback(m)			: enable / disable automatic screenswap  m=0 disable m>0 wait m milliseconds and perform screenswap m<0 perform the invocate in code screenswap after m milliseconds
+dualplayfield(optional m)		: set/unset automatic update of a screen upper sprite
+waitvbl					: wait automatic screenswap
+fps(optional n)				: set/unset or give the current frame rate counter (0/1/none)
+
+#_________________________________________________________________________________________________________________________
+#Graphics
+
+rgb(r,g,b)				: give current color in Uint32 format
+color (c,optional v)			: set  palette color c with value v se missing give the current color c
+palette(optional 0-255 param)		: set all palettes color
+ink(c)					: select the current color in Uint32 format
+
+point(x,y)				: give the color of x,y point
+dot(x,y)				: write x,y point with a current color
+plot(x,y,c)				: write x,y point with a c color
+line(x,y,x1,y1)				: write a line
+box(x,y,x1,y1)				: write a empty rettangle
+bar(x,y,x1,y1)				: write a fill rettangle
+circle(x,y,r)				: write a circle
+fillcircle(x,y,r)			: write a fill circle
+ellipse(x,y,rx,ry)			: write a ellipse
+fillellipse(x,y,rx,ry)			: write a fill ellipse
+paint(x,y)				: fill a close area
+
+#_________________________________________________________________________________________________________________________
+#File graphics input output
+
+loadimage(filename,n)			: load a graphics file in a slot n
+saveimage(filename,n)			: save slot n in a graphics file(only bmp)
+loadsound(filename,n)			: load a wave file in a sound slot n
+savesound(filename,n)			: save a wave file from sound slot n
+loadmusic(filename)			: load a music module (xm,mod,ogg and only for linux mp3)
+
+#_________________________________________________________________________________________________________________________
+#Image manipulation
+
+hotspot(n,x,y)				: select the point of coordinates in a imageslot (n,0,0=up left(default) | n,1,1=center | n,2,2 =down right)n= image
+setcolorkey(c)				: set the colorkey for bitmap transparency if set -1 (default ) will be used the left-up corner color.
+imageexists(n)				: give 1 if the image buffer n exist 0 if empty
+imagewidth(n)				: give the image n width or error if image n if empty
+imageheight(n)				: give the image n height or error if image n if empty
+deleteimage(n)				: erase the image n of the memory
+copyimage(s,d)  			: copy image s to image d
+setalpha(n,a)				: set trasparency
+zoomimage(n,zoomx,zoomy)		: zoom image
+rotateimage(n,angle)			: rotate image
+rotozoomimage(n,angle,zoom)		: rotate and zoom image
+
+#_________________________________________________________________________________________________________________________
+#Blitting
+
+blt(n,sx,sy,sw,sh,dx,dy)		: copy a part of graphics slot in screen
+pastebob(x,y,n)				: copy on screen image n at x,y performing clip
+pasteicon(x,y,n)			: copy on screen image n at x,y without clipping
+grab(n,x,y,w,h)				: grab a a selectarea and copy it in slot n
+
+#_________________________________________________________________________________________________________________________
+#Sprite system
+
+#In this implementation there are 512 sprites software that are indipendent from the screens
+
+spriteclip(x,y,w,h)			: set the visibilty area of sprites
+sprite(n,x,y,fr)			: set or move the sprite n at x,y with image fr
+deletesprite(n)				: unset sprite n
+xsprite(n)				: give the x of sprite n
+ysprite(n)				: give the y of sprite n
+spritewidth(n)				: give the width of sprite n
+spriteheight(n)				: give the height of sprite n
+frsprite(n)				: give the frame of sprite n
+livesprite(n)				: give 1 if sprite n is "live"
+spritehit(n,optional x)			: give 1 if sprite n have a collission with sprite x if x=-1 with any
+autoupdatesprite(m)			: set/ unset automatic sprites update at screenswap
+updatesprite				: manual sprites updates at next screenswap
+
+#_________________________________________________________________________________________________________________________
+#Bob system
+
+#In this implementation there are 512 bobs software that are dipendent from the screens and performs
+#background preserve
+
+setbob(n,scr)				: set bob n at logic screen scr
+bob(n,x,y,fr)				: set or move bob n at x,y with frame fr
+deletebob(n)				: unset bob n
+xbob(n)					: give x of bob n
+ybob(n)					: give y of bob n
+bobwidth(n)				: give width of bob n
+bobheight(n)				: give height of bob n
+frbob(n)				: give the frame of bob n
+livebob(n)				: give 1 if bob n is "live"
+bobhit(n,optional x)			: give 1 if bob n have a collision with bob x if x=-1 with any
+autoupdatebob(m) 			: set/ unset automatic bobs update at screenswap
+updatebob  				:  manual bobs updates at next screenswap
+
+#_________________________________________________________________________________________________________________________
+#Text draw
+
+text(x,y,s,testo)			: print the text testo  on current screen with s size
+setfont(path)				: select the font
+textrender(testo,s,n)                   : make an image slot n with the text  write with a current font and size s
+
+#_________________________________________________________________________________________________________________________
+#Print screen
+
+pen(c)					: set prints color (without parameter give the current color)
+paper(c)				: set caractere back color (without parameter give the current color)
+fprints(testo)				: print a text monospace without cariage return
+prints(testo)				: print a text monospace
+locate(x,y)				: move the cursor at x y
+atx					: give x of cursor
+aty					: give y of cursor
+curson					: show the text cursor on screen at(atx,aty)
+cursoff					: hide the text cursor
+inputs(prompt,defs)			: give the string insert to keyboard(default is default text)
+zoneinputs(x,y,l,default)		: give the string insert to keyboard in  x,y coordinates with l lenght
+#_________________________________________________________________________________________________________________________
+#Sounds and music
+
+soundexists(n)				: give 1 if the sound buffer n exist 0 if empty
+deletesound(n)				: delete from memory sound n
+copysound(s,d)				: copy  sound bank s in sound bank d
+
+musicexists()				: give 1 if the music is load 0 if empty
+
+playsound(n,c,optional l)		: play the sound n in  channel c l loops
+volumesound(c,optional v)		: change the volume of channel c (-1  all) at value v (0-128) without v or -1 give the current volume
+stopsound(optional c)			: stop the  wave play in channel c (-1 or none =all)
+pausesound(optional c)			: paused channel c (-1 or none =all)
+resumesound(optional c)			: unpaused channel c (-1 or none =all)
+vumetersound(optional c)                : give the current state of sound channel (-1 or none=all)
+positionsound(c,angle,dist)             : position sound in 3d space
+soundchannels(n)	                : dinamically change the number of channells managed by sdlBasic
+
+playmusic(n)				: play track xm,mod,ogg,mp3 n=number of ripetition(-1 always)
+positionmusic(p)                        : move the execution at p second
+stopmusic				: terminate the music play
+pausemusic                              : set pause of the current music
+resumemusic                             : unset pause of musica
+rewindmusic                             : report at start the music
+fademusic(t)				: music fade
+volumemusic(optional v)			: change the volume of music (0-128) -1 or none give the current volume
+speedmusic(v)                           : change the speed of music
+#_________________________________________________________________________________________________________________________
+#Keyboard
+
+key(keycode)				: give 1 if is press the key keycode
+inkey					: give ascii code of key press
+waitkey(optional keycode)		: wait a key pression (0 =any key)
+
+#_________________________________________________________________________________________________________________________
+#Mouse
+
+xmouse					: give mouse x coordinate on display
+ymouse					: give mouse y coordinate on display
+xmousescreen(n)				: give mouse x coordinate on screen
+ymousescreen(n)				: give mouse y coordinate on screen
+bmouse 					: give the buttonclick on the mouse
+mouseshow				: show the mouse cursor
+mousehide				: hide the mouse cursor
+mousezone(x,y,w,h)			: give 1 if the mouse pointer is in rectangle(xy with size wh)
+
+#_________________________________________________________________________________________________________________________
+#Joystick
+
+**xjoy					: give joystick x coordinate
+**yjoy					: give joystick y coordinate
+**bjoy					: give joystick button pressed
+
+#_________________________________________________________________________________________________________________________
+#SDLtime
+
+wait(t)					: wait t milliseconds
+timer					: give the current tick
+
+#_________________________________________________________________________________________________________________________
+#* non work
+#** non work and be tested
+#-> to delete
+
+
+#to do:
+#
+#msgbox
+#fsel
+#dirsel
+#inputbox
+#listbox
+#otionbox
+#checkbox??
+#
+#menu system
+#
+#socket system
+#
+#sprite editor
+#ide write in sdlBasic
+#

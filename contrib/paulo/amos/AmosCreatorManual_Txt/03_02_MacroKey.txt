@@ -1,0 +1,29 @@
+Rem ************************************ 
+Rem *        AMOS Example 3.2          * 
+Rem *         The Macro keys           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem set up screen
+Locate 0,0 : Centre "<Use Amiga Fx to enter your commands>"
+Locate 0,3 : Print String$("*",40)
+Locate 0,6 : Print String$("*",40)
+Locate 0,4
+Rem load macros
+For F=1 To 10
+   Read COMMAND$
+   Rem load first six characters into function key  
+   Key$(F)=Left$(COMMAND$,6)
+   Rem Set Right Amiga functions to the same as the left version
+   Key$(F+10)=Left$(COMMAND$,6)
+   Rem display commands 
+   Locate X Curs,(F-1)/5+4 : Print COMMAND$;
+Next F
+Rem test commands
+Do 
+   Locate 0,22 : Cline : Input "Enter you command?";C$
+   Locate 0,23 : Cline : Print "You typed ";C$
+Loop 
+Rem command data 
+Data "Get     ","Drop     ","Look    ","Read    ","Enter  "
+Data "Invent  ","Save     ","Load    ","Restore ","Oops"

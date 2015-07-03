@@ -1,0 +1,41 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.11         * 
+Rem *           Font List              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load fonts from the disc 
+Get Fonts 
+Rem Count fonts
+COUNT_FONTS
+Rem Display available fonts  
+Centre "Fonts Installed" : Print : Print String$("=",40)
+Print "Rom   Fonts:";ROM_FONTS
+Print "Disc  Fonts:";DISC_FONTS
+Print "Total Fonts:";FONT_COUNT
+End 
+Procedure COUNT_FONTS
+   Rem A small procedure to get the number and type of fonts on the disc
+   Shared DISC_FONTS,ROM_FONTS,FONT_COUNT
+   Rem Initialise variables 
+   F=1 : F$=Font$(F) : DISC_FONTS=0 : ROM_FONTS=0 : FONT_COUNT=0
+   Rem Check through font list
+   While F$<>""
+      Inc FONT_COUNT
+      Rem Read font name 
+      F$=Font$(F) : TYPE$=Mid$(F$,35,4)
+      Rem Find font type 
+      If TYPE$="Disc" Then Inc DISC_FONTS Else Inc ROM_FONTS
+      Inc F
+   Wend 
+End Proc
+Procedure FONT_SIZE[F]
+   Rem Get size of font number f
+   Shared SIZE
+   F$=Font$(F)
+   If F$=""
+      SIZE=0
+   Else 
+      SIZE=Val(Mid$(F$,30,3))
+   End If 
+End Proc

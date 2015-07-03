@@ -1,0 +1,27 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.12        * 
+Rem *          Moving a menu           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Open a high resolution screen
+Screen Open 0,640,200,16,Hires
+Rem Define title 
+Menu$(1)="Menu 1"
+Rem Create first level of menu 
+Menu$(1,1)="Level 1.1"
+Menu$(1,2)="Level 1.2"
+Rem Generate second menu level 
+Menu$(1,1,1)="Option 1.1.1"
+Menu$(1,1,2)="Option 1.1.2"
+Menu$(1,2,1)="Option 1.2.1"
+Menu$(1,2,2)="Option 1.2.2"
+Rem Activate menu
+Menu On 
+Curs Off 
+Rem Print instructions 
+Locate 0,10 : Centre "Select a menu with the Right button"
+Locate 0,11 : Centre "Now move the mouse with the Left button depressed"
+Locate 0,12 : Centre "The menu will be dragged with the mouse pointer"
+Do 
+Loop 

@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00 
+[HKEY_CLASSES_ROOT\sdlBasicFile] 
+@="sdlBasic program runtime" 
+[HKEY_CLASSES_ROOT\sdlBasicFile\DefaultIcon] 
+@="c:\\programmi\\sdlBasic\\sdlBasic.exe,3" 
+[HKEY_CLASSES_ROOT\sdlBasicFile\shell] 
+@="open" 
+[HKEY_CLASSES_ROOT\sdlBasicFile\shell\open] 
+[HKEY_CLASSES_ROOT\sdlBasicFile\shell\open\command] 
+@="c:\\programmi\\sdlBasic\\sdlBasic.exe \"%1\"" 

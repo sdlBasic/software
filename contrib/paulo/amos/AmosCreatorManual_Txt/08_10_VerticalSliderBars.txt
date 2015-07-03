@@ -1,0 +1,26 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.10         *   
+Rem *       Vertical slider bar        *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Curs Off : Double Buffer : Cls 0
+Locate 0,0 : Centre "Move the slider with the mouse"
+Autoback 0
+Reserve Zone 1
+Set Zone 1,0,0 To 25,190
+VSLIDE[10]
+Do 
+   SREAD[1]
+Loop 
+Procedure SREAD[Z]
+   YM=Y Screen(Y Mouse)
+   While Mouse Zone=Z
+      Y=Y Screen(Y Mouse)
+      If Y<>YM and Mouse Key=1 Then VSLIDE[Y] : YM=Y
+   Wend 
+End Proc[Y]
+Procedure VSLIDE[Y]
+   Vslider 5,0 To 15,190,190,Y,5
+   Screen Swap : Wait Vbl 
+End Proc

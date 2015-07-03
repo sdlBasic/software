@@ -1,0 +1,5 @@
+do
+	setdisplay(320,200,0,0)
+	prints("ciao")
+	waitvbl
+loop

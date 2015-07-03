@@ -1,0 +1,35 @@
+'
+'	Explosion - I hope
+'
+
+setDisplay(640,480,32,1)
+autoback(-15)
+
+sheet = loadImage("./media/explosion_01.png",0)
+explode = loadSound("./media/explode.wav")
+expo =0
+y=0
+delay =0
+explosion=true
+
+while not key(k_esc)
+cls
+
+	blt(0,expo*128,y*128,128, 128,100,100)
+	delay = delay + 0.2
+	if delay >= 1 then
+		delay=0
+		y= y + 1
+		expo +=1
+		if expo >25 then
+			if y > 4 then
+				expo = 0
+				y=0
+			end if
+		end if
+	end if
+screenswap
+if expo= 0 then
+	playsound(explode,1)
+end if
+wend

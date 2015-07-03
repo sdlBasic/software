@@ -1,0 +1,281 @@
+From correasilva@portugalmail.pt Wed Jun  9 21:59:00 2004
+Return-Path: <correasilva@portugalmail.pt>
+Received: from smtp4.libero.it (193.70.192.54) by ims2b.libero.it (7.0.028)
+        id 40C6BDE1000461C3 for __vroby__@libero.it; Wed, 9 Jun 2004 21:59:02 +0200
+Received: from galadriel.portugalmail.pt (195.245.179.73) by smtp4.libero.it (7.0.027-DD01)
+        id 40A4C1E904A71C8D for __vroby__@libero.it; Wed, 9 Jun 2004 21:59:02 +0200
+Received: by galadriel.portugalmail.pt (Postfix on SuSE Linux 7.3 (i386), from userid 65534)
+	id 1610960CFB; Wed,  9 Jun 2004 20:59:00 +0100 (WEST)
+Received: from 193.126.177.86 ( [193.126.177.86])
+	as user correasilva@portugalmail.pt@imap.portugalmail.pt by webmail.portugalmail.pt with HTTP;
+	Wed,  9 Jun 2004 20:59:00 +0100
+Message-ID: <1086811140.40c76c04d9466@webmail.portugalmail.pt>
+Date: Wed,  9 Jun 2004 20:59:00 +0100
+From: correasilva@portugalmail.pt
+To: __vroby__@libero.it
+Subject: the cubic curve used on DPaint
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+  boundary="-MOQ1086811140e8a966382fbd70f819eba9158ac897d5"
+User-Agent: Internet Messaging Program (IMP) 3.0
+X-Originating-IP: 193.126.177.86
+Status: R
+X-Status: N
+X-KMail-EncryptionState:
+X-KMail-SignatureState:
+
+This message is in MIME format.
+
+---MOQ1086811140e8a966382fbd70f819eba9158ac897d5
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
+
+
+
+(attch:sdlbas_040605.zip_)
+
+
+
+
+Hi Vroby!
+  (for now it's just a part of the reply - again, late i'll send the rest)
+  Attached i'm sending a cubic curve example like used on Deluxe Paint (the
+power point is the curve middle point)
+  For this i needed to use 6 points (instead of 4 from earlier cubic example) -
+the curve edjes (0 and 2)(handled), the old power point (1) the arc center(3),
+the arc midpoint(5)(handled), and the center of the 4 faced parallel polygon
+(virtually drawn by points 0,1,2,3) where the arc is drawn (4)   - is from the
+distance between points 4 and 5 i can find 1 and 3  (multiplying this distance
+by sin(45º)/(sin(45º)-.5) (2.414328))
+  One more i'm sending you is what i can understand as a shoot-em-up skeleton -
+now my difficulty is to think how the whole thing works...
+  One more suggestion i don't know if is possible: what about a small command
+would let us change the default sdlBasic host GUI window title name (which is
+defaultly 'sdlBasic')?   As some applications uses it, i think it can be
+possible... like: Windowtitle("FrozenBubble - sdlBasic version")
+
+
+
+
+
+(...)
+>> is this all related to memory banks?
+> the sdlBasic .txt contain all commads implemented. in source code there are
+only generic copyright (lgpl). But it's my original code not copied from nothing.
+
+Ok, thanks!  i saw it and started testing! =)
+I think a command is missing: banksize(optional bank)
+For example:[code]
+ loadbank("test1.bin",1)
+lastadr=banksize(1)
+  for i=0 to lastadr-1
+     vl=peek(1,i)
+     poke(1,i,255-v1)
+   next
+ savebank("test1_b.bin",1)
+[/code]
+
+Since the savebank() command knows the size of the bank, i think can be useful
+we knowing this size too
+
+
+
+
+
+
+
+>>  One mail you told me not beign sure which pictures formats sdlBasic opens or
+not, so i started to test one by one - i'm very glad it supports .xpm (otherwise
+it's weird why not supporting .xbm since it's very looking like) - very missing
+is .tif and .mag support (is the picture support entirely related to sdl libraries?)
+>  Tank'you for the test of bitmap format. the problem of tif is resolved. i
+have recompiled sdl_image.dll with support of it.
+
+  You welcome!
+  Do you know what is happening to .xbm?  i think all libraries comes with .xpm
+would come with .xbm too, as they have a very looking-like codec (just like .lbm
+and .iff)
+  Do you think sdl picture library developer is also interested supporting .mag?
+  About .tif, i got deeper on trying more compression and colourspace modes
+(this can be more related to sdl library author).
+  Colourspaces: opened rgb (i think indexed too) and cmyk - didn't open cielab.
+ (cmyk is merely inverted to rgb without recalibration (the easier way) -
+#FFFF00 is not the same as cmyk:0,0,100,0 when calibrated  (calibration seems to
+use gamma and hue adjusts as well, as cmyk from an inkjet print can also look
+different from a laser or offset print))
+  Compressions: opened none, lzw (that one Unisys patented like .gif, .lzh and
+.lha) and packbits - didn't opened zip, jpeg, ccitt3, ccitt4 and deflate (i
+didn't tried all compressions from Tiff v6 used on XnView)
+
+
+>  I have altrought resolved the problem with mp3.
+>  Now sdlBasic can be play mp3 ogg xm mod and midi on linux and windows!!!
+
+
+  I found a bug on .ogg - i converted io.sid to io.ogg with sid2wav and audacity
+- used -u commandline for converting into a 8khz sample (smaller result keeping
+quality) - it plays fine on WinAmp, but not on sdlBasic (plays lots faster) -
+otherwise other .ogg and .mp3 tunes plays nicely  (like those from  that Helder
+Rei do Kuduro - maybe the problem is .ogg from sdl library doesn't recognize
+8khz sample frequency)
+
+
+
+
+
+
+
+(...)
+>> Weird is it seems to support .tif, but it wasn't what i got as feedback (.tif
+has lots of compression modes (lzh, zip, jpeg...) - i tried the uncompressed
+mode) (.tif were very, very popular on MacOS during end 80's and early 90's (and
+still is, even after appearing .jpg and .png) - commercial applications like
+Aldus Freehand (now Macromedia) since versions 1 to 4 and Adobe Photoshop since
+versions 1 to 2.5, were very based on .tif - mac scanning and ocr apps also used
+.tif as default that time ) .lbm seems to get started from windows version of
+Deluxe Paint (which is a bit different from Amiga version) (PaintShopPro seems
+to beign able to import/export it) - seeing .lbm from an hex editor (like
+HexWorkshop) the 4-character chunk signatures seems to be exactly the same as
+.iff, but the
+ displaying is not the same (weird colours and more situations like this) - weird...
+> iff are supported lbm not.....
+
+I can get both running! (in my oppinion both are very welcome)
+
+
+>> As well also, there is one emulator project for emulating PPC and MacOS-X -
+named PearPC (i couldn't test yet since having not enough disk space needed for
+imagedisks and still using w9x), would be interesting testing sdlBasic and
+wxBasic on it
+> But required macos??
+
+  PearPC no, it's an emulator just like UAE, BasiliskII (Mac-68k), Mame or any
+other - it emulates PPC (603, 604, G4 and G5) on any x86 (afaik... - if someone
+port it to Alpha and Mips would be nicely welcome too)    - for now (afaik
+again) the only OSes tested on it were MacOS-X, Linux-PPC (Mandrake, Debian,
+YellowDog...) and Darwin (Darwin is that open-source MacOS-X kernel (based on
+NextSTEP and BSD, now ported only to x86 and PPC architectures), also
+distributed as OS with WindowMaker gui (that one comes with RedHat 5.0?))
+  I told you this in the case you may want to test sdlBasic in the MacOS-X
+version more easily
+
+
+
+
+
+
+
+>> in next time i send you a .reg file to update the register but you can
+another works missing.....
+> in allegate (a new dlls ,sdlBasic and interface )
+
+  A question: how can i expand the sdlBasic-setup.exe into a folder instead of
+having to run it? - i'm asking this because i like more .zip distributions than
+setup.exe (telling better: i hate setup.exe...) (for me, a install document
+should be not much more than a compressed folder, just like .rpm is)
+  My concern is also not knowing what really changed (i got the same .dll
+documents as from the old .zip distribution with a .bat getting these back from
+c:\windows\system folder) - what i could see were about SDL_image.dll (36 to
+40kb) and SDL_mixer.dll (264 to 320kb) - confirm?
+  (I'm asking this because some old Opera setup.exe i could expand when renamed
+to .zip, and some others to .cab - i don't know which compression format
+Nullsoft uses)
+  One more suggestion: how far is possible writing in the sdlBasic .rc document
+the information about date and version of the actual sdlBasic?  - this is
+important to get assured which sdlBasic version is the sdlbasic.exe i'm using
+
+
+
+
+
+>>   Btw, i'm sending you a more accuraced player sprite motion (a bit like
+ the one i used on skatetribe - the tip is using a variable which goes from
+ edges (-64 to 64 is what i used) to 0, and the up/down keys forces against
+ this variable) In my viewpoint, the interesting on analising games like IO
+ is the experience we can get for making our own shoot-em-up games, as well
+ being part of the sources used on open-source game development (i found no
+ one good open-source shoot-em-up yet)
+> tank'you i think to integrate it in my work....
+
+you welcome!
+
+
+
+
+>>> another dolorous things. I'm using true colors screen and not palette
+ resolution. When i use 256 colors screen i make a emulation of true colors
+ - this way can't be used color cicling. The only way possible is rewriting
+ with other color but is slower way......
+>>   I have a solution i don't know if it is easy to implement on your
+ sdlbasic interpreter C sources, and using SDL libraries - the idea is:
+ choosing the colourmode:
+ - as rgb (from 0 to 16777216)
+ - as index (from 0 to 255)
+ with commands like
+ - colourmode=rgb (or colourmode=0 - this one would be the default mode)
+ - colourmode=index (or colourmode=1)
+>>   (i'm assuming you could do as well, for example, colour cycling directly
+with a small C example and SDL libraries)
+>>   The resulting 4 situations:
+>> 1) colourmode=rgb on bitdepth from 1 to 8
+   - the palette matrix would be the current display palette
+   - rgb output is set by closest euclidian distance
+       (like from an algorithm from a picture filter i sent you)
+       (if you output 0xFFFF00 and the closest palette is 0xF0E800,
+          the output is 0xF0E800)
+       (euclidian on C can be fast enough)
+>> 2) colourmode=rgb on bitdepth from 9 to 32
+   - as i think is used now
+>> 3) colourmode=index on bitdepth from 1 to 8
+   - i think it's a direct output, seems to not be that hard
+>> 4) colourmode=index on bitdepth from 9 to 32
+   - the output is the rgb value from the index palette
+       (the only problem with this, logically acceptable in the user
+          viewpoint as you're using a colour representation, is as
+          when you're using 2 indexed colours with the same value,
+          like index 0x02 and 0x5C with 0x40E329, you must not count
+          which 0x40E329 you're using )
+>> As back, using the point() command we should know which colourmode we
+ want (using indexed from rgb would need euclidian calculation as well) -
+ some default function may be needed to look out which colourmode is
+ currently beign used A question: if the solution is this, the only
+ difficulty only would remains on picture loading, or it's not a problem at
+ all?
+> sdlbasic use linear bitmap.
+Simple for every pixel there can be or 1 or 2 or 4 bytes.
+
+  I know... i think my suggestion wouldn't affect nothing on it
+  I think, as well, the hardware paletted mode on 8bitdepth is really needed:
+commands like color() could affect directly into the 8bitdepth palette
+  In the sources, where are you dealing with bitdepths and colour outputting?
+(as well the rgb emulation on 8bitdepth)?   i'm not good in C coding but maybe i
+can help...
+  The fact is i'm really curious about sdlBasic performing colour cycling! =))))
+(as well beign able to save .bmp pictures as 8bitdepth...)
+
+
+
+
+
+
+> still have found the command gamma ramp but not sure on how works.
+
+  How it can work on sdlbasic?   From the user viewpoint would be like entering
+Gamma(1.4) , Gamma(0.7) , Gamma(2.0) or any other value  - this would affect the
+palette (8bit depth) or rgb output - when you enter a colour like #4080C0 , the
+displaying output would be, with gamma 1.4 (instead of 1.0) like #7797C1  (note
+that colours like #000000 and #FFFFFF always keeps as #000000 and #FFFFFF
+whatever the value of Gamma() is )  , but when you get the point() back, the
+value would keep as #4080C0 - the gamma would only affect output
+  I don't know if sdl libraries defaulty supports gamma anyway
+  I can send you soon some examples would simulate it, but i really think is
+more useful you beign able to adjust gamma with a command like gamma() would be
+in the sdlBasic display core, specially when using sprites grabbed from
+pictures... (i think you can imagine a situation with too dark or too light
+graphics over loaded pictures... =||| )
+
+regards,
+Paulo
+
+
+

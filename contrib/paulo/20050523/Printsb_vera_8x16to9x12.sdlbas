@@ -1,0 +1,45 @@
+'--- An example to avoid installed fonts and pictures for
+'---   a mere text displaying (is it useful or useless?)
+'--- Font drawing readed from the hexdump below (z$[]) (8x8pixels)
+'--- Bug: hard to define Textplot(a$) as a sub-routine 
+'--- Bug: prints(asc(chr$(237))) command provides -19 as result (237-256)
+'---   isn't it weird? - can this be related to signed integers?
+
+include"printsb_vera_8x16to9x12.sdlblib"
+
+
+xedge=800:yedge=600:wndwd=0
+setdisplay(xedge,yedge,32,wndwd):paper(0x9f7F7F):ink(0):pen(0):cls
+setautoback(25)
+
+pen(0xFFFFFF):paper(0xAA4400)
+
+locate(25,6):printsb(" Hello world! (locate(25,6)) ")
+'locate(25,6):prints (" Hello world! (locate(25,6)) ")
+
+paper(0xFEDCBA):pen(0x123456)
+locate(4,1):printsb(" This example tries to display a text without using any default .ttf font installed on the operative system fonts folder, Vera, DejaVu, or whatever - just using text with bitmap characters, like used on Amos (or any other 8bit (and 16bit?) ansi-basic interpreter) ")
+
+paper(0xABCDEF):pen(0x654321)
+locate(8,12):printsb(" The purpose is suggesting a way to sdlBasic display text not needing any installed specific typeface - allowing us to run .sdlbas programs on protected operative systems on public computers (like at schools, companies, public libraries, cibercafes, etc.) ")'
+
+paper(0xDEFABC):pen(0x321654)
+locate(10,17):printsb(" And showing .sdlbas stuff to friends and colleagues beyond our personal desktop or portable computers. (protected operative systems normally lacks us from the possibility of installing typefaces like Vera or DejaVu) ")
+
+paper(0xCAFDBE):pen(0x465132)
+locate(2,21):printsb(" (for now, the problem of the method i'm using is that it's too slow...) ")
+
+paper(0xCDEFAB):pen(0x316524)
+locate(5,23):printsb(" Anyway, my idea for this suggestion is us using it as a choice for .sdlbas coders, for easier backward-compatibility (this is a huge concern i have - is deeply boring have to constantly completelly recode all our stuff monthly) ")
+
+
+
+paper(0xEEDDCC):pen(0x442143)
+locate(5,27):printsb(" Bug found using this method - since i'm using a 8x8 typeface, and the .ttf used now is larger than this (9x13) - and i'm using locate() command - if i try to write text close to bottom, the display scrolls... ")
+
+
+
+
+
+waitkey(k_esc)
+

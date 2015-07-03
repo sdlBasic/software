@@ -1,0 +1,22 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.7         * 
+Rem *        Screen scrolling          *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Load Iff "AMOS_DATA:IFF/Amospic.IFF",1
+Screen Open 0,320,256,32,Lowres
+Get Palette 1 : Curs Off : Flash Off 
+Screen Copy 1 To 0 : Screen 0 : Double Buffer : Bob Update Off 
+S=2
+Rem Define scrolls 
+Def Scroll 1,80,80 To 240,240,0,-S : Rem scroll screen
+Repeat 
+   For Y=0 To 199 Step S
+      Scroll 1
+      Screen Copy 1,80,Y,240,Y+S To 0,80,240-S
+      Screen Swap 
+      Screen Copy 1,80,Y,240,Y+S To 0,80,240-S
+      Wait Vbl 
+   Next Y
+   Screen Swap : Wait Vbl : Scroll 1
+Until Mouse Key

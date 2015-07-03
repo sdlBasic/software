@@ -1,0 +1,19 @@
+Rem ************************************ 
+Rem *        AMOS Example 11.1         * 
+Rem *        Hardware sprites          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load sprite images from the disc 
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Rem load sprite colours into current screen  
+Get Sprite Palette 
+Curs Off : Cls : Paper 0 : Locate 0,0 : Centre "<Hardware sprites> "
+Do 
+   Rem Move five sprites along with the mouse 
+   For S=0 To 5
+      Sprite S+9,X Mouse+S*32,Y Mouse+S*32,1
+   Next S
+   Rem Slow down sprite updates for extra smoothness
+   Wait Vbl 
+Loop 

@@ -1,0 +1,36 @@
+'
+'      Screen tutorial #13 - Extra Half Bright mode    
+'
+'
+'Open an Extra Half Bright screen
+'
+Screen Open 0,320,200,64,Lowres
+Curs Off : Flash Off : Cls 0 : Paper 0
+'
+'Set up a palette of 64 colours, using shades that show the effect of EHB mode 
+'
+Palette 0,$FFF,$EEE,$DDD,$CCC,$BBB,$AAA,$999,$888,$F00,$E00,$D00,$C00,$B00,$A00,$900,$80,$90,$A0,$B0,$C0,$D0,$E0,$F0,$8,$9,$A,$B,$C,$D,$E,$F
+'
+' Display the colours from 0-15 with their half bright colours alongside 
+'
+For A=0 To 15
+   EHB=((( Colour(A) and $F00)/2) and $F00)
+   EHB=EHB+(((Colour(A) and $F0)/2) and $F0)
+   EHB=EHB+(((Colour(A) and $F)/2) and $F)
+   Print Hex$( Colour(A),3);
+   Ink A : Bar 32,A*8 To 78,A*8+8
+   Print At(10,);Hex$(EHB,3)
+   Ink A+32 : Bar 112,A*8 To 158,A*8+8
+Next A
+'
+' Display colours 16-31
+'
+For A=16 To 31
+   EHB=(Colour(A))/2
+   Print At(20,A-16);Hex$(Colour(A),3);
+   Ink A : Bar 192,(A-16)*8 To 238,(A-16)*8+8
+   Print At(30,);Hex$(EHB,3)
+   Ink A+32 : Bar 272,(A-16)*8 To 318,(A-16)*8+8
+Next A
+Print : Print 
+Print "Cols:0-15      32-47     16-31     48-63"

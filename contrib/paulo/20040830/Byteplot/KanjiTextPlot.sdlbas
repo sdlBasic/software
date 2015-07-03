@@ -1,0 +1,81 @@
+'--- An example to displaying japanese Kanji fonts 
+'---   specially on non-japanese OSes, avoiding installed fonts 
+'---   and pictures for a mere text displaying (is it useful or useless?)
+'--- Shift-JIS encoding has close to 8000 characters
+'--- Font drawing readed from the hexdump below (z$[]) (16x16pixels)
+'---   (4 8x8 blocks)
+'--- To Do:
+'---   - beign able to use the whole 8192 characters (maybe more from unicode?)
+'---   - text beign entered as ShiftJis, Unicode (like Utf8)
+'---     and hexdump (like from utf16 big-endian)
+'--- (i still don't know how can display otherwise unicode text on sdlBasic)
+
+'function bitwiseand(a,b)
+'--- this function is also known as andbits(a,b)
+'      c=0:while ((2^c)<a) or ((2^c)<b):c=c+1:end while
+'  tmpr=0:for d=0 to c
+'    a0=(int(a/(2^d)))mod 2:b0=(int(b/(2^d)))mod 2
+'    n0=a0 and b0:tmpr=tmpr+(n0*(2^d)):next
+'      bitwiseand=tmpr
+' end function
+
+'function bitwiseor(a,b)
+'--- this function is also known as orbits(a,b)
+'      c=0:while ((2^c)<a) or ((2^c)<b):c=c+1:end while
+'  tmpr=0:for d=0 to c
+'    a0=(int(a/(2^d)))mod 2:b0=(int(b/(2^d)))mod 2
+'    n0=a0 or b0:tmpr=tmpr+(n0*(2^d)):next
+'      bitwiseor=tmpr
+' end function
+
+'function bitwisexor(a,b)
+'--- this function is also known as xorbits(a,b)
+'      c=0:while ((2^c)<a) or ((2^c)<b):c=c+1:end while
+'  tmpr=0:for d=0 to c
+'    a0=(int(a/(2^d)))mod 2:b0=(int(b/(2^d)))mod 2
+'    n0=a0 xor b0:tmpr=tmpr+(n0*(2^d)):next
+'      bitwisexor=tmpr
+' end function
+
+function hexvl(a$)
+   e=asc(ucase$(a$))
+   hexvl=abs(((e>=48 and e<=57)*(e-48))+((e>=65 and e<=70)*(e-55)))
+ end function
+
+function bytefromhexdump(a$,byteadr)
+   i=(byteadr*2)+1
+   m1$=mid$(a$,i,1):m2$=mid$(a$,i+1,1)
+   tmpr=(hexvl(m1$)*16)+hexvl(m2$) 
+   bytefromhexdump=tmpr
+ end function
+
+sub KanjiHexdumpPlot(x,y,a$,i,p)
+  for e=0 to (len(a$)/2)-1
+     ex=(bitwiseand(e,8))
+     ey=(bitwiseand(e,16))/2
+     ym=(bitwiseand(e,7))
+      v=bytefromhexdump(a$,e)
+    for z=0 to 7:ik=p:z2=7-z   
+      if (((int(v/(2^z2)))mod 2) and (2^z2)) then:ik=i:end if
+      ink(ik):dot(x+z+ex,y+ym+ey):next:next
+ end sub
+
+xedge=320:yedge=200:wndwd=1
+setdisplay(xedge,yedge,32,wndwd):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+px=2:py=2:xpz=0:i1=0:p1=0xAAAAAA
+
+ hx$="0001020204047c200000808040407c0810080811122c30001020201090681800"
+   KanjiHexdumpPlot (px*16,py*16,hx$,i1,p1):px=px+1
+ hx$="00001f00000000000000f80000000000000020301c0700000000000000fc0000"
+   KanjiHexdumpPlot (px*16,py*16,hx$,i1,p1):px=px+1
+ hx$="08080808790b0e0c000000e090101010081838680808080010101011130e0000"
+   KanjiHexdumpPlot (px*16,py*16,hx$,i1,p1):px=px+1
+ hx$="08081f10302362a20000ff0404c444442222222320202020444444c40404041c"
+   KanjiHexdumpPlot (px*16,py*16,hx$,i1,p1):px=px+1
+ hx$="000708101008000000e01008080830c001010000010100000000000080800000"
+   KanjiHexdumpPlot (px*16,py*16,hx$,i1,p1):px=px+1
+
+waitkey(k_esc)
+

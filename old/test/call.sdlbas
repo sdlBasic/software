@@ -1,0 +1,19 @@
+'
+' sdlBasic call
+'
+'_______________________________________________________
+
+dim s$[10]
+
+s$[1]=2*5
+prints(s$[1])
+screenswap
+waitkey
+erase s$
+prints(s$[1])
+screenswap
+waitkey(27)
+
+
+
+

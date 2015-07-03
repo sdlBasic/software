@@ -1,0 +1,8 @@
+setdisplay(480,120,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+a$="One tiger, two tigers, three tigers..."
+b$="tiger"
+prints("a$="+chr$(0x22)+a$+chr$(0x22))
+prints("b$="+chr$(0x22)+b$+chr$(0x22))
+prints("tally(a$,b$)="+str$(tally(a$,b$)))
+waitkey
+

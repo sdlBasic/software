@@ -1,0 +1,12 @@
+'- .lbm - a bit looking like Amiga .iff (or almost exactly the same 
+'- with some differences?)
+  finp$="lbm.lbm"
+xedge=256:yedge=212
+  setdisplay(xedge,yedge,32,1)
+  paper (0xffffff):ink (0x000000): pen (0x000000):cls
+  loadimage(finp$,1):pasteicon(0,0,1)
+  waitkey
+
+
+
+

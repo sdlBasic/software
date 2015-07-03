@@ -1,0 +1,24 @@
+Rem ************************************ 
+Rem *        AMOS Example 6_4          * 
+Rem *            Clipping              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Open a screen for the instructions 
+Screen Open 2,640,40,4,Hires
+Screen Display 2,140,260,,
+Print "Press the LEFT button to activate clipping"
+Print "Click on the RIGHT button to deactivate clipping"
+Rem Initialize screen 0 (default)
+Screen 0 : Cls 6 : Ink 2,1,0
+Rem draw boxes 
+Do 
+   If Mouse Key
+      If Mouse Key=1 : Clip 80,50 To 240,150 : End If 
+      If Mouse Key=2 : Clip : End If 
+      While Mouse Key : Wend 
+   End If 
+   Set Pattern Rnd(30)+1
+   BX=X Screen(X Mouse) : BY=Y Screen(Y Mouse)
+   Bar BX,BY To BX+50,BY+50
+Loop 

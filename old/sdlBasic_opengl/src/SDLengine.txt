@@ -1,0 +1,205 @@
+SDLengine elenco comandi
+_______________________________________________________________________________________________
+initialize				: avvia l'engine e i parametri di default
+terminate				: termina sdl libera la memoria e resettta i parametri
+
+_________________________________________________________________________________________________________________________
+Screen
+
+setdisplay(w,h,d,m)		 	: apre lo schermo/finestra in double buffer in modo 0=screen|1=window|2=resize
+displaywidth				: restituisce la larghezza del display
+displayheight				: restituisce l'altezza del display
+displaybpp				: restituisce la profondita di colore del display
+
+screen(n)				: attiva lo schgermo logico n
+directscreen 				: apre direttamente il display come screen(more fast but sprite and offset does not works)
+screenopen(n,w,h,dx,dy,dw,dh,flag)	: apre lo schermo logico n di dimensione w,h nelle coordinate dx,dy,dw,dh, del display
+screenclose(n)				: chiude lo schermo logico n
+screenclone(n,s,x,y,w,h,flag)		: crea una nuova entrata nello schermo s
+screenrect(x,y,w,h,flag)		: modifica le coordinate di output sul display dello screen corrente
+screencopy(n,x,y,w,h,nd,xd,yd)          : copia una porzione di schermo da n a nd
+screenfade(n,t)				: sfuma lo screen n in t time
+screenfadein(n,i,t)			: sfuma lo screen n dal nero verso l'immagine i in t time
+screencrossfade(n,i,t)			: sfuma lo screen n dall'imagine corrente verso l'immagine i in t time
+screenalpha(n,a)			: setta il parametro alpha(trasparenza) allo screen n
+screenlock(n)				: blocca lo screen n per l'accesso diretto dai comandi grafici
+screenunlock(n)				: sblocca lo screen n per l'accesso diretto dai comandi grafici
+xscreenrect				: restituisce la coordinata x del rettangolo di output dello screen
+yscreenrect				: restituisce la coordinata y del rettangolo di output dello screen
+wscreenrect				: restituisce la coordinata w del rettangolo di output dello screen
+hscreenrect				: restituisce la coordinata h del rettangolo di output dello screen
+flagscreenrect				: restituisce lo stato del flag del rettangolo di output dello screen
+screenwidth				: restituisce la larghezza dello screen corrent
+screenheight				: restituisce l'altezza dello screen corrente
+offset(x,y)				: posiziona la posiziona di visione del display sullo schermo logico corrente
+xoffset					: restituisce la coordinata x dell' offset dello screen corrente
+yoffset					: restituisce la coordinata y dell' offset dello screen corrente
+cls 					: cancella lo schermo logico corrente
+screenswap				: scambia lo schermo logico con quello fisico e aggiorna il sprite system
+autoback				: attiva / disattiva lo screenswap automatico
+dualplayfield(m) 			: attiva  / disattiva l'aggiornamento degli screen sopra al piano dei bob
+waitvbl					: attende lo screenswap automatico
+fps(n)					: attiva/disattiva/restituisce il numero di frame per secondo attuali
+_________________________________________________________________________________________________________________________
+Graphics
+
+rgb(r,g,b)				: restituisce il colore corrente in formato Uint32
+color(c,v)				: setta il colore c (0-255) nella paletta conil valore v
+ink(c)					: seleziona il colore corrente dal formato Uint32
+point(x,y)				: restituisce la componente  colore alla coordinata x,y
+dot(x,y)					: scrive un punto con il colore ink alla coordinata x,y
+dot_ex(x,y,c)				: scrive un punto con il colore c alla coordinata x,y
+line(x,y,x1,y1)				: traccia una linea
+box(x,y,x1,y1)				: traccia un rettangolo vuoto
+bar(x,y,x1,y1)				: traccia un rettangolo pieno
+circle(x,y,r)				: traccia un cerchio
+fillcircle(x,y,r)			: traccia un cerchio pieno
+ellipse(x,y,rx,ry)			: traccia un ellisse
+fillellipse(x,y,rx,ry)			: traccia un ellisse piena
+paint(x,y)				: riempie un area chiusa
+
+_________________________________________________________________________________________________________________________
+File graphics input output
+
+loadimage(filename,n)			: carica in un banco file grafico
+saveimage(filename,n)			: salva il banco n nel file grafico (deve essere .bmp)
+loadsound(filename,n)			: carica in un banco un file wav
+soundexists(n)				: restituisce 1 se il banco sonoro n esiste 0 se vuoto
+loadmusic(filename)			: carica in un banco un file xm mod
+musicexists()				: restituisce 1 se la musica e' caricata 0 se vuoto
+
+_________________________________________________________________________________________________________________________
+Image manipulation
+
+hotspot(n,x,y)				: stabilisce il punto delle coordinate (n,0,0=alto sx | n,1,1=centro | n,2,2 =basso dx)n= image
+imageexists(n)				: restituisce 1 se il banco n esiste 0 se vuoto
+imagewidth(n)				: restituisce la larghezza dell'immagine n
+imageheight(n)				: restituisce l'altezza dell'immagine n
+deleteimage(n)				: cancella l'immagine n dalla memoria
+copyimage(s,d)				: copia l'immagine s nel banco d
+setalpha(n,a)				: set trasparency
+zoomimage(n,zoomx,zoomy)			: zoom image
+rotateimage(n,angle)			: rotate image
+rotozoomimage(n,angle,zoom)		: rotate and zoom image
+
+_________________________________________________________________________________________________________________________
+Blitting
+
+blt(n,sx,sy,sw,sh,dx,dy)		: copia un banco nello screen
+pastebob(x,y,n)				: copia sullo schermo il banco n alle coordinate x,y ritagliando
+pasteicon(x,y,n)			: copia sullo schermo il banco n alle coordinate x,y
+grab(n,x,y,w,h)				: ritaglia dallo schermo e copia nel banco
+
+_________________________________________________________________________________________________________________________
+Sprite system
+
+spriteclip(x,y,w,h)			: imposta il clipping degli sprite
+sprite(n,x,y,fr)			: attiva o sposta il sprite n alla coordinata x,y con l'immagine fr
+deletesprite(n)				: disattiva il sprite n
+xsprite					: restituisce la coordinata x del sprite n
+ysprite					: restituisce la coordinata y del sprite n
+spritewidth				: restituisce la larghezza del sprite n
+spriteheight				: restituisce l'altezza del sprite n
+frsprite				: restituisce il frame del sprite n
+livesprite				: restituisce 1 se il sprite n e' "vivo"
+spritehit(n,optional x)			: restituisce 1 se il sprite n collide con il sprite x se -1 con tutti
+autoupdatesprite(m)			: attiva  / disattiva l'aggiornamento automatico dei sprite allo screenswap
+updatesprite				: attiva  un aggiornamento manuale degli sprite allo screenswap
+
+_________________________________________________________________________________________________________________________
+Bob system
+
+setbob(n,scr)				:assegna il bob n allo screen scr
+bob(n,x,y,fr)				: attiva o sposta il bob n alla coordinata x,y con l'immagine fr
+deletebob(n)				: disattiva il bob n
+xbob					: restituisce la coordinata x del bob n
+ybob					: restituisce la coordinata y del bob n
+bobwidth				: restituisce la larghezza del bob n
+bobheight				: restituisce l'altezza del bob n
+frbob					: restituisce il frame del bob n
+livebob					: restituisce 1 se il bob n e' "vivo"
+bobhit(n,optional x)					: restituisce 1 se il sprite n collide con il sprite x se -1  con tutti
+autoupdatebob(m) 			: attiva  / disattiva l'aggiornamento automatico dei bob allo screenswap
+updatebob  				: attiva   un aggiornamento manuale dei bob allo screenswap
+
+_________________________________________________________________________________________________________________________
+Text draw
+
+text(x,y,s,testo)			: stampa il testo sul video con s size
+setfont(path)				: seleziona il font d'uso
+textrender(testo,s,n)                   : crea il sprite n contenente il "testo" scritto con il font corrente con size s
+
+_________________________________________________________________________________________________________________________
+Print screen
+
+pen(c)					: setta il colore di print senza parametri restituisce il colore corrente
+paper(c)				: settail colore di sfondo del carattere senza parametri restituisce il colore corrente
+fprints(testo)				: stampa un testo monospace nella griglia senza andare a capo
+prints(testo)				: stampa un testo monospace nella griglia
+locate(x,y)				: muove il cursore di stampa alle coordinate x y
+atx					: restituisce la coordinata x del cursore
+aty					: restituisce la coordinata y del cursore
+curson					: visualizza il cursore lampeggiante sul video alle coordinate (atx,aty)
+cursoff					: spegne il cursore lampeggiante sul video
+inputs(request,default)			: raccoglie l'input da tastiera fino alla pressione di invio e lo restituisce
+zoneinputs(x,y,l,default)		: raccoglie l'input da tastiera fino alla pressione nell'area specificata da x,y,l
+
+_________________________________________________________________________________________________________________________
+Sounds and music
+
+playsound(n,c)				: suona il suono n nel canale c
+playfreqsound(n,c,rate,optional l)	: suona il suono n nel canale c alla frequenza rate l volte
+volumesound(c,v)			: cambia il volume del canale c (-1 tutti) al valore v (0-128)
+stopsound(c)				: ferma l'emissione del wav dal canale c (-1 tutti)
+pausesound(c)				: mette in pausa il canale c (-1 tutti)
+resumesound(c)				: sblocca dalla pausa il canale c (-1 tutti)
+vumetersound(c)                         : restituisce lo stato corrente del canale (-1 tutti)
+positionsound(c,angle,dist)             : posiziona il suono
+soundChannels(n)	                :definisce dinamicamente il numero di canali
+
+playmusic(n)				: suona il track xm,mod,ogg,mp3 n e' l numero di volte (-1 continua)
+positionmusic(p)                        : sposta l'esecuzione al secondo indicato
+stopmusic				: termina la riproduzione del modulo musicale
+pausemusic                              : mette in pausa la musica in esecuzione
+resumemusic                             : riavvia la musica in pausa
+rewindmusic                             : riavvolge la musica corrente
+fademusic(t)				: esegue la dissolvenza progressiva della musica
+volumemusic(v)				: cambia il volume della musica al valore v (0-128)
+speedmusic(v)                           : cambia la velocita di esecuzione della musica
+
+_________________________________________________________________________________________________________________________
+Keyboard
+
+key(keycode)				: restitusce 1 se e' premuto il tasto keycode
+inkey					: restituisce il codice ascii del tasto premuto
+waitkey(keycode)			: attende la pressione di un tasto(0 qualsiasi)
+
+_________________________________________________________________________________________________________________________
+Mouse
+
+xmouse					: restituisce la coordinata x del mouse sul display
+ymouse					: restituisce la coordinata y del mouse sul display
+xmousescreen(n)				: restituisce la coordinata x del mouse sullo screen
+ymousescreen(n)				: restituisce la coordinata y del mouse sullo screen
+bmouse 					: restituisce il pulsante premuto del mouse
+mouseshow				: visualizza il cursore del mouse
+mousehide				: nasconde il cursore del mouse
+mousezone(x,y,w,h)			: restituisce 1 se il mouse occupa questa parte dello screen
+
+_________________________________________________________________________________________________________________________
+Joystick
+
+**xjoy					: retituisce la coordinata x del joystick
+**yjoy					: retituisce la coordinata y del joystick
+**bjoy					: retituisce il pulsante premuto del joystick
+
+_________________________________________________________________________________________________________________________
+SDLtime
+
+wait(t)					: attende il trascorrere di t millisecondi
+timer					: restituisce il ticks corrente
+
+_________________________________________________________________________________________________
+
+
+

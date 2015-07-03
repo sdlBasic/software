@@ -1,0 +1,47 @@
+Rem ************************************ 
+Rem *        AMOS Example 15.3         * 
+Rem *          Using CBlock            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Clear screen 
+Curs Off 
+Locate 0,10 : Centre "Testing CBLOCK"
+Rem Call Alert box 
+ALERT
+Procedure ALERT
+   Rem generate a simple dialogue box 
+   Rem set position 
+   W=160 : H=100 : X=80 : Y=50
+   Rem save background
+   Get Cblock 1,X,Y,W+16,H+16
+   Rem draw box 
+   Paper 0 : Pen 2
+   Ink 0 : Bar X+5,Y+5 To X+W+5,Y+H+5
+   Ink 0 : Bar X,Y To X+W,Y+H
+   Ink 2 : Box X+1,Y+1 To X+W-1,Y+H-1
+   Locate X Text(X),Y Text(Y)+2 : Centre "Dialogue box"
+   Rem Make a button
+   Locate X Text(X+W/2)-1,Y Text(Y+H)-4
+   XB=X Graphic(X Curs)-7 : YB=Y Graphic(Y Curs)-7
+   Print Border$("OK",2);
+   Rem create screen zone around button 
+   Reserve Zone 1
+   Set Zone 1,XB,YB To X Graphic(X Curs)+7,Y Graphic(Y Curs)+15
+   Rem Read the button
+   While Q=0
+      Rem wait for a keypress
+      While Mouse Key=0 : Wend 
+      Rem test zone
+      Z=Mouse Zone
+      If Z=1
+         Paper 2 : Pen 0
+   Locate X Text(X+W/2)-1,Y Text(Y+H)-4
+         Print Border$("OK",2)
+         Pen 0 : Paper 2
+         Play 30,40 : Q=1
+      End If 
+   Wend 
+  Rem restore screen 
+  Put Cblock 1,X,Y
+End Proc

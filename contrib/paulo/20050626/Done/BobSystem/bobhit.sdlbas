@@ -1,0 +1,13 @@
+'- based on a Vroby's example
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+screenopen(7,80,80,0,0,0,0,0)
+   paper(8^8-1):ink(0):pen(0):cls:setcolorkey(8^8-1)
+    line(0,0,32,32):line(32,0,0,32):grab(1,0,0,32,32)
+   paper(8^8-1):ink(0):pen(0):cls:setcolorkey(8^8-1)
+    line(16,0,16,32):line(0,16,32,16):grab(2,0,0,32,32)
+ screenclose(7)
+while key(27)=0
+   bob(1,100,100,2):bob(2,xmouse,ymouse,1)
+   locate(1,1):prints("bobhit(1,2)="+str$(bobhit(1,2)))
+   waitvbl
+ end while

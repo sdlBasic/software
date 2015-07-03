@@ -1,0 +1,52 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.8          * 
+Rem *           Slider bars            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Curs Off : Double Buffer : Cls 0
+Paper 0 : Locate 0,0 : Centre "Control sliders with the mouse"
+Rem create a screen zone around the bars 
+Reserve Zone 2
+Rem Zone around horizontal slider  
+Set Zone 1,0,175 To 319,195
+Rem Display a horizontal slider
+HSLIDE[10] : Screen Swap : Wait Vbl : HSLIDE[10]
+Rem Zone around vertical slider
+Set Zone 2,0,0 To 25,170
+Rem Display a vertical slider
+VSLIDE[10] : Screen Swap : Wait Vbl : VSLIDE[10]
+Autoback 0
+Rem main loop
+Do 
+   Rem Read sliders 
+   Rem Each slider should be enclosed inside its own screen zone
+   Rem Check horizontal slider  
+   If Mouse Zone=1 and Mouse Key
+      Rem Read mouse 
+      X=X Screen(X Mouse)
+      Rem If slider has moved change it  
+      If X<>XM and Mouse Key=1 : XM=X : End If 
+   End If 
+   Rem Check vertical slider
+   If Mouse Zone=2 and Mouse Key
+      Rem Read mouse 
+      Y=Y Screen(Y Mouse)
+      Rem If slider has moved change it  
+      If Y<>YM and Mouse Key=1 : YM=Y : End If 
+   End If 
+   Rem Update display 
+   Locate 5,2 : Print "X slider=";X;"  " : Locate 22,2 : Print "Y SLIDER=";Y;"  "
+   VSLIDE[Y] : HSLIDE[X]
+   Rem Double buffering smooths the effect  
+   Screen Swap : Wait Vbl 
+   Locate 5,2 : Print "X slider=";X;"  " : Locate 22,2 : Print "Y SLIDER=";Y;"  "
+Loop 
+Procedure HSLIDE[X]
+   Rem Display a slider bar using the Hslider command 
+   Hslider 0,180 To 319,190,319,X,5
+End Proc
+Procedure VSLIDE[Y]
+   Rem Display a slider bar using the Vslider command 
+   Vslider 0,0 To 10,170,170,Y,5
+End Proc

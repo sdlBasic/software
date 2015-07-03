@@ -1,0 +1,3 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+prints("2*3="+str$(2*3))
+waitkey

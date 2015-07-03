@@ -1,0 +1,37 @@
+'
+'      Screen tutorial #05 - Screen copying and masks      
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+'
+Restore MASKS
+For Z=1 To 5
+   Read MASK,MASK$
+   Locate 10,0 : Centre MASK$
+   Locate 0,20 : Centre "Click left mouse or press a key"
+   Do 
+      Paste Bob 0,0,1
+'
+'Only do the screen copy if the left mouse button is pressed   
+'
+      If Mouse Key=1
+         X=X Screen(X Mouse)
+         Y=Y Screen(Y Mouse)
+'
+'Copy the Bob from the top left of the screen to the X,Y of the mouse
+'
+         Screen Copy 0,0,0,60,85 To 0,X,Y,MASK
+'
+         Wait Vbl : Wait Vbl 
+      End If 
+      A$=Inkey$ : If A$<>"" Then Exit 
+   Loop 
+Next Z
+MASKS:
+Data %11000000,"     Replace mask %11000000   "
+Data %110000,"    Invert mask %110000       "
+Data %10000000," A logical AND mask %10000000 "
+Data %11100000," A logical OR mask %11100000  "
+Data %1100000,"An Exclusion OR mask %01100000"

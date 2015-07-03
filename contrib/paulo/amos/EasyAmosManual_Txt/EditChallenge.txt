@@ -1,0 +1,513 @@
+'      ################################
+'      ##  Easy AMOS Challenge Quiz  ##
+'      ##     By Dominic Ramsey      ##
+'      ## (c)1992 Europress Software ##  
+'      ################################
+'
+Dim CHPT$(20),ANS$(3),CORRECT(20),GRADUATE(20)
+Global PATH$,CURX,CURY,A$,CHALK$,CHPT$(),QUES$,ANS$(),ANS,FONTNUM,FONT2,SELECTED,QNUM,NAME$,CORRECT(),GRADUATE(),GUESS,RDAN
+'Where to find the questions...
+PATH$="Easy_Tutorial:Challenge/"
+'Initialise evrything
+INIT
+'Find the chapter headings and get the players name. 
+RD_CHAPTER : GT_NAME
+'
+'This is the main loop of the program
+MAIN:
+' Ask which chapter the plauyer wants to answer questions on.
+' Return to start if player has saved results to disc. (SELECTED=21) 
+GT_CHAPTER : If SELECTED=21 Then Goto MAIN
+'
+' Read in the question data for specified chapter and remove the   
+' excess spaces form the end of the random access file.  
+FIND_QUES : RM_SPACES
+' Reset question number to zero
+QNUM=1
+'
+' Ask all the questions
+While QNUM<999
+   SHW_QUES : GT_ANSWER
+   ' If player presses [Esc] then goto start. 
+   If GUESS=4 Then CORRECT(SELECTED)=0 : Goto MAIN
+   ' Find next question 
+   NXT_QUEST
+Wend 
+'
+' Show player how well he/she did. 
+CONGRATS
+' Check to see if player has graduated in all subjects.
+CHECKGRAD
+Goto MAIN
+'
+Procedure WRITE[TXT$,ANI]
+   ' This is the procedure which writes the question  
+   ' onto the blackboard and moves the chalk. 
+   '
+   ' Use correct font or spacing will go wrong. 
+   TL=0 : Set Font FONTNUM
+   ' Convert mouse co-ordinates into floating point numbers.
+   XB#=X Bob(1) : YB#=Y Bob(1)
+   ' Next work out the speed needed to move the chalk from its
+   ' current position to the position needed at the top left of the blackboard. 
+   DX#=CURX-XB# : DY#=(CURY-16)-YB#
+   DX#=DX#/20.0 : DY#=DY#/20.0
+   If DX#<-8
+      DX#=DX#/2.0 : DY#=DY#/2.0
+      ' Move the chalk to its starting position. 
+      For TEMP=1 To 40
+         XB#=XB#+DX# : YB#=YB#+DY#
+         Wait Vbl : Bob 1,XB#,YB#,2
+      Next TEMP
+   Else 
+      For TEMP=1 To 20
+         XB#=XB#+DX# : YB#=YB#+DY#
+         Wait Vbl : Bob 1,XB#,YB#,2
+      Next TEMP
+   End If 
+   ' Make sure the chalk is placed accurately 
+   Wait Vbl : Bob 1,CURX,CURY-16,2
+   ' Count to end of sentence.
+   RDAN=1
+   For A=1 To Len(TXT$)
+      CH$=Mid$(TXT$,A,1)
+      If CH$=" " : Gosub CHKSP : End If 
+      ' Check if next word will fit. 
+      Gr Writing 0
+      If CH$<>" "
+         ' make a chalk sounding noise with a built in sound effect.
+         Volume Rnd(9)+2 : Shoot 
+         ' Draw the next character to the screen using graphic text 
+         ' for accurate placement.
+         Ink 1,2 : Text CURX,CURY,CH$ : AN=1
+         '
+         ' The next loop moves the chalk over the charceter which has just  
+         ' been draw to make it look like the chalk is doing the writing. 
+         For TEMP=1 To 2
+            ' an=animation frame for chlak 
+            AN=AN+2
+            If AN=5 : AN=1 : AA=AA+1 : End If 
+            If AA=5 : AA=1 : End If 
+            If AA<4
+               Bob 5,246,120,29+(RDAN/5)
+               Bob 1,X Bob(1)+4,,AA
+            Else 
+               Bob 5,246,120,29+(RDAN/5)
+               Bob 1,X Bob(1)+4,,2
+            End If 
+            RDAN=RDAN+1
+            If RDAN=20 : RDAN=1 : End If 
+            'increase cursor position
+            CURX=CURX+4
+         Next 
+      Else 
+         '
+         ' This loop moves the chalk straight accross the spaces in the text
+         ' without animating it.
+         '
+         For TEMP=1 To 4
+            Bob 1,X Bob(1)+2,,
+            CURX=CURX+2
+         Next 
+      End If 
+   Next 
+   ' Move chalk back to the base of the blackboard
+   If ANI=3
+      Repeat 
+         Bob 1,,Y Bob(1)+2,3
+      Until Y Bob(1)>138
+      Bob 1,X Bob(1),139,4
+   End If 
+   Goto NDOP
+   '
+   ' Check for spaces in the question. This allows for words to wrap
+   ' around the blackboard, and not be split up.
+   '
+   CHKSP:
+   TEMP=1 : While Mid$(TXT$,TEMP+A,1)<>" " and(TEMP+A<Len(TXT$))
+      TEMP=TEMP+1
+   Wend 
+   ' If the word doesn't fit, move the cursor down to the next line,
+   ' and to the left hand side of the blackboard. 
+   If CURX+(TEMP*8)>245
+      XB#=X Bob(1) : YB#=Y Bob(1)
+      ' The next lines check if the procedure is being used to write the question, 
+      ' or one of the answers, as the answers must be indented from the rest of
+      ' the text to make them stand out. 
+      If ANI=1
+         CURX=6
+         ' Indent, and increment flag for number of lines in answer.  
+         ' This is used to set the Mouse Zone so the player can click on the answer.  
+      Else CURX=34 : TL=TL+1
+      End If 
+      DX#=(CURX-XB#)/32.0
+      DY#=9.0/32.0
+      For TEMP=1 To 32
+         Wait Vbl : Bob 1,XB#,YB#,2
+         XB#=XB#+DX# : YB#=YB#+DY#
+      Next 
+      CURY=CURY+9
+      Wait Vbl : Bob 1,CURX,CURY-16,3
+   End If 
+   Return 
+   NDOP:
+   '
+   ' The TL variable is returned as a paramter and gives the number of lines
+   ' of text that were written on the blackboard. 
+   '
+End Proc[TL]
+Procedure INIT
+   'Erase all questions. Set border col & pointer. Hide the original pointer. 
+   ' Turn the audio filter off for clearer sound. 
+   Erase 10 : Colour Back $700 : Change Mouse 24 : Hide On : Led Off 
+   Load PATH$+"Challengepic.abk",6 : Unpack 6 To 0 : Screen Hide 0
+   Get Sprite Palette : Erase 6 : Get Rom Fonts 
+   TEMP=1 : While Font$(TEMP)<>"" : TEMP=TEMP+1 : Wend 
+   For A=TEMP-1 To 1 Step -1
+      If Instr(Font$(A)," 8 ")>0 Then FONTNUM=A
+      If Instr(Font$(A)," 9 ")>0 Then FONT2=A
+   Next 
+   If FONT2=0 Then FONT2=FONTNUM
+   Set Font FONTNUM
+End Proc
+Procedure CLRBOARD
+   Ink 7 : Hide On : Wait Vbl : Bob 7,,,51
+   For TEMP=11 To 240 Step 7
+      Bar TEMP,41 To TEMP+6,142
+      If I Bob(6)>45 Then Bob 6,,,I Bob(6)-1 : Wait Vbl 
+   Next 
+End Proc
+Procedure GT_CHAPTER
+   Screen Open 1,320,38,16,Lowres : Screen Hide 1 : Get Sprite Palette 
+   Cls 3 : Flash Off : Screen Copy 0 To 1 : Ink 7 : Paint 3,37
+   RESETPALETTE : Screen Open 0,640,200,16,Hires : Screen Hide 1 : Flash Off : Get Sprite Palette 
+   RESETPALETTE : Cls 0 : Screen To Front 1 : Reserve Zone 22 : TEMP=1 : Set Font FONTNUM : Gr Writing 0
+   Ink 4 : Text 240,196,"Save Results To Disk" : Text 510,196,"<< QUIT >>"
+   Ink 13 : Text 239,195,"Save Results To Disk" : Text 509,195,"<< QUIT >>"
+   Set Font FONT2 : For RW=0 To 1
+      For CL=1 To 10
+         Ink 4 : Text RW*320+35,CL*14+42,CHPT$(TEMP)
+         If GRADUATE(TEMP)=0
+            XX=320*RW+266
+         Else If GRADUATE(TEMP)=10
+               XX=320*RW+250
+            Else 
+               XX=320*RW+258
+            End If 
+         End If 
+         Text XX,CL*14+42,Str$(GRADUATE(TEMP)*10)+"%"
+         Ink 13, : Text RW*320+34,CL*14+41,CHPT$(TEMP) : Text XX-1,CL*14+41,Str$(GRADUATE(TEMP)*10)+"%"
+         Set Zone TEMP,RW*320+20,CL*14+31 To RW*320+319,CL*14+43
+         If CORRECT(TEMP)>GRADUATE(TEMP) : GRADUATE(TEMP)=CORRECT(TEMP) : End If 
+         If GRADUATE(TEMP)=10
+            Paste Bob RW*320+15,CL*14+33,20
+         Else If GRADUATE(TEMP)>7
+               Paste Bob RW*320+15,CL*14+33,19
+            Else 
+               Paste Bob RW*320+15,CL*14+33,5
+         End If : End If 
+         CORRECT(TEMP)=0
+         TEMP=TEMP+1
+      Next CL
+   Next RW
+   Screen Show 1 : Screen Show 0 : Show On 
+   Set Zone 22,500,187 To 600,197
+   Set Zone 21,240,187 To 400,197 : Set Font FONTNUM
+   Screen 1 : FDUP : Screen 0 : FDUP
+   RM:
+   Gr Writing 2
+   While Mouse Key<>1 : SELECTED=Mouse Zone
+      ' Highlight the Topic
+      If SELECTED>0 and SELECTED<11
+         Bar 30,SELECTED*14+33 To 310,SELECTED*14+43
+         While SELECTED=Mouse Zone and Mouse Key=0 : Wend 
+         Bar 30,SELECTED*14+33 To 310,SELECTED*14+43
+      End If 
+      If SELECTED>10 and SELECTED<21
+         Bar 350,(SELECTED-10)*14+33 To 630,(SELECTED-10)*14+43
+         While SELECTED=Mouse Zone and Mouse Key=0 : Wend 
+         Bar 350,(SELECTED-10)*14+33 To 630,(SELECTED-10)*14+43
+      End If 
+      'Save results
+      If SELECTED=21
+         Bar 237,187 To 400,197
+         While Mouse Zone=21 and Mouse Key=0 : Wend 
+         Bar 237,187 To 400,197
+      End If 
+      'Quit
+      If SELECTED=22
+         Bar 500,187 To 600,197
+         While Mouse Zone=22 and Mouse Key=0 : Wend 
+         Bar 500,187 To 600,197
+      End If 
+   Wend 
+   If SELECTED=0 Then Goto RM
+   If SELECTED=22 Then Edit 
+   FDDN : Screen 1 : FDDN
+   Screen Close 1 : Load PATH$+"Challengepic.abk",6 : Unpack 6 To 0 : Screen Hide 0 : Erase 6 : Double Buffer : Get Sprite Palette 
+   RESETPALETTE : If SELECTED=21 Then SVE_SCORE : Pop Proc
+   Screen Show 0 : Hide On : Paste Bob 240,96,22 : Bob 1,76,139,4 : QNUM=1 : Bob 2,269,69,6
+   Bob 6,264,127,33 : Bob 3,290,58,42 : Bob 7,272,171,51 : Gr Writing 0 : Ink 1
+   Set Font FONTNUM : Text 2,190,"QUESTION :" : Text 2,180,"TOPIC : "+CHPT$(SELECTED) : FDUP
+End Proc
+Procedure RD_CHAPTER
+   Restore HEADINGS
+   For TEMP=1 To 20
+      Read CHPT$(TEMP)
+   Next 
+   HEADINGS:
+   Data "Introduction","First Steps","Up & Running","The Bare Bones"
+   Data "Logic","Text","The Keyboard","Graphics"
+   Data "Bobs","Understanding Screens","Using Screens","Sound"
+   Data "Maths","Creating A Game","Handling Data","Peripherals & Discs"
+   Data "Memory","Debugging Errors","The Tutor","General Knowledge"
+End Proc
+Procedure SHW_QUES
+   Ink 1 : Paste Bob 240,96,22 : Paste Bob 90,183,43 : Text 84,190,Str$(QNUM)
+   For TEMP=33 To 38
+      Bob 6,264,127,TEMP : Wait 4
+   Next 
+   For TEMP=23 To 28
+      Bob 6,243,136,TEMP : Wait 4
+   Next 
+   Reserve Zone 3 : CURX=14 : CURY=49
+   If Rnd(1)=1
+      WRITE[QUES$,1]
+   Else 
+      WRITE[NAME$+": "+QUES$,1]
+   End If 
+   CURX=20 : CURY=CURY+9
+   For TEMP=1 To 3
+      ANS$(TEMP)=" "+Str$(TEMP)+" "+ANS$(TEMP)
+      If TEMP=3 Then MD=3 Else MD=2
+      CURY=CURY+9 : CURX=10
+      WRITE[ANS$(TEMP),MD]
+      'Check for 2 lines of text in answer 
+      TL=Param
+      If TL=0
+         Set Zone TEMP,10,CURY-7 To 10+(Len(ANS$(TEMP))*8),CURY+1
+      Else Set Zone TEMP,10,CURY-7-(TL*8) To 240,CURY+1
+      End If 
+   Next 
+   ' Put away scroll
+   For TEMP=28 To 23 Step -1
+      Bob 6,243,136,TEMP : Wait 4
+   Next 
+   For TEMP=38 To 33 Step -1
+      Bob 6,264,127,TEMP : Wait 4
+   Next 
+   Bob Off 5 : Show On 
+   ' Clear keyboard buffer  
+   Repeat : Until Inkey$=""
+End Proc
+Procedure GT_ANSWER
+   Timer=0 : Music 1 : Mvolume 50 : RDAN=45 : FOOT=51 : ANI2=17
+   KL:
+   T=Timer/63 : CLOCK=T+6
+   If CLOCK=18 Then CLOCK=6
+   Bob 2,269,69,CLOCK
+   If(Rnd(600)=1 and I Bob(6)=45 and ANI=0 and T<11) Then ANI=1
+   If CLOCK=8 or CLOCK=13 Then ANI2=15
+   If Rnd(1) and(Timer mod 45)=1 Then Bob 8,256,118,52 : Wait 4 : Bob Off 8
+   FOOT=33*(ANI2 mod 2)+18
+   If RDAN<45 Then RDAN=45 : ANI=0
+   Wait Vbl : Bob 6,259,128,RDAN : Bob 7,,,FOOT
+   If(Timer mod 7)=1 Then RDAN=RDAN+ANI
+   If(Timer mod 8)=1 and ANI2>1 and ANI2<16 Then ANI2=ANI2-1
+   If RDAN=>49 Then ANI=-1 : RDAN=49
+   If T=12 Then OUT_OF_TIME : Pop Proc
+   MZ=Mouse Zone : I$=Inkey$ : I=Val(I$)
+   If Scancode=69
+      ' Escape 
+      Gosub VOLDOWN : GUESS=4
+      FDDN
+      Pop Proc
+   End If 
+   If MZ>0 and Mouse Key=1 Then I=MZ
+   If I>0 and I<4
+      Gosub VOLDOWN
+      GUESS=I
+      If GUESS=ANS
+         CORRECT(SELECTED)=CORRECT(SELECTED)+1
+      End If 
+      Pop Proc
+   End If 
+   Goto KL
+   VOLDOWN:
+   Music Off : Wait 2 : Play 40,0
+   Return 
+End Proc
+Procedure GT_NAME
+   FIRSTNAME : TEMP$=Upper$(Param$)
+   Gr Writing 0 : RESETPALETTE : Volume 10 : Ink 0, : Bar 0,38 To 319,199 : Paint 0,37
+   Ink 7 : Text 87,88,"==================" : Text 50,60,"PLEASE ENTER YOUR NAME BELOW"
+   Ink 3 : Text 86,87,"==================" : Text 49,59,"PLEASE ENTER YOUR NAME BELOW"
+    CX=88
+   If TEMP$>""
+      For TEMP=1 To Len(TEMP$)
+         Ink 7 : Text CX+1,79,Mid$(TEMP$,TEMP,1)
+         Ink 3 : Text CX,78,Mid$(TEMP$,TEMP,1)
+         CX=CX+10
+      Next 
+   End If 
+   Screen Show 0 : FDUP
+   L:
+   Ink 6, : Bar CX,70 To CX+8,80 : Ink 7, : Box CX,70 To CX+8,80
+   M: I$=Inkey$ : If I$="" Then Goto M
+   If Val(I$)>0 Then Goto M
+   S=Scancode : If S=68 or(I$=Chr$(13)) Then Play 35,0 : Goto CHECK
+   If(S=65 or S=70) and CX>88
+      Ink 0 : Bar CX,70 To CX+8,80 : Play 20,0
+      CX=CX-10 : NAME$=Left$(NAME$,Len(NAME$)-1) : Goto L
+   End If 
+   If CX<225
+      A=Asc(I$)
+      If A<65 or A>122 : Goto L : End If 
+      If A>96 : A=A-32 : I$=Chr$(A) : End If 
+      TYP:
+      Ink 0, : Bar CX,70 To CX+9,80
+      Ink 7 : Text CX+1,79,I$ : Ink 3 : Text CX,78,I$
+      CX=CX+10 : NAME$=NAME$+I$ : Play 40,0 : Wait 5
+   End If 
+   Goto L
+   CHECK:
+   If NAME$="" Then NAME$="Anon"
+   FDDN : NAME$=Left$(NAME$,1)+Lower$(Right$(NAME$,Len(NAME$)-1))
+   Ink 0, : Bar 0,38 To 319,199 : Show On 
+   Ink 7 : Box 46,101 To 129,113 : Box 196,101 To 274,113
+   Text 63,60,"Would you like to load in" : Text 80,75,"your previous scores?"
+   Ink 3 : Text 62,59,"Would you like to load in" : Text 79,74,"your previous scores?"
+   Bar 47,102 To 128,112 : Bar 197,102 To 273,112
+   Ink 7 : Text 49,110,"Yes Please         No Thanks"
+   Reserve Zone 2 : Set Zone 1,47,102 To 128,112 : Set Zone 2,197,100 To 273,110
+   FDUP : Gr Writing 2
+   GTZN:
+   While Mouse Key<>1 : TEMP=Mouse Zone
+      If TEMP=1
+         Bar 47,102 To 128,112
+         While TEMP=Mouse Zone and Mouse Key=0 : Wend 
+         Bar 47,102 To 128,112
+      End If 
+      If TEMP=2
+         Bar 197,102 To 273,112
+         While TEMP=Mouse Zone and Mouse Key=0 : Wend 
+         Bar 197,102 To 273,112
+      End If 
+   Wend 
+   If Mouse Zone=0 Then Goto GTZN
+   If TEMP=1
+      TEMP$=Fsel$(PATH$+"*.CHA",NAME$+".CHA","Choose your scores file.","Click Ok for Default name.")
+      If TEMP$="" : Sam Play 15,1,11000 : Goto ND : End If 
+      If Exist(TEMP$)=0 : Sam Play 15,1,11000 : Goto ND : End If 
+      Load TEMP$,10
+      For TEMP=1 To 20
+         GRADUATE(TEMP)=Peek(Start(10)+TEMP)
+      Next 
+      Erase 10
+   End If 
+   ND:
+   FDDN
+End Proc
+Procedure NXT_QUEST
+   QNUM=QNUM+1
+   If QNUM=11 Then QNUM=999 : Pop Proc
+   CLRBOARD : Bob 2,,,6 : Wait Vbl : FIND_QUES : RM_SPACES
+End Proc
+Procedure OUT_OF_TIME
+   Music Off : Volume 25 : RDAN=41
+   For TEMP=1 To 25 : Bob 3,,,RDAN : Wait 3 : RDAN=RDAN+1 : If RDAN=43 Then RDAN=41
+   Sam Play 15,1,12000+Rnd(100) : Next : GUESS=0 : Bob 3,,,42 : Wait Vbl 
+End Proc
+Procedure SVE_SCORE
+   Reserve As Data 10,22
+   For TEMP=1 To 20
+      Poke Start(10)+TEMP,GRADUATE(TEMP)
+   Next 
+   TEMP$=Fsel$(PATH$+"*.CHA",NAME$+".CHA","Click Ok To Save","With Default Name")
+   If TEMP$<>""
+      Save TEMP$,10
+   Else Sam Play 15,1,11000
+   End If 
+   Erase 10
+End Proc
+Procedure TDTEXT[TX,TY,T$]
+   Gr Writing 0 : Ink 7 : Text TX+1,TY+1,T$
+   Ink 3 : Text TX,TY,T$
+End Proc
+Procedure CONGRATS
+   Hide On : FDDN : Cls 0,0,38 To 320,200 : Bob Off : Ink 7 : Paint 1,37
+   COR=CORRECT(SELECTED)
+   If COR=10 Then TDTEXT[4,80,"Congratulations, "+NAME$+"!"] : TDTEXT[4,100,"You scored top marks - 100%!"]
+   If COR<10 and COR>7 Then TDTEXT[4,80,"Well done, you passed"] : TDTEXT[4,100,"with a score of"+Str$(COR*10)+"%."]
+   If COR>5 and COR<8 : TDTEXT[4,70,"You scored"+Str$(COR*10)+"%, "+NAME$+"."]
+      TDTEXT[4,90,"I'm sure you could do better, so why"]
+   TDTEXT[4,110,"don't you try this chapter again."] : End If 
+   If COR<3 : TDTEXT[4,80,"You only scored"+Str$(COR*10)+"%, "+NAME$+"."]
+   TDTEXT[4,90,"Try reading this chapter again."] : End If 
+   If COR>2 and COR<6 : TDTEXT[4,70,"You could do much better, "+NAME$+"."]
+      TDTEXT[4,90,"You scored"+Str$(COR*10)+"%, so you should read"]
+   TDTEXT[4,110,"the chapter on "+CHPT$(SELECTED)+" again."] : End If 
+   TDTEXT[92,190,"Please press a key"] : FDUP : Repeat : Until Inkey$="" : Wait Key : FDDN
+   If CORRECT(SELECTED)>GRADUATE(SELECTED)
+      GRADUATE(SELECTED)=CORRECT(SELECTED)
+   End If 
+End Proc
+Procedure FIND_QUES
+   Open Random 1,PATH$+"questdata"
+   Field 1,105 As Q$,40 As A$,40 As B$,40 As C$,1 As COR$
+   TEMP=((SELECTED-1)*10)+QNUM
+   Get 1,TEMP
+   Wait 5
+   Close 1
+   QUES$=Q$
+   ANS$(1)=A$ : ANS$(2)=B$ : ANS$(3)=C$
+   ANS=Val(COR$)
+End Proc
+Procedure CHECKGRAD
+   GRAD=1 : For TEMP=1 To 20 : If GRADUATE(TEMP)<8 Then GRAD=0
+   Next 
+   If GRAD=1 Then Run PATH$+"Graduate.AMOS"
+End Proc
+Procedure RM_SPACES
+   A=1
+   While Asc(Right$(QUES$,A))=32
+      A=A+1
+   Wend 
+   QUES$=Left$(QUES$,107-A)
+   For AA=1 To 3
+      A=1
+      While Asc(Right$(ANS$(AA),A))=32
+         A=A+1
+      Wend 
+      ANS$(AA)=Left$(ANS$(AA),42-A)
+   Next 
+End Proc
+Procedure FDUP
+   Fade 2,$700,$FFF,$FBB,$C77,$522,$900,$F00,$0,$FC0,$EF,$4A,$852,$A63,$BBB,$777,$333
+   Wait 30
+End Proc
+Procedure FDDN
+   Fade 2,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700
+Wait 30
+End Proc
+Procedure RESETPALETTE
+   Palette $700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700,$700
+End Proc
+Procedure FIRSTNAME
+   TITLE$="EasyAmos"
+   If Not Exist(TITLE$) Then Pop Proc
+   Open In 1,TITLE$ : L=Lof(1) : Close 1
+   Reserve As Work 11,L
+   Bload TITLE$,11
+   S=Hunt(Start(11) To Start(11)+Length(11),"wned ")
+   If S=0 Then Pop Proc
+   S=S+35
+   A$=""
+   NAME$=""
+   While Peek(S)<>32
+      A$=Chr$(Peek(S))
+      NAME$=NAME$+A$
+      S=S+1
+   Wend 
+   Erase 11
+End Proc[NAME$]

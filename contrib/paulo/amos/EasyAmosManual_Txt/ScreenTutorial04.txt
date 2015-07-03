@@ -1,0 +1,22 @@
+'
+'      Screen tutorial #04 - Screen copying        
+'
+'Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk" 
+
+
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+'
+'Plonk an image to the screens top left
+'
+Paste Bob 0,0,1
+'
+'Using screen copy we can take the image and enlarge it, and mess about! 
+'
+For Y=0 To 90
+   Y2=Y*2
+   Screen Copy 0,0,Y,70,Y+1 To 0,100,180-Y2
+   Screen Copy 0,0,Y,70,Y+1 To 0,200,Y2
+   Screen Copy 0,0,Y,70,Y+1 To 0,200,Y2+1
+Next Y

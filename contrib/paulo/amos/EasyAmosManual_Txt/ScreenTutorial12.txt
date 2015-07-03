@@ -1,0 +1,38 @@
+'
+'      Screen tutorial #12 - Packing screens     
+'
+'Load the IFF picture to pack
+'
+Load Iff "Easy_Tutorial:Iff/Grab_Me.Iff",1
+Wait Vbl 
+'
+'Pack the screen into bank 15
+'
+Spack 1 To 15
+'
+'Erase the screen by drawing lines over it 
+'
+For A=1 To 256
+   Draw 0,A To 319,A
+   Draw 0,256-A To 319,256-A
+Next A
+'
+'Now close screen 1
+'
+Screen Close 1
+'
+'Now open a new screen - number 3
+'
+Screen Open 3,320,200,16,Lowres
+Locate 0,10
+Centre "Screen erased"
+Locate 0,12
+Centre "Unpacking data to screen..."
+Wait 100
+Locate 0,14
+Centre "NOW!"
+Wait 5
+'
+'Unpack the packed screen from bank 15 to screen 3 
+'
+Unpack 15 To 3

@@ -1,0 +1,22 @@
+'
+'      Screen tutorial #07 - The Appear command        
+'
+Screen Open 0,320,40,16,Lowres : Curs Off 
+Screen Open 2,320,40,16,Lowres : Curs Off : Screen Hide 2
+Screen 0
+Print 
+Centre "Easy AMOS"
+Print : Print 
+Centre "(c) 1992 Europress Software Ltd"
+Screen Copy 0 To 2
+Screen Open 1,320,40,16,Lowres : Curs Off : Screen Hide 1
+Print 
+Centre "Programming by Francois Lionet"
+Print : Print 
+Centre "Manual by Mel Croucher"
+Do 
+   Wait 50
+   Appear 1 To 0,3
+   Wait 50
+   Appear 2 To 0,27
+Loop 

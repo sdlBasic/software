@@ -1,0 +1,39 @@
+Screen Open 0,320,200,16,0
+Flash Off : Curs Off : Cls 7
+
+Palette $0,$111,$222,$333,$444,$555,$666,$777,$888,$999,$AAA,$BBB,$CCC,$DDD,$EEE,$FFF
+
+For X=0 To 15 : Ink X
+
+
+'- d= delay (1=1/50sec)(50=1sec) 
+'- i= colour index start 
+'- f= colour index end 
+'- b= flag (1=looping)(0=stops)
+
+Procedure STPSFTDN[D,I,F,B]
+    T=Colour(I)
+    For E=I To F-1
+      Colour E,Colour(E+1) : Next 
+  If B=1 : Colour F,T : End If 
+    For QD=1 To D : Wait Vbl : Next QD
+ End Proc
+
+Procedure STPSFTUP[D,I,F,B]
+    T=Colour(F)
+    For E=F To I+1 Step -1
+      Colour E,Colour(E-1) : Next 
+  If B=1 : Colour I,T : End If 
+    For QD=1 To D : Wait Vbl : Next QD
+ End Proc
+
+Bar X*10,32 To X*10+10,128
+Next 
+
+'Shift Up 4,5,14,1 
+
+For ZZ=1 To 30
+STPSFTUP[4,5,14,1]
+Next 
+
+

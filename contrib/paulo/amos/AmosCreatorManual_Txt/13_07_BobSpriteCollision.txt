@@ -1,0 +1,108 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.7         *   
+Rem *    Bob and Sprite collisions     *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Initalisation
+Double Buffer 
+Rem make some images 
+MAKE_OBJECTS
+Curs Off : Cls 0
+Rem define attack wave 
+A$="Loop: For R1=0 To 9"
+A$=A$+"Let R2=R1*4; Let R3=40-R2"
+A$=A$+"For R0=1 To R3; Let X=X+8; Next R0;"
+A$=A$+"Let Y=Y+10; Let R3=R3-2;"
+A$=A$+"For R0=1 To R3; Let X=X-8; Next R0;"
+A$=A$+"Let Y=Y+10; Next R1; Let Y=16; Let X=X-160; Jump Loop;"
+Rem make collision detection mask
+Make Mask 
+RELEASE_ALIENS
+Rem----------------------------------------
+Rem call mouse control routine 
+MOUSE_CONTROL
+Rem exit 
+Sprite Off : Bob Off 
+Rem--------------------------------------- 
+End 
+Procedure MOUSE_CONTROL
+   Rem This procedure controls the ship and detects a collision 
+   Shared ALIENS,OBJECTS
+   OBJECTS=ALIENS
+   Hide On 
+   IMAGE=1 : Rem choose bob image 
+   Rem Main loop
+   Repeat 
+      Repeat 
+         Rem position ship at mouse coords
+         Sprite 8,X Mouse,220,IMAGE : Wait Vbl 
+         Rem fire missile 
+         If Mouse Click Then MISSILE
+         Rem check for collisions 
+         Rem did missile hit ship 
+         If Spritebob Col(9)
+            Boom 
+            For C=1 To OBJECTS
+               Bell 
+               If Col(C)
+                  Sprite 9,-10,, : Amal Off 9 : Amal Off C
+               Bob C,-10,0, : Dec ALIENS : Wait Vbl : End If 
+            Next C
+         End If 
+         Rem has alien hit ship 
+         If Spritebob Col(8)
+            Boom : Locate 0,0 : Centre "<You Died!>" : DEAD=True
+         End If 
+      Until DEAD or ALIENS=0
+      If DEAD=0 Then RELEASE_ALIENS
+   Until DEAD
+End Proc
+Procedure MISSILE
+   Rem fire missile 
+   Sprite 9,X Mouse,215,2
+   A$="Move 0,-200,25"
+   Amal 9,A$
+   Amal On 
+   Shoot 
+End Proc
+Procedure RELEASE_ALIENS
+   Rem release attack wave
+   Shared A$,LEVEL,ALIENS,OBJECTS
+   Rem increment level
+   Add LEVEL,1,1 To 7 : ALIENS=LEVEL : OBJECTS=ALIENS
+   Rem release aliens 
+   For B=1 To ALIENS
+      Channel B To Bob B
+      Bob B,16,16,3
+      Rem start attack 
+      Wait Vbl : Amal B,A$ : Amal On 
+      Rem allow last alien to move out of place before defining new one  
+      Repeat 
+      Until X Bob(B)>32
+   Next B
+End Proc
+Procedure MAKE_OBJECTS
+   Rem generate the images required for the game on the fly 
+   Cls 0
+   Rem get generate ship  
+   Polygon 8,0 To 16,16 To 0,16 To 8,0
+   Ink 0
+   Polygon 8,10 To 16,16 To 0,16 To 8,10
+   Get Sprite 1,0,0 To 16,16
+   Rem hot spot at centre of ship 
+   Hot Spot 1,$11
+   Rem create missile 
+   Cls 0,0,0 To 17,17
+   Ink 2
+   Bar 7,0 To 9,16
+   Get Sprite 2,0,0 To 16,16
+   Rem hot spot at tip of missile 
+   Hot Spot 2,$10
+   Rem draw alien 
+   Cls 0,0,0 To 17,17
+   Ink 3
+   Polygon 11,0 To 19,0 To 31,16 To 0,16 To 11,0
+   Get Bob 3,0,0 To 32,17
+   Hot Spot 3,$12
+End Proc

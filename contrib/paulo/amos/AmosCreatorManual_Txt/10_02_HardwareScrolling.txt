@@ -1,0 +1,33 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.2         * 
+Rem *       Hardware scrolling         * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem open an extra wide screen
+Screen Open 0,960,100,8,Lowres
+Screen Display 0,130,150,320,100
+Palette 0,$111,$222,$333,$444,$555,$666,$777
+Flash Off 
+Rem create a nice rainbow for the background 
+Set Rainbow 0,1,64,"(8,2,8)","",""
+Rainbow 0,1,150,100
+Rem generate a landscape 
+LAND[640,0,50]
+Rem Load the last section of the landscape with a copy of the first bit
+Screen Copy 0,0,0,319,100 To 0,639,0
+Rem hardware scrolling 
+Do 
+   For I=0 To 159
+      Screen Offset 0,I*4,0 : Wait Vbl 
+   Next I
+Loop 
+Rem generate a landscape 
+Procedure LAND[W,X,N]
+   Ink 1 : Bar X,0 To W+X,99
+   For T=0 To N
+      Ink Rnd(5)+2
+      TX=Rnd(W)+X : TW=Rnd(W/8)+4 : TH=Rnd(50)
+      Polygon TX,99 To TX+TW/2,99-TH To TX+TW,99
+   Next T
+End Proc

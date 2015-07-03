@@ -1,0 +1,19 @@
+
+sub BytePlot(x,y,v,i,p)
+  for z=0 to 7:ik=p:z2=7-z   
+    if (((int(v/(2^z2)))mod 2) and (2^z2)) then:ik=i:end if
+    ink(ik):dot(x+z,y): next
+ end sub
+
+setdisplay(320,200,32,0):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+for x= 8 to 319 step 16
+for y= 8 to 192
+  irgb=rgb(rnd(255),rnd(255),rnd(255))
+  prgb=rgb(rnd(255),rnd(255),rnd(255))
+  BytePlot(x,y,rnd(255),irgb,prgb)
+next:next
+
+waitkey(k_esc)
+

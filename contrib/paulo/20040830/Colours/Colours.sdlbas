@@ -1,0 +1,32 @@
+
+xedge=320:yedge=200:bdept=32:wndwd=0
+  xw=2048:yw=256
+  xr=xedge/xw:yr=yedge/yw
+setdisplay(xedge,yedge,bdept,wndwd)
+
+paper(0xAAAAAA):cls
+
+for b=0 to 7
+for r=0 to 255 step 4
+for g=0 to 255
+
+x=((b*256)+r)*xr
+y=g*yr
+
+b1=(b*255)/7
+
+  Ink (rgb(r,g,b1))
+  box (x,y,x+3,y+3)
+
+
+   if key(27) then:end:end if
+
+next:next:next
+
+ waitkey
+
+
+
+
+
+

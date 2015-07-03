@@ -1,0 +1,909 @@
+'interface version 3
+'
+'_____________________________________________________
+
+' INSTRUCTIONS
+'
+' for make a interface program simple use this rutines
+'
+' the scheme of a program is simple:
+' use setnew to set the necessary control
+' use draw for drawing the control in display
+' make a loop cycle (tipicaly with while wend commands)
+' use the rutines waintevent(0 or -1) to wait an event condition
+' use getparam rutine to interrogate the control for event tipically with "if" condition control
+' use setparam and drawobject to change the displayed controls
+'
+' Interface not used callback for simplicity reason
+'
+'
+'
+' i suggest to use the follow rutines:
+' newcontrol(type,parent,x,y,w,h,value):set a new control and return the number id
+' setnew(n,type,parent,x,y,w,h,value) :set a new interaface element
+' setparam(n,param,value) : set a param with value:and force redrawing
+' getparam(n,param) : return the value of param
+
+' getlist(n,entry) : return the value of entry in list
+' setlist(n,entry,value) : set a list entry with value. Use it for change a value of list element
+' addlist(n,value) : append a list entry with value and update listcount
+' insertlist(n,entry):insert the entry from the list
+' deletelist(n,entry):remove the entry from the list
+' clearlist(n): clear the list
+
+
+' drawobject(control): draw a control
+' draw(): draw all controls set
+' refresh(): redraw all controls
+
+' eventobject(i): check thevents of control.param is the number of the control
+' event(): check all control: return 0 if not found events
+' waitevent(t): wait an event for t cycle. With -1 for ever or event occurred
+
+'_____________________________________________________
+
+' HISTORY
+'--- from Vroby (0404xx or earlier)
+'--- more implementation trying from vroby (040502)
+'--- more implementation trying from Paulo Silva (040429,040512)
+'--- added list system trying from vroby (040604)
+'--- added listcontrol trying from vroby(040604)
+'--- bug fix of slider control trying from vroby (040605)
+'--- added scrollbar at listcontrol (040606)
+'--- added instructions on source (040606)
+
+'_____________________________________________________
+
+' TODO
+'--- combo control
+'--- vslider control
+'--- vgauge control
+'--- textarea control
+'--- grid control
+
+'_____________________________________________________
+
+' COMMON ARRAYS
+common _interface[256,8]:'the array of the control
+common _list[16,0xffff] :'the array of datalist
+common _listcontrol[16]:'the array of controls associate at list objects
+common _listcount[16]: 'the array of listcount (the number of elements in list) properties
+common _listindex[16]: 'the array of first element displayed in a control(for scroll elements)
+'_____________________________________________________
+
+' PROPERTIES
+common _state=0 :'the state of control used for event and drawing
+  common destroy=0,drawing=1,operative=2,clicked=3,activated=4
+common _type=1: 'the type of control
+  common window=0,frame=1,staticbox=1,label=2,menubutton=3
+  common button=4,textentry=5,textarea=6,check=7
+  common radio=8,list=9,combo=10,slider=11
+  common gauge=13
+common _parent=2 : ' the parent of the control (for inclusion in windows frame clipcontrol and other)
+common _value=7 : ' the value of the control (can be a title, caption object select and depend of type control)
+common _x=3,_y=4,_w=5,_h=6 :' coordinates x,y is position w and h the dimension
+'_____________________________________________________
+
+' COLORS
+common _back_col=0xAAAAAA,_light=8^8-1,_dark=0
+_red=0xFF0000:_green=0x00FF00:_blue=0x0000FF
+
+'_____________________________________________________
+
+for i=0 to 256:_interface[i,0]=0:next :'reset the array
+'_____________________________________________________
+
+
+' GET / SET
+' the rutines for param controll access
+'_____________________________________________________
+
+' getparam(n,param) : return the value of param
+function getparam(n,param)
+    return _interface[n,param]
+end function
+'_____________________________________________________
+
+' setparam(n,param,value) : set a param with value:and force redrawing
+sub setparam(n,param,value)
+    _interface[n,param]=value
+    _interface[n,_state]=drawing
+end sub
+'_____________________________________________________
+
+
+' GETLIST / SETLIST
+' the rutines for manage lists data
+'_____________________________________________________
+
+' setlistbind(n) : set a first list free to control n
+function setListBind(n)
+    for il =0 to 16
+  if _listcontrol[il]=0 then
+      _listcontrol[il]=n
+      _listcount[il]=0
+      _listindex[il]=0
+
+      return il
+      exit function
+  end if
+    next
+    return -1
+end function
+'_____________________________________________________
+
+' setlistunbind(n) : remove list bind to control n
+function setListUnbind(n)
+    for il =0 to 16
+  if _listcontrol[il]=n then
+      _listcontrol[il]=0
+      _listcount[il]=0
+      _listindex[il]=0
+      return il
+      exit function
+  end if
+    next
+    return -1
+end function
+'_____________________________________________________
+
+' getlistbind(n) : get a list asociates
+function getlistbind(n)
+    for il =0 to 16
+  if val(_listcontrol[il])=n then
+      return il
+      exit function
+  end if
+    next
+    return -1
+end function
+'_____________________________________________________
+
+' getlist(n,entry) : return the value of entry in list
+function getlist(n,entry)
+    return _list[getlistbind(n),entry]
+end function
+'_____________________________________________________
+
+' setlist(n,entry,value) : set a list entry with value
+sub setlist(n,entry,value)
+    _list[getlistbind(n),entry]=value
+end sub
+'_____________________________________________________
+
+' addlist(n,value) : append a list entry with value and update listcount
+sub addlist(n,value)
+    l=getlistbind(n)
+    _list[l,_listcount[l]]=value
+    _listcount[l]+=1
+end sub
+'_____________________________________________________
+
+' insertlist(n,entry):insert the entry from the list
+sub insertlist(n,entry,value)
+    l=getlistbind(n)
+    for idl =_listcount[l] to entry step -1
+  _list[l,idl]=_list[l,idl-1]
+    next
+    _listcount[l]+=1
+    _list[l,entry]=value
+end sub
+'_____________________________________________________
+
+' deletelist(n,entry):remove the entry from the list
+sub deletelist(n,entry)
+    l=getlistbind(n)
+    for idl =entry to _listcount[l] -2
+  _list[l,idl]=_list[l,idl+1]
+    next
+    _listcount[l]-=1
+end sub
+
+'_____________________________________________________
+' clearlist(n): clear the list
+sub clearlist(n)
+    l=getlistbind(n)
+    _listcount[l]=0
+end sub
+'_____________________________________________________
+' CONTROLS RUTINES
+' for make and destroy controls of interface
+'_____________________________________________________
+
+' setnew(n,type,parent,x,y,w,h,value) :set a new interaface element
+sub setnew(n,type,parent,x,y,w,h,value)
+    _interface[n,_state]=1 'state default is 1 -1 =destroy
+    _interface[n,_type]=type
+    _interface[n,2]=parent
+    _interface[n,3]=x:_interface[n,4]=y
+    _interface[n,5]=w:_interface[n,6]=h
+    _interface[n,7]=value
+
+    'automatic bindlisting
+    if type=list then :setlistbind(n):end if
+end sub
+'_____________________________________________________
+
+'newcontrol(type,parent,x,y,w,h,value): set a new controls in array interface. return the number of control
+function newcontrol(type,parent,x,y,w,h,value)
+     for i= 1 to 255
+   if _interface[i,0]=0 then
+       setnew(i,type,parent,x,y,w,h,value)
+       return i
+       exit function
+   end if
+    next
+    return -1
+end function
+'_____________________________________________________
+
+' destroycontrol(n): destroy the control. Use refresh for deleting the control of display.
+sub destroycontrol(n)
+    _interface[n,0]=0
+end sub
+'_____________________________________________________
+
+
+
+' DRAWING SYSTEM
+' drawing system use many routines that provides to draw respective element
+' in a specific state drawobject set the relative coordinate of parent object
+' and select the appropriate draw routine draw write all elements
+' refresh rewrite all elements in current state
+'_____________________________________________________
+
+' draw_window(control,state,x,y,w,h,value): draw a window control
+sub draw_window(control,state,x,y,w,h,value)
+   if state=1 then
+  ink(_back_col): bar(x,y-15,x+w,y+h)
+  ink(_light): box(x,y-15,x+w,y+h)
+  ink(_light): bar(x,y-15,x+w,y)
+  ink(_dark): text(x+10,y-15,12,value)
+  state=2
+   end if
+end sub
+'_____________________________________________________
+
+' draw_staticbox(control,state,x,y,w,h,value): draw staticbox and frame control
+sub draw_staticbox(control,state,x,y,w,h,value)
+   if state=1 then
+  ink(_dark): box(x,y+8,x+w,y+h)
+  ink(_light):box(x+1,y+9,x+w+1,y+h+1)
+  ink(_back_col):vl=len(value)*7: bar(x+4,y,x+vl+4,y+12)
+  ink(_dark): text(x+8,y,12,value)
+  state=2
+    end if
+  end sub
+'_____________________________________________________
+
+' draw_label(control,state,x,y,w,h,value): draw a label control
+sub draw_label(control,state,x,y,w,h,value)
+   if state=1 then
+       ink(_back_col): bar(x,y,x+w,y+h)
+       ink(_dark): text(x+2,y,12,value)
+  state=2
+   end if
+
+end sub
+'_____________________________________________________
+
+' draw_menubutton(control,state,x,y,w,h,value): NOT IMPLEMENTED
+sub draw_menubutton(control,state,x,y,w,h,value)
+ end sub
+'_____________________________________________________
+
+' draw_button(control,state,x,y,w,h,value): draw a control button
+sub draw_button(control,state,x,y,w,h,value)
+   if state=1 then
+       ink(_back_col): bar(x,y,x+w,y+h)
+       ink(_light): line(x,y,x+w,y):line(x,y,x,y+h)
+       ink(_dark):  line(x+w,y+h,x+w,y):line(x+w,y+h,x,y+h)
+       ink(_dark): text(x+2,y,12,value)
+  state=2
+   end if
+   if state=3 then
+       ink(_back_col): bar(x,y,x+w,y+h)
+       ink(_dark): line(x,y,x+w,y):line(x,y,x,y+h)
+       ink(_light):  line(x+w,y+h,x+w,y):line(x+w,y+h,x,y+h)
+       ink(_dark): text(x+2,y,12,value)
+  state=4
+   end if
+ end sub
+'_____________________________________________________
+
+' draw_textentry(control,state,x,y,w,h,value): draw a textentry control (only one rows)
+sub draw_textentry(control,state,x,y,w,h,value)
+   if state=1 then
+  if h<>16 then :h=16:end if
+  x=(int(x/9)*9)-1
+  y=(int(y/12)*12)
+  w=(int(w/9)*9)+2
+       ink(_light): bar(x,y,x+w,y+h)
+       ink(_dark): box(x,y,x+w,y+h)
+       ink(_dark): text(x+2,y,12,value)
+  state=2
+    end if
+end sub
+'_____________________________________________________
+
+' draw_textarea(control,state,x,y,w,h,value): NOT IMPLEMENTED
+sub draw_textarea(control,state,x,y,w,h,value)
+   if state=1 then
+       ink(_light): bar(x,y,x+w,y+h)
+       ink(_dark): line(x,y,x+w,y):line(x,y,x,y+h)
+       ink(_dark):  line(x+w,y+h,x+w,y):line(x+w,y+h,x,y+h)
+       ink(_dark): text(x+2,y,12,value)
+  state=2
+    end if
+ end sub
+'_____________________________________________________
+
+' draw_check(control,state,x,y,w,h,value): draw a check control(value is a caption for veriyfy you must
+' use thee state property)
+sub draw_check(control,state,x,y,w,h,value)
+    if state=1 then
+       ink(_back_col): bar(x,y,x+w,y+h)
+       ink(_light)
+         line(x+12,y+12,x+12,y):line(x+12,y+12,x,y+12)
+       ink(_dark)
+         line(x,y,x+12,y):line(x,y,x,y+12)
+         text(x+20,y-1,12,value)
+           state=2
+     end if
+    if state=3 then
+       ink(_back_col): bar(x,y,x+w,y+h)
+       ink(_light)
+         line(x+12,y+12,x+12,y):line(x+12,y+12,x,y+12)
+       ink(_dark)
+         line(x,y,x+12,y):line(x,y,x,y+12)
+         line(x+3,y+6,x+6,y+10):line(x+6,y+9,x+10,y+3)
+         line(x+2,y+6,x+5,y+10):line(x+5,y+9,x+9,y+3)
+         text(x+20,y-1,12,value)
+           state=4
+     end if
+ end sub
+'_____________________________________________________
+
+' draw_radio(control,state,x,y,w,h,value):draw a radio button At this time you can't create only one
+' series of radio controls)
+sub draw_radio(control,state,x,y,w,h,value)
+if state=1 then
+      ink(_back_col)
+        bar(x,y,x+w,y+h)
+      ink(_light)
+        line(x+12,y+9,x+12,y+3):line(x+9,y+12,x+3,y+12)
+        line(x+12,y+9,x+9,y+12)
+      ink(_dark)
+        line(x+3,y,x+9,y):line(x,y+3,x,y+9)
+        dot(x+1,y+2):dot(x+2,y+1)
+        text(x+20,y-1,12,value)
+          state=2
+    end if
+   if state=3 then
+      ink(_back_col)
+        bar(x,y,x+w,y+h)
+      ink(_light)
+        line(x+12,y+9,x+12,y+3):line(x+9,y+12,x+3,y+12)
+        line(x+12,y+9,x+9,y+12)
+      ink(_dark)
+        line(x+3,y,x+9,y):line(x,y+3,x,y+9)
+        dot(x+1,y+2):dot(x+2,y+1)
+        bar(x+4,y+5,x+9,y+8):bar(x+5,y+4,x+8,y+9)
+        text(x+20,y-1,12,value)
+          state=4
+    end if
+ end sub
+'_____________________________________________________
+
+'(---)
+' Here is DrawList =))))
+
+'draw_list(control,state,x,y,w,h,value): draw a list control
+sub draw_list(control,state,x,y,w,h,value)
+    l=getlistbind(control)
+   if state=1 then
+       ink(_light): bar(x,y,x+w,y+h)
+  ink(_dark): box(x,y,x+w,y+h)
+
+       for ild1 = _listindex[l] to min(_listindex[l]+int(h/12)-1,_listcount[l]-1)
+      ild=ild1-_listindex[l]
+      if ild1 = value then
+         ink(_dark): bar(x+2,y+(ild*12)+1,x+w,y+(ild*12)+12+1)
+         ink(_light): text(x+2,y+(ild*12),12,_list[ l ,ild1 ])
+      else
+         ink(_light): bar(x+2,y+(ild*12)+1,x+w,y+(ild*12)+12+1)
+         ink(_dark): text(x+2,y+(ild*12),12,_list[ l ,ild1 ])
+      end if
+  next
+
+  if _listcount[l]>(int(h/12)) then
+       ink(_back_col)
+          bar (x+w-10,y,x+w,y+h)
+       ink(_dark)
+          line (x+w-10,y,x+w,y):line (x+w-10,y,x+w-10,y+h)
+       ink(_light)
+          line (x+w-10,y+h,x+w,y+h):line (x+w,y,x+w,y+h)
+
+       ink(_back_col)
+          bar(x+w-9,y+1,x+w+1,y+10)
+       ink(_light)
+          line(x+w-9,y+1,x+w-1,y+1):line(x+w-9,y+1,x+w-9,y+10)
+       ink(_dark)
+          line(x+w-1,y+1,x+w-1,y+10):line(x+w-9,y+10,x+w-1,y+10)
+          '- draw uptriangle
+
+       ink(_back_col)
+          bar(x+w-9,y+h-10,x+w-1,y+h-1)
+       ink(_light)
+          line(x+w-9,y+h-10,x+w-1,y+h-10):line(x+w-9,y+h-10,x+w-9,y+h-1)
+       ink(_dark)
+          line(x+w-1,y+h-10,x+w-1,y+h-1):line(x+w-9,y+h,x+w-1,y+h-1)
+          '- draw downtriangle
+
+        '- bug: this slider handle goes a bit far from limit
+        sldx1=x+w-9:sldx2=x+w-1
+         sldy1=y+12+(_listindex[l]*(h-20)/_listcount[l])
+         sldy2=sldy1+max(int(((h/12))*(h-20)/_listcount[l]),1)
+       ink(_back_col)
+          bar(sldx1,sldy1,sldx2,sldy2)
+       ink(_light)
+          line(sldx1,sldy1,sldx2,sldy1):line(sldx1,sldy1,sldx1,sldy2)
+       ink(_dark)
+          line(sldx2,sldy1,sldx2,sldy2):line(sldx1,sldy2,sldx2,sldy2)
+
+  end if
+
+  state=2
+    end if
+ end sub
+'_____________________________________________________
+
+'draw_combo(control,state,x,y,w,h,value): NOT IMPLEMENTED
+sub draw_combo(control,state,x,y,w,h,value)
+ end sub
+'_____________________________________________________
+
+'draw_slider(control,state,x,y,w,h,value): draw a slider control value can be in range 0-100
+sub draw_slider(control,state,x,y,w,h,value)
+   if state=1 then
+  if h<8 then :h=8:end if
+  ink(_back_col): bar(x-2,y,x+w+2,y+h+1)
+  ink(_dark): line(x,y+(h/2)-1,x+w,y+(h/2)-1):line(x,y+(h/2),x,y+(h/2)+1)
+  ink(_light):  line(x+w,y+(h/2)-1,x+w,y+(h/2)+1):line(x,y+(h/2)+1,x+w,y+(h/2)+1)
+  v=(value*100)/w
+  ink(_back_col): bar(x+v-2,y,x+v+2,y+h)
+  ink(_light):line(x+v-2,y,x+v+2,y):line(x+v-2,y+0,x+v-2,y+h)
+  ink(_dark): line(x+v-2,y+h,x+v+2,y+h):line(x+v+2,y+0,x+v+2,y+h)
+  state=2
+    end if
+ end sub
+'_____________________________________________________
+
+' draw_gauge(control,state,x,y,w,h,value): draw a gauge control value can be in range 0-100
+sub draw_gauge(control,state,x,y,w,h,value)
+    if state=1 then
+  ink(_back_col):bar(x,y,x+w,y+12)
+  ink(_light):   line(x,y+12,x+w,y+12):line(x+w,y,x+w,y+12)
+  ink(_dark)
+  line(x,y,x+w,y):line(x,y,x,y+12)
+  bar(x+2,y+2,x+2+((w*value)/100),y+12-2)
+  state=2
+    end if
+  end sub
+'_____________________________________________________
+
+' drawobject(control): draw a control
+sub drawobject(control)
+    if _interface[control,_state]<>2 then
+    'and _interface[control,_state]<>0 then
+
+  'SETPARENT
+  parent=_interface[control,_parent]
+  if parent<>-1 and parent <> control then
+      x=_interface[control,_x]+_interface[parent,_x]
+      y=_interface[control,_y]+_interface[parent,_y]
+      w=_interface[control,_w]
+      h=_interface[control,_h]
+      value=_interface[control,_value]
+
+      oldparent=_interface[parent,_parent]
+      if oldparent<>-1 and oldparent <> parent then
+    x=x+_interface[oldparent,_x]
+    y=y+_interface[oldparent,_y]
+      end if
+
+  else
+      x=_interface[control,_x]
+      y=_interface[control,_y]
+      w=_interface[control,_w]
+      h=_interface[control,_h]
+      value=_interface[control,_value]
+  end if
+
+  'WcontrolNDOW
+  if _interface[control,_type]=window then
+      draw_window(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'FRAME STATICBOX
+  if _interface[control,_type]=staticbox then
+      draw_staticbox(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'BUTTON
+  if _interface[control,_type]=button then
+      draw_button(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'LABEL
+  if _interface[control,_type]=label then
+      draw_label(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'TEXTENTRY
+  if _interface[control,_type]=textentry then
+      draw_textentry(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'CHECK
+  if _interface[control,_type]=check then
+      draw_check(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'RADIO
+  if _interface[control,_type]=radio then
+      draw_radio(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'SLIDER
+  if _interface[control,_type]=slider then
+      draw_slider(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'TEXTAREA
+  if _interface[control,_type]=textarea then
+      draw_textarea(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'GAUGE
+  if _interface[control,_type]=gauge then
+      draw_gauge(control,_interface[control,_state],x,y,w,h,value)
+  end if
+
+  'LIST
+  if _interface[control,_type]=list then
+      draw_list(control,_interface[control,_state],x,y,w,h,value)
+  end if
+    end if
+end sub
+'_____________________________________________________
+
+' draw(): draw all controls set
+sub draw
+    for i =0 to 256:drawobject(i): next
+ end sub
+'_____________________________________________________
+
+' refresh(): redraw all controls
+sub refresh
+    autoback(0)
+    for i =0 to 256
+  if _interface[i,_state]=4 then
+      _interface[i,_state]=3
+  else
+      if _interface[i,_state]<>0 then
+     _interface[i,_state]=1
+      end if
+  end if
+  drawobject(i)
+    next
+    screenswap
+    autoback(25)
+ end sub
+'_____________________________________________________
+
+' EVENT SYSTEM
+' Event system provide to verify all object event
+' At this time not work well and doesn't optimizes routine
+' The logic is similar to drawing system
+'_____________________________________________________
+
+' event_window(i,state,x,y,w,h,value): check the specific windows events
+function event_window(i,state,x,y,w,h,value)
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    state=3
+    drawobject(i)
+    return 3
+    exit function
+      end if
+  end if
+    end if
+
+    return 0
+end function
+'_____________________________________________________
+
+' event_button(i,state,x,y,w,h,value): check the specific buttons events
+function event_button(i,state,x,y,w,h,value)
+    if state=4 then
+  state=1
+  drawobject(i)
+    end if
+
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    state=3
+    drawobject(i)
+    return 3
+    exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' event_label(i,state,x,y,w,h,value): check the label events
+function event_label(i,state,x,y,w,h,value)
+
+    if state=4 then
+  state=1
+  drawobject(i)
+    end if
+
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+         state=3
+         drawobject(i)
+         return 3
+         exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' event_textentry(i,state,x,y,w,h,value): check the textentry events
+function event_textentry(i,state,x,y,w,h,value)
+
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+         state=3
+         paper(_light)
+         pen(_dark)
+         value=zoneinputs(x/9,y/12,w/9-1,value)
+         setparam(i,_value,value)
+         state=1
+         drawobject(i)
+         return 3
+         exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' event_check(i,state,x,y,w,h,value): check the check controls events
+function event_check(i,state,x,y,w,h,value)
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    state=3
+    drawobject(i)
+    while bmouse <>0:end while
+    return 3
+    exit function
+      end if
+  end if
+    end if
+
+    if state=4 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    state=1
+    drawobject(i)
+    while bmouse <>0:end while
+    return 1
+    exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' event_radio(i,state,x,y,w,h,value): check the radio controls events
+function event_radio(i,state,x,y,w,h,value)
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    state=3
+    drawobject(i)
+    for i1 =0 to 256
+        if _interface[i1,_type]=radio and _interface[i1,_state]=activated and i1<>i then
+      _interface[i1,_state]=1:drawobject(i1)
+        end if
+    next
+    return 3
+    exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' event_slider(i,state,x,y,w,h,value): check the slider controls events
+function event_slider(i,state,x,y,w,h,value)
+    if state=3 then
+  state=1
+  drawobject(i)
+    end if
+
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    value=(xmouse()-x) *w/100
+    setparam(i,_value,value)
+    state=3
+    drawobject(i)
+    return 3
+    exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' event_list(i,state,x,y,w,h,value): check the list controls events
+function event_list(i,state,x,y,w,h,value)
+    l=getlistbind(i) :'find the list associate at control
+
+    if mousezone(x+w-10,y,10,10)and bmouse=1 then
+  _listindex[l]-=1
+  if _listindex[l]<0 then :_listindex[l]=0:end if
+  drawobject(i)
+  state=3
+  return 3
+  exit function
+    end if
+
+    if mousezone(x+w-10,y+h-10,10,10)and bmouse=1 then
+  _listindex[l]+=1
+  if _listindex[l]>(_listcount[l]-int(h/12)) then :_listindex[l]=(_listcount[l]-int(h/12)):end if
+  drawobject(i)
+  state=3
+  return 3
+  exit function
+    end if
+
+    if mousezone(x+w-10,y+10,10,h-20)and bmouse=1 then
+  _listindex[l]=int(((ymouse-(y+10))*_listcount[l])/(h-20))
+  if _listindex[l]>(_listcount[l]-int(h/12)) then :_listindex[l]=(_listcount[l]-int(h/12)):end if
+  drawobject(i)
+  state=3
+  return 3
+  exit function
+    end if
+
+    if state=2 then
+  if mousezone(x,y,w,h)then
+      if bmouse=1 then
+    value=int((ymouse()-y) /12)+_listindex[l]
+    setparam(i,_value,value)
+    state=3
+    drawobject(i)
+    return 3
+    exit function
+      end if
+  end if
+    end if
+    return 0
+end function
+'_____________________________________________________
+
+' eventobject(i): check thevents of control.param is the number of the control
+function eventobject(i)
+        'SETPARENT
+  parent=_interface[i,_parent]
+  if Parent<>-1 and parent <> i then
+      x=_interface[i,_x]+_interface[parent,_x]
+      y=_interface[i,_y]+_interface[parent,_y]
+      w=_interface[i,_w]
+      h=_interface[i,_h]
+      value=_interface[i,_value]
+
+      oldparent=_interface[parent,_parent]
+      if oldparent<>-1 and oldparent <> parent then
+    x=x+_interface[oldparent,_x]
+    y=y+_interface[oldparent,_y]
+      end if
+
+  else
+      x=_interface[i,_x]
+      y=_interface[i,_y]
+      w=_interface[i,_w]
+      h=_interface[i,_h]
+      value=_interface[i,_value]
+  end if
+
+  'WINDOW
+  if _interface[i,_type]=window then
+      return event_window(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'BUTTON
+  if _interface[i,_type]=button then
+      return event_button(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'LABEL
+  if _interface[i,_type]=label then
+      return event_label(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'TEXTENTRY
+  if _interface[i,_type]=textentry then
+      return event_textentry(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'CHECK
+  if _interface[i,_type]=check then
+      return event_check(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'RADIO
+  if _interface[i,_type]=radio then
+      return event_radio(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'SLIDER
+  if _interface[i,_type]=slider then
+      return event_slider(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+
+  'LIST
+  if _interface[i,_type]=list then
+      return event_list(i,_interface[i,_state],x,y,w,h,value)
+      exit function
+  end if
+    return 0
+end function
+'_____________________________________________________
+
+' event(): check all control: return 0 if not found events
+function event
+    x=0
+    for i =0 to 256
+  x=x+eventobject(i)
+    next
+    waitvbl
+    return x
+ end function
+'_____________________________________________________
+
+' waitevent(t): wait an event for t cycle. With -1 for ever or event occurred
+sub waitevent(t)
+    'refresh
+    while 0=0
+  if event() <> 0 then :exit while:end if
+  if t=0 then :exit while:end if
+  t-=1
+    end while
+end sub
+'_____________________________________________________

@@ -1,0 +1,5 @@
+'sqr test
+
+
+prints(sqr(49))
+waitkey

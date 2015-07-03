@@ -1,0 +1,241 @@
+
+include"msx1palette.sdlblib"
+
+xedg=320:yedg=200:wdwd=0
+
+
+'setdisplay(256,192,32,1)
+
+setdisplay(xedg,yedg,32,wdwd):mousehide:paper(color(11)):ink(0):pen(0):cls
+
+include"background.sdlblib"
+
+
+   ScreenOpen (1,128,128,0,0,0,0,0)
+ Loadimage("CombatSprites_C01.png",1): pasteicon(0,0,1): Screen(1)
+    for y=0 to 127:for x=0 to 127:ink(color(5))
+       uq=bitwiseand(point(x,y),0xFF)
+       if uq<127 then:dot(x,y):end if
+     next:next
+    for y=0 to 7: For x=0 To 7
+       k=(y*8)+x: grab(2+k,x*16,y*16,16,16)
+     Next:next
+
+ Loadimage("CombatSprites_C01.png",1): pasteicon(0,0,1): Screen(1)
+    for y=0 to 127:for x=0 to 127:ink(color(6))
+       uq=bitwiseand(point(x,y),0xFF)
+       if uq<127 then:dot(x,y):end if
+     next:next
+    for y=0 to 7: For x=0 To 7
+       k=(y*8)+x: grab(64+2+k,x*16,y*16,16,16)
+     Next:next
+
+ Loadimage("CombatSprites_C01.png",1): pasteicon(0,0,1): Screen(1)
+    for y=0 to 127:for x=0 to 127:ink(color(12))
+       uq=bitwiseand(point(x,y),0xFF)
+       if uq<127 then:dot(x,y):end if
+     next:next
+    for y=0 to 7: For x=0 To 7
+       k=(y*8)+x: grab(128+2+k,x*16,y*16,16,16)
+     Next:next
+
+ Loadimage("CombatSprites_C01.png",1): pasteicon(0,0,1): Screen(1)
+    for y=0 to 127:for x=0 to 127:ink(color(13))
+       uq=bitwiseand(point(x,y),0xFF)
+       if uq<127 then:dot(x,y):end if
+     next:next
+    for y=0 to 7: For x=0 To 7
+       k=(y*8)+x: grab(192+2+k,x*16,y*16,16,16)
+     Next:next
+
+deletesprite(0)
+
+
+
+
+screen(0)
+
+while key(27)=0
+
+dpl=1
+
+xpos0=16+32:xpos1=224+32:xpos2=16+32:xpos3=224+32
+ypos0=16+4:ypos1=16+4:ypos2=160+4:ypos3=160+4
+
+xbul0=0:xbul1=0:xbul2=0:xbul3=0
+ybul0=0:ybul1=0:ybul2=0:ybul3=0
+
+acv0=1:acv1=1:acv2=1:acv3=1
+
+
+tg0=0:tg1=0:tg2=0:tg3=0
+
+cndr0=6:cndr1=10:cndr2=2:cndr3=14
+lagr0=0:lagr1=0:lagr2=0:lagr3=0
+
+while key(27)=0 and dpl=1
+
+   if acv0=1 then
+     if key(asc("w")) then
+        xpos0=xpos0-sin(int(cndr0)*314.1592/800*-1)
+        ypos0=ypos0-cos(int(cndr0)*314.1592/800*-1)
+        lagr0=lagr0+1: if lagr0>2 then:lagr0=0:end if
+      end if
+     if key(asc("s")) then
+        xpos0=xpos0+sin(int(cndr0)*314.1592/800*-1)
+        ypos0=ypos0+cos(int(cndr0)*314.1592/800*-1)
+        lagr0=lagr0-1: if lagr0<0 then:lagr0=2:end if
+      end if
+     if key(asc("a")) then
+        cndr0=cndr0-.25
+        if cndr0<0 then:cndr0=16:end if
+        lagr0=lagr0+1: if lagr0>2 then:lagr0=0:end if
+      end if
+     if key(asc("d")) then
+        cndr0=cndr0+.25
+        if cndr0>16 then:cndr0=0:end if
+        lagr0=lagr0+1: if lagr0>2 then:lagr0=0:end if
+      end if
+     if key(asc("z")) and (tg0=0) then:tg0=1:xbul0=xpos0:ybul0=ypos0:end if
+    end if
+
+   if acv1=1 then    
+     if key(asc("t")) then
+        xpos1=xpos1-sin(int(cndr1)*314.1592/800*-1)
+        ypos1=ypos1-cos(int(cndr1)*314.1592/800*-1)
+        lagr1=lagr1+1: if lagr1>2 then:lagr1=0:end if
+      end if
+     if key(asc("g")) then
+        xpos1=xpos1+sin(int(cndr1)*314.1592/800*-1)
+        ypos1=ypos1+cos(int(cndr1)*314.1592/800*-1)
+        lagr1=lagr1-1: if lagr1<0 then:lagr1=2:end if
+      end if
+     if key(asc("f")) then
+        cndr1=cndr1-.25
+        if cndr1<0 then:cndr1=16:end if
+        lagr1=lagr1+1: if lagr1>2 then:lagr1=0:end if
+      end if
+     if key(asc("h")) then
+        cndr1=cndr1+.25
+        if cndr1>16 then:cndr1=0:end if
+        lagr1=lagr1+1: if lagr1>2 then:lagr1=0:end if
+      end if
+     if key(asc("v")) and (tg1=0) then:tg1=1:xbul1=xpos1:ybul1=ypos1:end if
+    end if
+
+   if acv2=1 then    
+     if key(asc("i")) then
+        xpos2=xpos2-sin(int(cndr2)*314.1592/800*-1)
+        ypos2=ypos2-cos(int(cndr2)*314.1592/800*-1)
+        lagr2=lagr2+1: if lagr2>2 then:lagr2=0:end if
+      end if
+     if key(asc("k")) then
+        xpos2=xpos2+sin(int(cndr2)*314.1592/800*-1)
+        ypos2=ypos2+cos(int(cndr2)*314.1592/800*-1)
+        lagr2=lagr2-1: if lagr2<0 then:lagr2=2:end if
+      end if
+     if key(asc("j")) then
+        cndr2=cndr2-.25
+        if cndr2<0 then:cndr2=16:end if
+        lagr2=lagr2+1: if lagr2>2 then:lagr2=0:end if
+      end if
+     if key(asc("l")) then
+        cndr2=cndr2+.25
+        if cndr2>16 then:cndr2=0:end if
+        lagr2=lagr2+1: if lagr2>2 then:lagr2=0:end if
+      end if
+     if key(asc("m")) and (tg2=0) then:tg2=1:xbul2=xpos2:ybul2=ypos2:end if
+    end if
+
+   if acv3=1 then    
+     if key(k_up) then
+        xpos3=xpos3-sin(int(cndr3)*314.1592/800*-1)
+        ypos3=ypos3-cos(int(cndr3)*314.1592/800*-1)
+        lagr3=lagr3+1: if lagr3>2 then:lagr3=0:end if
+      end if
+     if key(k_down) then
+        xpos3=xpos3+sin(int(cndr3)*314.1592/800*-1)
+        ypos3=ypos3+cos(int(cndr3)*314.1592/800*-1)
+        lagr3=lagr3-1: if lagr3<0 then:lagr3=2:end if
+      end if
+     if key(k_left) then
+        cndr3=cndr3-.25
+        if cndr3<0 then:cndr3=16:end if
+        lagr3=lagr3+1: if lagr3>2 then:lagr3=0:end if
+      end if
+     if key(k_right) then
+        cndr3=cndr3+.25
+        if cndr3>16 then:cndr3=0:end if
+        lagr3=lagr3+1: if lagr3>2 then:lagr3=0:end if
+      end if
+     if key(k_rshift) and (tg3=0) then:tg3=1:xbul3=xpos3:ybul3=ypos3:end if
+    end if
+
+     if tg0=1 then 
+        xbul0=xbul0-sin(int(cndr0)*314.1592/800*-1)*8
+        ybul0=ybul0-cos(int(cndr0)*314.1592/800*-1)*8
+          if (xbul0>xedg) or (xbul0<0) or (ybul0>yedg) or (ybul0<0) then
+             tg0=0:xbul0=0:ybul0=0
+           end if
+      end if
+
+     if tg1=1 then 
+        xbul1=xbul1-sin(int(cndr1)*314.1592/800*-1)*8
+        ybul1=ybul1-cos(int(cndr1)*314.1592/800*-1)*8
+          if (xbul1>xedg) or (xbul1<0) or (ybul1>yedg) or (ybul1<0) then
+             tg1=0:xbul1=0:ybul1=0
+           end if
+      end if
+
+     if tg2=1 then 
+        xbul2=xbul2-sin(int(cndr2)*314.1592/800*-1)*8
+        ybul2=ybul2-cos(int(cndr2)*314.1592/800*-1)*8
+          if (xbul2>xedg) or (xbul2<0) or (ybul2>yedg) or (ybul2<0) then
+             tg2=0:xbul2=0:ybul2=0
+           end if
+      end if
+
+     if tg3=1 then 
+        xbul3=xbul3-sin(int(cndr3)*314.1592/800*-1)*8
+        ybul3=ybul3-cos(int(cndr3)*314.1592/800*-1)*8
+          if (xbul3>xedg) or (xbul3<0) or (ybul3>yedg) or (ybul3<0) then
+             tg3=0:xbul3=0:ybul3=0
+           end if
+      end if
+
+   bob(15,xpos0,ypos0,cndr0+2+(lagr0*16))
+   bob(16,xpos1,ypos1,cndr1+2+(lagr1*16)+64)
+   bob(17,xpos2,ypos2,cndr2+2+(lagr2*16)+128)
+   bob(18,xpos3,ypos3,cndr3+2+(lagr3*16)+192)
+
+
+   bob(25,xbul0,ybul0,2+63)
+   bob(26,xbul1,ybul1,2+63+64)
+   bob(27,xbul2,ybul2,2+63+128)
+   bob(28,xbul3,ybul3,2+63+192)
+
+
+     if bobhit(15,26) or bobhit(15,27) or bobhit(15,28) then
+        acv0=0:tg0=0:xpos0=0:ypos0=0:xbul0=0:ybul0=0:end if
+
+     if bobhit(16,25) or bobhit(16,27) or bobhit(16,28) then
+        acv1=0:tg1=0:xpos1=0:ypos1=0:xbul1=0:ybul1=0:end if
+
+     if bobhit(17,25) or bobhit(17,26) or bobhit(15,28) then
+        acv2=0:tg2=0:xpos2=0:ypos2=0:xbul2=0:ybul2=0:end if
+
+     if bobhit(18,25) or bobhit(18,26) or bobhit(18,27) then
+        acv3=0:tg3=0:xpos3=0:ypos3=0:xbul3=0:ybul3=0:end if
+
+
+     if key(k_f2) then:dpl=0:end if
+
+
+  waitvbl
+wend
+wend
+
+
+
+
+

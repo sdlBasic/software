@@ -1,0 +1,25 @@
+'
+' sdlBasic test: inputBox  
+' 
+'   Name:      inputbox.sdlbas
+'   Purpose:   test the command inputbox 
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+'  Bugs:	cursor write black sign in panel 
+'
+' Todo:
+'  
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+include "interface.sdlblib"
+setautoback(50)
+
+
+
+sub main
+	prints(inputbox("ciao","prova"))
+	while key(k_return)<>0  or key(27)<>0:end while
+	waitkey
+end sub
+
+main

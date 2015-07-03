@@ -1,0 +1,81 @@
+Rem ************************************ 
+Rem *       AMOS Example 16.10         * 
+Rem *        Menu Procedures           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Define menu strings
+Rem Reserve ten bytes of storage and call TRY1 
+M1$="(reserve 10:proc TRY1)"
+Rem When used inside menu, calls TRY2
+M2$="(proc TRY2)"
+Rem Create menus 
+For L1=1 To 4
+   Rem Title is drawn using procedure TRY1
+   Menu$(L1)=M1$
+   For L2=1 To 2
+      Rem First level menu is drawn by TRY2
+      Menu$(L1,L2)=M2$
+      For L3=1 To 3
+         Rem Set up third level menu
+         Menu$(L1,L2,L3)=M1$
+      Next 
+   Next 
+Next 
+Menu On 
+Wait Key 
+End 
+Rem Menu procedures
+Procedure TRY1
+   Rem Draw a bar with pattern N
+   Rem Menu procedures may not use parameters, so N is shared 
+   Shared N
+   Rem If menu item has fully opened
+   If Dreg(2)
+      Rem get X,Y coordinates of left coorner of item
+      X=Dreg(0) : Y=Dreg(1)
+      Rem Load address of reserved data area 
+      V=Areg(1)
+      N=Deek(V) : Add N,1,0 To 25 : Doke V,N
+      Rem Draw menu bar
+      Set Pattern N
+      Bar X,Y To X+64,Y+16
+      Text X,Y+8,Str$(Deek(V))
+   End If 
+   Dreg(0)=65
+   Dreg(1)=17
+End Proc
+Rem Menu procedure 2 
+Procedure TRY2
+   Rem Draws a fancy moire pattern
+   Rem set dimensions of box
+   TX=64 : TY=64
+   Rem Get coordinates of top left hand corner of box 
+   X1=Dreg(0) : Y1=Dreg(1)
+   Rem Calculate coordinates of bottom right corner 
+   X2=X1+TX : Y2=Y1+TY
+   Rem Find middle of box 
+   MX=X1+TX/2 : MY=Y1+TY/2
+   Rem check if menu box has been drawn 
+   If Dreg(2)
+      Rem Draw pattern 
+      Set Pattern 0
+      Bar X1,Y1 To X2,Y2
+      Ink 2
+      For X=X1 To X2 Step 2
+         Draw X,Y1 To MX,MY
+      Next 
+      For Y=Y1 To Y2 Step 2
+         Draw X2,Y To MX,MY
+      Next 
+      For X=X2 To X1 Step -2
+         Draw X,Y2 To MX,MY
+      Next 
+      For Y=Y2 To Y1 Step -2
+         Draw X1,Y To MX,MY
+      Next 
+   End If 
+   Rem Load X,Y with coords of bottom of box
+   Dreg(0)=TX+1
+   Dreg(1)=TY+1
+End Proc

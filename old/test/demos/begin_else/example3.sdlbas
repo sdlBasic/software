@@ -1,0 +1,342 @@
+ '***************************
+ '****HELLO WORLD 3**********
+ 'freecode by begin_else*****
+ '***************************
+ 
+ '*********************
+ 'VARIABLE DECLARATION
+ '*********************
+ 'Declare and assign values to variables
+ count=0 'not used
+ 'var for current executing module.
+ executing=0
+ 'var enabling user instr.
+ print_user_instructions=0
+ 'var to prevent slow fading
+ 'of music during execute last sect.
+ fade_music=0
+ 'var to set left/right screen limits
+ mothership_state=0
+ 'var to send render text instr. once
+ render_text=0
+ 'var to send render text instr. once
+ set_text=0
+ 'var to enable allways execute section
+ allways_execute=0
+ 'var for mothership x axis speeds.
+ xspeed=0
+ animate=0
+ 
+ '***************
+ 'EXECUTE FIRST
+ '***************
+ 'Execute section at start up
+ 'only once and outside of main
+ 'loop.
+ if executing=0 then
+ executing=1
+ 'clear the screen once
+ cls
+ 'select the screen resolution
+ 'at 32 bpp and unresizable
+ setdisplay(640,480,32,1)
+ 'hide the mouse
+ mousehide
+ 'change the ink color to red
+ ink (rgb(255,0,0))
+ 'load explosion wav sound
+ loadsound ("exp.wav",10)
+ 'load, play and set volume for mod music.
+ loadmusic ("titolo.mod")
+ volumemusic(128)
+ playmusic (-1)
+ 'load sdlBasic logo bmp
+ loadimage("sdlBasic.bmp",1)
+ 'load mother ship bmp image sprite
+ loadImage ("madre.bmp",2)
+ 'place mothership bob bmp in 2d space
+ bob(2,65,64,2)
+ 'assign this .bmp No.2 to x and y vars.
+ x=xbob(2)
+ y=ybob(2)
+ 'set mothership state var to 1
+ mothership_state=1
+ ' explosion bmp
+ loadImage ("exp1.bmp",3 )
+ loadImage ("exp2.bmp",4 )
+ loadImage ("exp3.bmp",5 )
+ loadImage ("exp4.bmp",6 )
+ loadImage ("exp5.bmp",7 )
+ loadImage ("exp6.bmp",8 )
+ loadImage ("exp7.bmp",9 )
+ loadImage ("exp8.bmp",10 )
+ 
+ 
+ 'finish once only conditional
+ end if
+ 
+ 
+ '**************************************
+ ' MAIN LOOP
+ ' Executes while some key is´nt pressed
+ '**************************************
+ 'execute while escape key isn´t pressed.
+ while key(27) = 0
+ 
+ 
+ 
+ '---------------------------
+ 'Intorduction Section
+ '---------------------------
+ 
+ 'Render The Introduction Screen
+ if executing=1 then
+ 'only send render text instr. once and
+ 'will stay rendered until user presses c key
+ 'to continue.
+ if set_text=0 then
+ 'send render text instr. only once
+ set_text=1
+ 'render the authors prolog.
+ text(0,0,25,"FREECODE BY: begin_else !!!")
+ 'render to the main message.
+ text(80,230,55,"HELLO WORLD 3!!!")
+ 'inform user on how to continue
+ text(225,290,15,"Hit The c Key To Continue !!")
+ end if
+ if key(asc("c")) then
+ 'cls clears intro screen text when c key is pressed.
+ cls
+ executing=2
+ end if
+ 
+ else
+ 
+ '-------------------------
+ 'Principal Program Section
+ '-------------------------
+ if executing=2 then
+ 'enable var to render user instructions
+ print_user_instructions=1
+ 
+ 'update counter
+ count=count+1
+ 
+ 'when the user hits the number 1 key then print to screen
+ 
+ if key(asc("1")) then
+ if render_text=0 then
+ 'send render text instr. only once
+ render_text=2
+ cls
+ text(130,230,40,"OK! GOOD GOING !!")
+ else
+ render_text=0
+ end if
+ end if
+ 
+ 'when the user hits the number 2 key then print to screen
+ 
+ if key(asc("2")) then
+ if render_text=0 then
+ 'send render text instr. only once
+ render_text=3
+ cls
+ text(78,230,40,"AH! WHAT DO YA KNOW !!")
+ else
+ render_text=0
+ end if
+ end if
+ 
+ 'when the user hits the number 3 key then print to screen
+ 
+ if key(asc("3")) then
+ if render_text=0 then
+ 'send render text instr. only once
+ render_text=4
+ cls
+ text(190,230,40,"AWESOME !!")
+ else
+ render_text=0
+ end if
+ end if
+ 
+ 'print, the user instructions..
+ if print_user_instructions=1 then
+ text(65,390,20,"Hit the the keyboard number 1,2,3 keys to print !!!")
+ text(150,410,20,"Hit The (b)ack Key to Exit Section!!")
+ end if
+ 
+ 'enable executing var to exit this section
+ if key(asc("b")) then
+ executing=3
+ 'enable var to stop printing this modules
+ 'user instructions.
+ print_user_instructions=2
+ end if
+ 
+ else
+ 
+ 
+ 'Print Exiting Message
+ if executing=3 then
+ 
+ if set_text=1 then
+ 'send render text instr. only once
+ set_text=2
+ cls
+ text(205,230,40,"GOOD BY !!")
+ end if
+ 
+ 'Finish Intro, Principal and Exit Sections
+ end if ' finish executing=3
+ end if ' finish executing=2
+ end if ' finish executing=1
+ 
+ '----------------------
+ 'Execute Always section
+ '----------------------
+ if allways_execute=0 then
+ 
+ 'render stop music instructions only after intro screen
+ 'and when keyboard No. 5 key is pressed, stop music
+ 'as well as erase instructions.
+ if fade_music=0 and executing<>1 then
+ 'render stop music instructions
+ text(170,430,20,"Hit The No. 5 Key to Stop Music")
+ if key(53) then
+ fade_music=1
+ stopmusic()
+ 'clear everything for one tic.
+ cls
+ 'play explosion sound
+ playsound (10,2)
+ end if
+ end if
+ 
+ 'mothership section.
+ 'set different mothership xspeeds in different
+ 'executing modules to compensate.
+ if fade_music<>1 then
+ 
+ if executing=1 then
+ xspeed=10
+ else
+ if executing=2 then
+ xspeed=20
+ else
+ if executing=3 then
+ xspeed=13
+ end if
+ end if
+ end if
+ 
+ 'move mothership from left to right
+ if mothership_state=1 then
+ x=x+xspeed
+ if x>576 then
+ mothership_state=2
+ end if
+ end if
+ 
+ 'move mothership from right to left
+ if mothership_state=2 then
+ x=x-xspeed
+ if x<0 then
+ mothership_state=1
+ end if
+ end if
+ 
+ 'allways update mothership bob
+ bob(2,x,y,2)
+ 
+ else
+ 'delete the mothership bob when music stops
+ deletebob(2)
+ 'explosion animation section
+ if animate=0 then
+ 'place explosion(3) animation where mothership(2) was
+ bob (2,x,y,3+animate)
+ animate=animate+1
+ if animate>7 then
+ 'animate once
+ animate=7
+ 'delete all 8 expl. bmp´s
+ for i =3 to 10
+ deletebob(i)
+ next
+ end if
+ end if
+ 
+ end if 'end mothership section
+ 
+ 
+ 'allways display sdlBasic logo
+ pasteicon(250,180,1)
+ 
+ 'allways render exit to desktop instructions.
+ text(195,450,20,"Hit The Escape Key to Exit")
+ 
+ 'allways update the screen
+ screenswap
+ 
+ end if 'finish allways execute conditional
+ 
+ 'Finish overall loop when escape
+ 'key is pressed.
+ end while
+ 
+ '*************
+ 'EXECUTE LAST
+ '*************
+ 'Execute on exit key after overall loop, if
+ 'when music was playing when escape key
+ 'was pressed, fade it.
+ while (volumemusic(-1)>0)
+ 
+ 'when music was stopped in main loop, exit without
+ 'fading it.. the var fade_music is set in execute
+ 'always section.
+ if fade_music<>1 then
+ fademusic(2)
+ wait(100)
+ else
+ exit while
+ end if
+ 
+ end while
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 

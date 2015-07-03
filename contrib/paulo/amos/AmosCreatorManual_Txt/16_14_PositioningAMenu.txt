@@ -1,0 +1,14 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.14        * 
+Rem *        Positioning a menu        *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Menu$(1)="Menu"
+Menu$(1,1)="Option 1"
+Menu$(1,2)="Option 2"
+Menu Base 160,100
+Menu On 
+Curs Off 
+Do 
+Loop 

@@ -1,0 +1,36 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.3         *   
+Rem *          Screen Clone 1          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Open a wide screen 
+Screen Open 1,1000,10,16,Lowres
+Rem clones=5 
+C=5
+Rem Create screen clones 
+For I=2 To C
+   Screen Clone I
+Next I
+Rem Position screen clones 
+For I=1 To C
+   Screen Display I,120,I*50,400,10
+Next I
+Rem Write some text to the cloned screen 
+A$="        This is just a single screen. It has been duplicated "
+A$=A$+" five times using SCREEN CLONE. Amazing isnt it?"
+Print A$;
+Rem Scroll clones
+Repeat 
+   Rem Scroll right 
+   For I=1 To 250
+      Rem scroll each clone separately 
+      For J=1 To C : Screen Offset J,I*2+J*20,0 : Next J : Wait Vbl 
+   Next I
+   Rem Scroll left  
+   For I=250 To 1 Step -1
+      For J=1 To C : Screen Offset J,I*2+J*20,0 : Next J : Wait Vbl 
+   Next I
+   Rem Delay  
+   For W=1 To 40 : Next W
+Until Mouse Key

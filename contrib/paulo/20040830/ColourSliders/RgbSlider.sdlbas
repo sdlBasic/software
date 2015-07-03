@@ -1,0 +1,36 @@
+
+
+xedge=200:yedge=80
+  setdisplay(xedge,yedge,32,1)
+  paper (0xffffff):ink (0x000000): pen (0x000000):cls
+
+
+
+include "interface_040514.sdlblib"
+paper(0xAAAAAA):cls
+
+setnew(0,slider,14,40,8,100,10,50)
+setnew(1,slider,14,40,24,100,10,50)
+setnew(2,slider,14,40,40,100,10,50)
+
+
+  ink (0x777777)
+  bar (8,8,72,72)
+
+draw
+while(0=0)
+  waitevent(0)
+
+  if key(27)=1 then:end:end if
+
+  setparam(17,_value,getparam(15,_value))
+  drawobject(17)
+
+  r=(getparam(0,_value))*255/100
+  g=(getparam(1,_value))*255/100
+  b=(getparam(2,_value))*255/100
+
+  ink (rgb(r,g,b))
+  bar (8,8,72,72)
+
+wend

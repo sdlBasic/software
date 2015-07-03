@@ -1,0 +1,3 @@
+Syntax error on line number 46 of /home/devel_linux/basic/sdlBasic/sdlBasicDevel/contrib/paulo/20040804/_3dTR_0312121747.sdlbas
+Parse error: expected an expression, but got <
+   if res><0 then

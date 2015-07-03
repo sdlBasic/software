@@ -1,0 +1,9 @@
+setdisplay(320,240,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+open"fileinput.sdlbas" for input as #1
+  while eof(1)=0
+     file input #1,a$
+     prints(a$)
+     for n=0 to 25:waitvbl:next
+   wend
+ close#1
+waitkey

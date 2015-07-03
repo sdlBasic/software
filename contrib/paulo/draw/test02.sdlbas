@@ -1,0 +1,10 @@
+
+include"drawsubcommand_0409181809.sdlblib"
+setdisplay(320,200,32,0):paper(8^8-1):ink(0):pen(0):cls
+
+'draw("bm80,40c16711680nr4d4r4br2nr4u2nr4u2r4br2nd4f4u4br2nd4r4d2nl4d2br3pbr3pbr3pbr3pbr3pbr3p")
+
+draw("bm80,40c#440100;nr4d4r4br2nr4u2nr4u2r4br2nd4f4u4br2nd4r4d2nl4d2br3pbr3pbr3pbr3pbr3pbr3p")
+
+waitkey
+

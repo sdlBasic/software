@@ -1,0 +1,15 @@
+  finp$="test1.png":fout$=finp$+".bmp"
+xedge=320:yedge=240
+  setdisplay(xedge,yedge,32,1)
+  paper (0xffffff):ink (0x000000): pen (0x000000):cls
+  loadimage(finp$,1):pasteicon(0,0,1)
+for i=1 to 100
+    ink(rgb(rnd(255),rnd(255),rnd(255)))
+    box(rnd(xedge),rnd(yedge) ,rnd(xedge),rnd(yedge))
+ next 
+grab (1,0,0,xedge,yedge):saveimage (fout$,1)
+  waitkey
+
+
+
+

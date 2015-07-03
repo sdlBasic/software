@@ -1,0 +1,19 @@
+Rem ************************************ 
+Rem *        AMOS Example 12.2         * 
+Rem *        Double buffering          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Load "AMOS_DATA:sprites/Octopus.abk"
+Flash Off : Get Sprite Palette 
+Double Buffer 
+Curs Off : Cls : Paper 0 : Locate 0,0 : Centre "<Blitter objects> "
+Do 
+   Wait Vbl 
+   Rem Read mouse coords
+   X=X Screen(X Mouse) : Y=Y Screen(Y Mouse)
+   Rem Position bobs
+   For BX=0 To 3
+      Bob BX,BX*32+X,Y,1
+   Next BX
+Loop 

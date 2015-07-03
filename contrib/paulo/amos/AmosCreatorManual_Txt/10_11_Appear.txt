@@ -1,0 +1,36 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.11        * 
+Rem *             Appear               * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem select a picture 
+F$=Fsel$("AMOS_DATA:*.*")
+If F$="" Then Edit 
+Rem load picture 
+Load Iff F$,1
+Rem Create a blank screen to hold a copy of your image 
+If Screen Width>600 Then REZ=Hires Else REZ=Lowres
+Screen Open 0,Screen Width,Screen Height,Screen Colour,REZ
+Rem Open screens for the title and your commands 
+Screen Open 2,320,50,2,Lowres
+Screen Display 2,,250,,50
+Screen Open 3,320,10,2,Lowres
+Screen Display 3,,40,,10
+Rem Add an attractive rainbow effect to the title
+Screen 3 : Colour 1,$0 : Curs Off : Cls : Locate 0,0 : Centre "Appear"
+Set Rainbow 0,1,16,"(1,2,16)","(1,2,16)","(1,2,16)" : Rainbow 0,0,36,10
+Rem Intialise screens
+Screen 0 : Screen To Front 0 : Get Palette(1) : Screen To Front 2
+Screen To Front 3
+Flash Off 
+Rem Main loop
+Do 
+   Rem Best results are for odd numbers which are not a multiple of five
+   Rem odd but true 
+   Screen 2 : Input "Enter effect ";E
+   If E>0
+      Cls : Screen 0
+      Appear 1 To 0,E
+   End If 
+Loop 

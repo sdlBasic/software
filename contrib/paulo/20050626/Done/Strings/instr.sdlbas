@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+a$="The yellow cat jumped over the red dog"
+prints("a$="+chr$(34)+a$+chr$(34))
+b=instr(1,a$,"j")
+prints("b=instr(1,a$,\"j\")="+str$(b))
+waitkey

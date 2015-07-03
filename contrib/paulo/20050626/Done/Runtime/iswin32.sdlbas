@@ -1,0 +1,12 @@
+setdisplay(512,120,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+    a=iswin32
+  if a<>0 then
+     prints("this example is running on Windows32") 
+   else
+     prints("this example is not running on Windows32") 
+   end if
+     prints("")
+     prints("(Windows32: ReactOS, 9x(95,98,ME), NT(2000,XP,2003))")
+waitkey
+
+

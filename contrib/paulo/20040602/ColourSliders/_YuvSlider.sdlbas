@@ -1,0 +1,3 @@
+'-- YUV is a colour space used on rf tv sets
+'-- also used on msx2+ screen modes 
+'-- Y is the luminance and UV the crominance axis

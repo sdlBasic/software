@@ -1,0 +1,54 @@
+'-- example with overprint bar
+'-- size dependant on mouse speed
+'-- Paulo Silva - may 04 - GPL
+
+include"DrawingOpacity.sdlblib"
+
+fout$="test.bmp"
+
+xedge=640:yedge=480
+setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+sub waitick(t)
+   tkc=ticks:while ticks<tkc+t:wend
+ end sub
+
+    xn=xmouse:yn=ymouse
+    xo=xn:yo=yn
+
+while(0=0)
+   waitick(32)
+    xd=xn-xo:yd=yn-yo
+    xda=abs(xd):yda=abs(yd)
+
+    xo=xn:yo=yn
+    xn=xmouse:yn=ymouse
+
+
+   BarOverprint(xn-yda,yn-xda,xn+yda,yn+xda,0,31)
+
+
+
+'   if key("k_pagedown") then
+'      grab (1,0,0,xedge,yedge)
+'      saveimage (fout$,1)
+'    end if
+
+   if key(27) then : end :end if
+
+   if key(281) then 
+      grab (1,0,0,xedge,yedge)
+      saveimage (fout$,1)
+'      end
+    end if
+
+
+
+
+ wend
+
+
+
+
+

@@ -1,0 +1,17 @@
+'
+'      Sound tutorial #01 - Playing samples in random orders   
+'
+Load "BlockSamplesSam.abk"
+'
+' and play the samples!  
+'
+Curs Off : Cls 0 : Paper 0
+Locate 0,10
+Centre "Press a key between A and J"
+Do 
+   A$=Inkey$
+   A=Asc(A$)
+ If A>96 and A<107
+      Sam Play A-96
+   End If 
+Loop 

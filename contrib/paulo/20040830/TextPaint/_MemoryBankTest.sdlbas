@@ -1,0 +1,19 @@
+
+'- i don't know where is the bug
+
+dim mat$ [xched,yched]
+  xprop=8:yprop=8:xched=80:yched=60:xcur=4:ycur=4
+
+reservebank(1,yched*(xched+2))
+
+for i=0 to (yched*(xched+2))
+   poke (1,i,0)
+ next
+
+for i=0 to (yched*(xched+2)) step xched+2 
+   poke (1,i+xched,0x0D)
+   poke (1,i+xched+1,0x0A)
+ next
+
+savebank("BankTest.txt",1)
+

@@ -1,0 +1,1 @@
+SDLengine:screen already open: Text has zero width

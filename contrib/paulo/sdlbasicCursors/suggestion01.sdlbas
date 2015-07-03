@@ -1,0 +1,28 @@
+xedge=640:yedge=480:wdwd=0
+setdisplay(xedge,yedge,32,wdwd)
+changemouse(1)
+ink(0):pen(0):paper(0x7f7f7f):cls
+prints("press 1-8 key")
+
+while 0=0:
+    if key(asc("1")) then
+	changemouse(1)
+    end if
+    if key(asc("2")) then
+	changemouse(2)
+    end if
+    if key(asc("3")) then
+	changemouse(3)
+    end if
+    if key(asc("4")) then
+	    setcolorkey(0xff00ff):
+	    Loadimage("suggestion01.gif",0)
+    end if
+
+
+    if key(27) then
+		end:
+    end if
+wend
+
+

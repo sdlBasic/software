@@ -1,0 +1,10 @@
+include"printsb_vera_8x16to9x12.sdlblib"
+curson
+a$=""
+for i =32 to 255
+    a$=a$+chr$(i)
+   next
+prints(a$)
+prints("")
+printsb(a$)
+waitkey

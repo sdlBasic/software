@@ -1,0 +1,172 @@
+'
+' sdlBasic test: fSel
+'
+'   Name:      fsel.sdlbas
+'   Purpose:   test the command fsel (file selector interface)
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+'  Bugs:
+'  to much!!
+' Todo:
+'   rewrite with array cache list
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+include "interface.sdlblib"
+
+function iList(state,cx,cy,cw,ch,position,index,list[])
+
+	x=cx+parentx
+	y=cy+parenty
+	w=cw
+	h=ch
+
+	gx=x*9
+	gy=y*12
+        gw=w*9
+	gh=(h*12)+4
+
+	if mousezone(gx,gy,gw,gh)=1 then
+		s=int((ymousescreen(7)-gy)/12)
+		if bmouse=1 then
+			if state =i_mousein then
+				waitvbl
+				for i=0 to h-1
+				    if s=i then
+					ink(pen_color):bar(gx,gy+(i*12),gx+gw-1,gy+(i*12)+12+1)
+					pen(paper_color):paper(pen_color)
+					locate (x,y+i):prints(list[i+position])
+				    else
+					ink(paper_color):bar(gx,gy+(i*12),gx+gw-1,gy+(i*12)+12+1)
+					pen(pen_color):	paper(paper_color)
+					locate (x,y+i):prints(list[i+position])
+				    end if
+				next
+				ink(panel_color):bar (gx,gy+gh-3,gx+gw,gy+gh)
+				index=s
+				state=i_clicked
+				while bmouse <>0:end while
+			end if
+		else
+			if state =i_wait or index<>s then
+				waitvbl
+				for i=0 to h-1
+
+				    if s=i then
+					ink(pen_color):bar(gx,gy+(i*12),gx+gw-1,gy+(i*12)+12+1)
+					pen(paper_color):paper(pen_color)
+					locate (x,y+i):prints(list[i+position])
+				    else
+					ink(paper_color):bar(gx,gy+(i*12),gx+gw-1,gy+(i*12)+12+1)
+					pen(pen_color):	paper(paper_color)
+					locate (x,y+i):prints(list[i+position])
+				    end if
+				next
+				ink(panel_color):bar (gx,gy+gh-3,gx+gw,gy+gh)
+				index=s
+				state=i_mousein
+			end if
+		end if
+	else
+		if state <>i_wait then
+			ink(paper_color):bar (gx,gy,gx+gw,gy+gh)
+			pen(pen_color):	paper(paper_color)
+			for i=0 to h-1
+			    locate (x,y+i):prints(list[i+position])
+			next
+			ink(panel_color):bar (gx,gy+gh-3,gx+gw,gy+gh)
+			state=i_wait
+		end if
+	end if
+	screenswap
+	return state
+
+end function
+
+
+function fsel(path$,filter$,default$,title$)
+
+	screenopen(7,320,240,displaywidth/2-160,displayheight/2-120,320,240,0)
+	autoback(0)
+	paper(0):cls
+	frame=i_draw
+	frame=iframe(frame,0,0,35,19,title$)
+
+	buttonOk=i_draw
+	buttonCancel=i_draw
+	textEnterFileName=i_draw
+	textEnterFileName_text=default$
+	textEnterPath=i_draw
+	textEnterPath_text=path$
+
+
+	Button_scm=i_draw
+	Button_scp=i_draw
+
+	listFile=i_draw
+	dim listFile_List[]
+	listFile_Position=0
+	listFile_Index=0
+	listFile_Count=0
+	listFile_List[listFile_Count]=dirfirst(path$)
+	while listFile_List[listFile_Count]<>""
+	    listFile_Count=listFile_Count+1
+	    listFile_List[listFile_Count]=dirnext()
+	end while
+
+	while 0=0
+		if iText(textEnterFileName,1,18,32,textEnterFileName_text)=i_clicked then
+			r$=textEnterFileName_text
+			exit while
+		end if
+
+		if iText(textEnterPath,1,3,32,textEnterPath_text)=i_clicked then
+		end if
+
+		if iButton(buttonOk,27,5,"  OK  ")=i_Clicked then
+			r$=textEnterFileName_text
+			exit while
+		end if
+		if iButton(buttonCancel,27,7,"Cancel")=i_Clicked then
+			r$=""
+			exit while
+		end if
+		if iList(listFile,1,5,24,12,listFile_position,listFile_Index,listFile_List[])=i_Clicked then
+		    r$=listFile_List[listFile_Index]
+		    exit while
+		end if
+		if iButton(Button_scm,25,5,"-")=i_clicked then
+		    listFile_Position=listFile_Position-1
+		    if listFile_Position<0 then:listFile_Position=0:end if
+		    listFile=i_draw
+		    Button_scm=i_draw
+		end if
+		if iButton(Button_scp,25,16,"+")=i_clicked then
+		    listFile_Position=listFile_Position+1
+		    if listFile_Position>listFile_Count-12 then:listFile_Position=listFile_Count-12:end if
+		    if listFile_Position<0 then:listFile_Position=0:end if
+		    listFile=i_draw
+		    Button_scp=i_draw
+		end if
+
+
+		screenswap
+	end while
+	screenclose(7)
+	paper(0)
+	pen(pen_color)
+	autoback(25)
+	return r$
+
+end function
+
+
+setautoback(25)
+
+sub main
+	prints(fsel("/usr","*","input","prova fsel"))
+	while key(k_return)<>0  or key(27)<>0:end while
+
+	waitkey
+end sub
+
+main

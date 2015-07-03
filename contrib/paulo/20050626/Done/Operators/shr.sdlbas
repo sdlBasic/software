@@ -1,0 +1,7 @@
+setdisplay(240,320,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for f=1 to 20
+a=int(rnd(256))
+b=int(rnd(8))
+prints(str$(a)+" shr "+str$(b)+"="+str$(a shr b))
+next
+waitkey

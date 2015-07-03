@@ -1,0 +1,5 @@
+setdisplay(256,192,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for f=-128 to 127
+dot (f+128,96-64*acos(f*6.2832/255))
+next
+waitkey

@@ -1,0 +1,11 @@
+include"bugfix.sdlblib"
+
+print "bug: print(asc(chr$(237)))"
+print (asc(chr$(237)))
+print
+
+print "bugfix: print(asc(chr$(237)))"
+print(asc_b(chr$(237)))
+print
+
+waitkey

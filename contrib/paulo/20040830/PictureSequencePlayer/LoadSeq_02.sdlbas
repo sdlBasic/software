@@ -1,0 +1,21 @@
+finp$="seq0":suf$=".png":pct0=0:pct1=9
+  xedge=320:yedge=240: setdisplay(xedge,yedge,32,0)
+  dly=1000/25  '- 25fps
+Function depcdec$(cur,mxv,adj)
+   t0=0:t1=int(mxv):while t1>=1:t0=t0+1:t1=t1/10:wend:tmpr$=str$(cur)
+   if adj=1 then:tmpr$=right$(string$(t0,48)+tmpr$,t0):end if:depcdec$=tmpr$
+ End Function
+while 0=0
+  for i=pct0 to pct1
+     fnpc$=finp$+depcdec$(i,pct1,1)+suf$
+     loadimage(fnpc$,1):pasteicon(0,0,1)
+        if key(27) then:end:end if
+        if dly<>0 then: wait(dly):end if
+ next:wend
+
+
+
+
+
+
+

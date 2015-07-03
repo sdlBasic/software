@@ -1,0 +1,58 @@
+
+xed=320:yed=240
+
+sttmt=1
+kstt=0
+
+setdisplay (320,240,32,1)
+paper(8^8-1):ink(0):pen(0):cls
+
+sub RedrStt(v)
+     v0=bitwiseand(v,1)
+     v1=bitwiseand(v,2)
+     cls
+  if v0<>0 then
+     ink(0x655B84):bar(0,0,xed-1,10):box(0,0,xed-1,10)
+   end if
+  if v1<>0 then
+     ink(0x38593F):bar(xed-25,v0*11,xed-1,yed-1):box(xed-25,v0*11,xed-1,yed-1)
+   end if
+ end sub
+
+
+RedrStt(sttmt)
+while 0=0
+
+if (key(k_f9) and (kstt=0)) then
+    itf=0
+   if sttmt=3 and itf=0 then:sttmt=2:itf=1:end if
+   if sttmt=2 and itf=0 then:sttmt=3:itf=1:end if
+   if sttmt=1 and itf=0 then:sttmt=0:itf=1:end if
+   if sttmt=0 and itf=0 then:sttmt=1:itf=1:end if
+     RedrStt(sttmt)
+     kstt=1
+ end if
+if (key(k_f10) and (kstt=0)) then
+    itf=0
+   if sttmt=3 and itf=0 then:sttmt=0:itf=1:end if
+   if sttmt=2 and itf=0 then:sttmt=0:itf=1:end if
+   if sttmt=1 and itf=0 then:sttmt=3:itf=1:end if
+   if sttmt=0 and itf=0 then:sttmt=2:itf=1:end if
+     RedrStt(sttmt)
+     kstt=1
+ end if
+if ((key(k_f9)=0) and (key(k_f10)=0)) then
+   kstt=0
+ end if 
+
+ink(0)
+locate(1,1):prints(sttmt)
+locate(1,2):prints(kstt)
+
+end while
+
+
+
+
+
+

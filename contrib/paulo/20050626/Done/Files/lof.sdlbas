@@ -1,0 +1,7 @@
+setdisplay(320,240,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+finp$="lof.sdlbas"
+prints(finp$)
+open finp$ for input as #1
+prints("size:"+str$(lof(1))+" bytes")
+close#1
+waitkey

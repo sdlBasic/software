@@ -1,0 +1,279 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                      STEP THREE: the scrolling screen    
+'----------------------------------------------------------------------------
+'
+'  
+' Up until now, all our objects were moving on a single large screen 
+' (Screen 1).  We'll now open a new screen in front of screen 1, and   
+' copy the playfield onto it using the SCREEN COPY command.  
+'
+' This will generate a perfect scrolling effect. 
+'
+' Well, almost perfect! It will flicker a LOT unless we DOUBLE BUFFER  
+' our new display. At the same time, we MUST be sure that the bobs are 
+' displayed on the screen when we copy over the playfield. 
+' We'll therefore need to switch off the  automatic bob updating process 
+' with BOB UPDATE OFF. See the GAME_INIT procedure...  
+'  
+' Let's go...  
+'
+'----------------------------------------------------------------------------  
+Close Editor 
+Hide On 
+PATH$="Easy_Examples:"
+'
+' As before  
+Dim XP(1),YP(1),XDP(15),YDP(15),DB(1),DP(1),SP(1),IP(15,1),FL(1)
+Dim XR(1),YR(1)
+Dim XH(15),YH(15)
+Dim XHH(15),YHH(15)
+Dim CP(1),CB(1),CC(1),XC(1),YC(1)
+'
+' Make our variables global  
+Global XP(),YP(),XDP(),YDP(),DB(),DP(),SP(),IP(),FL()
+Global XR(),YR()
+Global P2BOB,BBP,BBB,PSIZE
+Global PLA
+Global XC(),YC()
+Global XH(),YH(),XHH(),YHH(),CP(),CB(),CC()
+Global P2BOB,BBP,BBB,PSIZE
+'
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+Load PATH$+"Pictures/Tricycle_Screen.Abk",10
+Load PATH$+"Pictures/Tricycle_Playfield.Abk",11
+'
+GAME_INIT
+'
+For P=0 To 1
+   XP(P)=160*32 : YP(P)=50*32+P*25*32
+Next 
+'
+GAME
+'
+ALL_ERASE
+Edit 
+'
+Procedure GAME_INIT
+   '
+   BBP=1 : P2BOB=10
+   BBB=4
+   PSIZE=10
+   '  
+   Restore _DIRECTIONS
+   ANGLE#=Pi#/2.0 : A=32 : B=3 : S=8
+   For D=0 To 15
+      XDP(D)=S*Cos(ANGLE#) : YDP(D)=-S*Sin(ANGLE#)
+      XH(D)=A*Cos(ANGLE#) : YH(D)=-A*Sin(ANGLE#)
+      XHH(D)=B*Cos(ANGLE#-Pi#/2) : YHH(D)=-B*Sin(ANGLE#-Pi#/2)
+      ANGLE#=ANGLE#-Pi#/8.0
+      Read IP(D,0),IP(D,1)
+   Next 
+   '
+   Unpack 11 To 1
+   Reserve Zone 10
+   Set Zone 1,21,0 To 223,24 : Set Zone 2,21,487 To 220,511
+   Set Zone 3,0,21 To 25,487 : Set Zone 4,220,24 To 256,487
+   Set Zone 5,0,0 To 21,24 : Set Zone 6,220,0 To 256,24
+   Set Zone 7,0,486 To 24,511 : Set Zone 8,220,487 To 256,511
+   ' ***
+   ' Unpack a new game display into screen 0  
+   Unpack 10 To 0
+   ' ***
+   ' Grab the colour palette from the playfield 
+   Get Palette 1
+   ' ***
+   ' Only display the first 200 lines of our new screen.  
+   ' You'll see why in TB_Step_7! 
+   Screen Display 0,,,,200
+   ' ***
+   ' Activate the DOUBLE BUFFER system for flicker free scrolling 
+   Double Buffer 
+   ' ***
+   ' Turn off the automatic BOB updates 
+   Bob Update Off 
+   ' ***
+   ' Auto back 1 makes the print command go faster on a double buffered screen  
+   Autoback 1
+   ' ***
+   ' Let's clear the viewing areas on our game display
+   CLR_DISPLAY
+   ' ***
+   ' and switch back to screen 1  
+   Screen 1
+   '
+   Pop Proc
+   '
+   _DIRECTIONS:
+   Data 1,2
+   Data 3,4
+   Data 5,6
+   Data 7,8
+   Data 9,10
+   Data Vrev(7),Vrev(8)
+   Data Vrev(5),Vrev(6)
+   Data Vrev(3),Vrev(4)
+   Data Vrev(1),Vrev(2)
+   Data Rev(3),Rev(4)
+   Data Rev(5),Rev(6)
+   Data Rev(7),Rev(8)
+   Data Hrev(9),Hrev(10)
+   Data Hrev(7),Hrev(8)
+   Data Hrev(5),Hrev(6)
+   Data Hrev(3),Hrev(4)
+   '
+End Proc
+Procedure GAME
+   ' ***
+   ' There are a LOT of changes here
+   '
+   Repeat 
+      ' ***
+      ' As we are displaying the bobs manually, we have to do everything 
+      ' ourselves. We'll begin by removing the bobs from the screen. 
+      Bob Clear 
+      ' ***  
+      ' We can then perform the player animation as usual    
+      MOVE_PLAYER[0]
+      MOVE_PLAYER[1]
+      ' ***
+      ' When we've finished, we must display the bobs at their new positions 
+      Bob Draw 
+      ' ***  
+      ' Now we are sure the bobs are drawn on the screen, we can 
+      ' call the DISPLAY_FIELD procedure to scroll the current sections
+      ' of screen 1 onto screen 0.   
+      DISPLAY_FIELD
+      ' ***
+      ' Although DISPLAY_FIELD scrolled the playfield, it's still stuck
+      ' on the invisible LOGICAL screen. So we'll need to flick this onto  
+      ' the PHYSICAL display with a SCREEN SWAP instruction. 
+      Screen Swap 
+      '
+      A$=Inkey$
+      If A$=Chr$(27) : Exit : End If 
+      If A$=" " : PLA=1-PLA : End If 
+      ' ***
+      ' Synchronise with the display 
+      Wait Vbl 
+      '
+   Until 0
+   '
+End Proc
+Procedure C0LLIDE[P,C]
+   '
+   On C Goto CYCLE,CYCLE
+   Pop Proc
+   '
+   ' Collision with other player    
+   CYCLE:
+   Q=1-P
+   CP(Q)=1 : SP(Q)=SP(P)+4*Sgn(SP(P)) : DP(Q)=DP(P) : Bob Off BBB+Q
+   CB(P)=B : CP(P)=1 : CC(P)=CC(P)+1 : SP(P)=-Min(SP(P),8)
+   Pop Proc
+   '
+End Proc
+Procedure MOVE_PLAYER[P]
+   '
+   FL(P)=FL(P)+1
+   '
+   If CP(P)
+      If SP(P)
+         SP(P)=SP(P)-Sgn(SP(P))
+      Else 
+         CP(P)=CP(P)-1 : DP(P)=DB(P)
+      End If 
+   End If 
+   '
+   If CP(P)=0
+      If P=PLA : J=Joy(1) : End If 
+      CB(P)=0 : CC(P)=0
+      ' Go faster? 
+      If J and 1 : If SP(P)<16 : SP(P)=SP(P)+3 : End If : End If 
+      ' Go slower? 
+      If J and 2 : If SP(P)>-16 : SP(P)=SP(P)-3 : End If : End If 
+      ' Turn left? 
+      If J and 4 : DP(P)=DP(P)-1 : If DP(P)<0 : DP(P)=15 : End If : DB(P)=DP(P) : End If 
+      ' Turn right?
+      If J and 8 : DP(P)=DP(P)+1 : If DP(P)>15 : DP(P)=0 : End If : DB(P)=DP(P) : End If 
+      ' Brake? 
+      If J and 16 : SP(P)=0 : End If 
+      '  
+   End If 
+   '
+   XP(P)=XP(P)+XDP(DP(P))*SP(P)
+   YP(P)=YP(P)+YDP(DP(P))*SP(P)
+   '
+   XR(P)=XP(P)/32 : YR(P)=YP(P)/32
+   '
+   S=Sgn(SP(P))
+   I=IP(DB(P),Abs(S)*(FL(P) mod 2))
+   Bob BBP+P,XR(P),YR(P),I+P2BOB*P
+   '
+   XD=XR(P)+S*(XH(DP(P))*PSIZE)/32 : YD=YR(P)+S*(YH(DP(P))*PSIZE)/32
+   '
+   C=Bob Col(BBP+P,BBP To 5)
+   '
+   A=Max(Zone(XD,YD),Max(Zone(XD+XHH(DP(P)),YD+YHH(DP(P))),Zone(XD-XHH(DP(P)),YD-YHH(DP(P)))))
+   '
+   If CC(P)>3
+      SP(P)=0 : CP(P)=0 : CC(P)=1
+      A=0 : C=0 : Bob Off BBB+P
+   End If 
+   '  
+   If A
+      CP(P)=3 : XC(P)=XD : YC(P)=YD : CC(P)=CC(P)+1
+      SP(P)=-S*Min(Max(Abs(SP(P)+6),4),8)
+   Else 
+      If C
+         B=Col(-1) : If B<>CB(P) : C0LLIDE[P,B] : End If 
+      End If 
+   End If 
+   '
+   If CP(P)=3 : Bob BBB+P,XC(P)+Rnd(4),YC(P)+Rnd(4),21 : End If 
+   If CP(P)=2 : Bob Off BBB+P : End If 
+   '
+End Proc
+Procedure DISPLAY_FIELD
+   ' ***
+   ' This procedure copies the (hidden) playfield on the main 
+   ' screen, in three different windows, centered on the players' trikes
+   ' and the ball (for later..) 
+   '
+   ' ***
+   ' We first copy the area around player 1 
+   ' The viewing area is 136x134 pixels in size, so we'll need to grab  
+   ' the section of the playfield starting from 78 units right, 
+   ' and 67 units above the trike.          
+   X=XR(0)-78 : Y=YR(0)-67
+   ' ***
+   ' Just a simple screen copy. FAST! 
+   Screen Copy 1,X,Y,X+156,Y+135 To Logic(0),2,2
+   ' ***
+   ' Now, we'll display the area around player 2  
+   X=XR(1)-78 : Y=YR(1)-67
+   ' The MIN bit ensures that we don't move past the bottom of the
+   ' playing area 
+   Screen Copy 1,X,Y,X+156,Min(Y+135,504) To Logic(0),162,2
+   '
+End Proc
+Procedure CLR_DISPLAY
+   ' ***
+   ' This procedure clears the viewing areas on the main game screen
+   '
+   Screen 0
+   For S=0 To 1
+      ' Left viewport
+      Cls 0,2,2 To 158,137
+      ' Right viewport 
+      Cls 0,162,2 To 318,137
+      ' Bottom viewport
+      Cls 0,102,139 To 102+117,139+59
+      Screen Swap : Wait Vbl 
+   Next 
+   Screen 1
+End Proc
+Procedure ALL_ERASE
+   For B=1 To 15 : Erase B : Next 
+End Proc

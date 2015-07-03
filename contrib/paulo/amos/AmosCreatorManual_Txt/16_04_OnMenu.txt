@@ -1,0 +1,31 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.4         * 
+Rem *             On MENU              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Menu$(1)=" Title 1 "
+Menu$(1,1)="Item 1.1 "
+Menu$(1,2)="Item 1.2 "
+Menu$(2)=" Title 2 "
+Menu$(2,1)="Item 2.1"
+Menu$(2,2)="Item 2.2"
+Rem Initailize on menu 
+On Menu Proc TITLE1,TITLE2
+Rem Activate automatic memu system 
+On Menu On 
+Menu On 
+Wait Key 
+Procedure TITLE1
+   Locate 0,22 : Print "You selected title 1"
+   Locate 0,23 : Print "Option ";Choice(2)
+   OMENU
+End Proc
+Procedure TITLE2
+   Locate 0,22 : Print "You selected title 2"
+   Locate 0,23 : Print "Option ";Choice(2)
+   OMENU
+End Proc
+End 
+Procedure OMENU
+   On Menu On 
+End Proc

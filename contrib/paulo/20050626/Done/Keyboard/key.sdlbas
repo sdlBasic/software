@@ -1,0 +1,9 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+   prints("use cursor keys")
+while key(27)=0
+   if key(k_up) then:cls:prints("cursor up pressed"):end if
+   if key(k_down) then:cls:prints("cursor down pressed"):end if
+   if key(k_left) then:cls:prints("cursor left pressed"):end if
+   if key(k_right) then:cls:prints("cursor right pressed"):end if
+ wend
+

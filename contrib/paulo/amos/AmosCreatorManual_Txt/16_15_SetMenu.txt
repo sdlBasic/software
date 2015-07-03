@@ -1,0 +1,21 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.15        * 
+Rem *              Set Menu            *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Menu$(1)=" Menu 1"
+Menu$(1,1)="Surprise!"
+Menu$(1,2)="Hi There!"
+Menu$(2)=" Menu 2 "
+Menu$(2,1)="Hi There!"
+Menu$(2,2)="Surprise!"
+Rem Position menu at centre of the screen
+Menu Base 100,160
+Rem position each menu indepenently
+Set Menu(1,1) To 20,20
+Set Menu(2,1) To -20,-20
+Menu On 
+Curs Off 
+Do 
+Loop 

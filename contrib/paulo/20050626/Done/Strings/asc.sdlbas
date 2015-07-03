@@ -1,0 +1,14 @@
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+a$="H":prints("a$=\"H\"")
+prints("asc(a$)="+str$(asc(a$)))
+a$="e":prints("a$=\"e\"")
+prints("asc(a$)="+str$(asc(a$)))
+a$="l":prints("a$=\"l\"")
+prints("asc(a$)="+str$(asc(a$)))
+a$="l":prints("a$=\"l\"")
+prints("asc(a$)="+str$(asc(a$)))
+a$="o":prints("a$=\"o\"")
+prints("asc(a$)="+str$(asc(a$)))
+a$="!":prints("a$=\"!\"")
+prints("asc(a$)="+str$(asc(a$)))
+waitkey

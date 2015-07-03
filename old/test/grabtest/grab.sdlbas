@@ -1,0 +1,15 @@
+'
+' grab sdlBasic Test
+'
+setautoback(25)
+for i= 0 to 255
+    line(rnd(640),rnd(480),rnd(640),rnd(480))
+next
+waitkey
+grab(1,640,0,32,32)
+for y=0 to 480 step 32
+    for x=0 to 640 step 32
+        pasteicon(x,y,1)
+    next
+next    
+waitkey(13)

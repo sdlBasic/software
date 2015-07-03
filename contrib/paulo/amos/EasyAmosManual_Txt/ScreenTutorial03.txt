@@ -1,0 +1,60 @@
+'
+'      Screen tutorial #03 - Wait Vbl and Autoback 
+'  
+'Set up a double buffered screen 
+'
+Screen Open 0,320,200,16,Lowres
+Curs Off 
+Double Buffer 
+'
+'Set Autoback 0 - This means we have to do the screen swapping 
+'
+Autoback 0
+X=2 : Y=2
+'
+'Main loop 
+'
+ML:
+'
+'Call a procedure which draws a box and fills it in with Red colour
+'
+PLT[X,Y]
+'
+'Because the box was drawn onto the LOGICAL screen we cannot yet see it. 
+'So we now ask Easy AMOS to swap the PHYSICAL screen over for the LOGICAL
+'screen. 
+'
+Screen Swap 
+'  
+'Even though we've asked for a screen swap it wont actually happen until 
+'the next vertical blank. So we have to slow our program down to wait for
+'this to happen. 
+'
+Wait Vbl 
+'
+'Now that the screens have been switched, we must draw the same box onto 
+'the new LOGICAL screen. Otherwise a flashing effect will mess up our
+'screen. You can see this by removing the line PLT[X,Y] below. 
+'
+PLT[X,Y]
+Screen Swap 
+Wait Vbl 
+'
+'Now we update the coordinates of the box so that it will be displayed 
+'at a different postion next time in the loop. 
+'
+X=X+10 : Y=Y+10
+'
+'Check to see if the last box has been drawn, if not jump back to the top
+'of the main Loop  
+'
+If X<180 Then Goto ML
+'
+'This is the small procedure which draws the box and fills it. 
+'
+Procedure PLT[X,Y]
+   Ink 5
+   Box X,Y To X+20,Y+20
+   Ink 4
+   Paint X+12,Y+12
+End Proc

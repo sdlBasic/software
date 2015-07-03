@@ -1,0 +1,19 @@
+finp$="KanjiShiftJisFont.hex":fout$=finp$+".txt"
+vnam$="knj$":lcnt=0
+
+'function decadj$(a,b)
+'   tmpr$=right$(string$(b,asc("0"))+str$(a),b)
+'   decadj$=tmpr$
+' end function
+
+Open finp$ For Input As #1:Open fout$ For Output As #2
+  While Not Eof(1)
+     Line Input #1, text1$
+     text2$=vnam$+"["+str$(lcnt)+"]="+chr$(34)+text1$+chr$(34)
+     lcnt=lcnt+1
+     print#2,text2$
+   End While
+ Close #1:Close #2
+
+
+

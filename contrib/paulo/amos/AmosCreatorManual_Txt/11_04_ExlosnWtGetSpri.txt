@@ -1,0 +1,32 @@
+Rem ****************************************** 
+Rem *        AMOS Example 11.4               * 
+Rem *  Creating an explosion with GET sprite * 
+Rem *    (c) Mandarin / Jawx 1990            * 
+Rem ****************************************** 
+Rem
+Flash Off : Hide : Curs Off 
+Screen Hide 0 : View 
+MAKE_OBJECT
+Cls 0
+Rem Display explosion  
+Locate 0,0 : Paper 0 : Centre "Move the explsion around with the mouse"
+Rem Position sprite  
+Sprite 9,X Mouse,Y Mouse,1
+Rem Animate sprite using AMAL
+Amal 9,"Loop: For R0=1 To 16; Let A=R0; Next R0; Jump Loop"
+Amal On 
+Screen Show 
+Rem Move sprite with mouse 
+Do 
+   Sprite 9,X Mouse,Y Mouse,1 : Wait Vbl 
+Loop 
+Procedure MAKE_OBJECT
+   For S=1 To 15
+      Rem clear space for image
+      Cls 0,0,0 To 32,32
+      Rem Create image 
+      Circle 16,16,S*2
+      Rem Load image into bank 
+      Get Sprite S,0,0 To 32,32
+   Next S
+End Proc

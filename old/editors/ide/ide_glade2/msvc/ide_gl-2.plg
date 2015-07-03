@@ -1,0 +1,42 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: ide_gl-2 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSP20.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I ".\\" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /Fp"Release/ide_gl-2.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\devel\basic\sdlBasic\sdlBasicDevel\ide\ide_glade2\src\callbacks.c"
+"C:\devel\basic\sdlBasic\sdlBasicDevel\ide\ide_glade2\src\interface.c"
+"C:\devel\basic\sdlBasic\sdlBasicDevel\ide\ide_glade2\src\main.c"
+"C:\devel\basic\sdlBasic\sdlBasicDevel\ide\ide_glade2\src\support.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSP20.tmp" 
+Creating temporary file "C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSP21.tmp" with contents
+[
+gtk-win32-2.0.lib gdk-win32-2.0.lib atk-1.0.lib gdk_pixbuf-2.0.lib pangowin32-1.0.lib gdi32.lib pango-1.0.lib gobject-2.0.lib gmodule-2.0.lib glib-2.0.lib intl.lib iconv.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/ide_gl-2.pdb" /machine:I386 /out:"Release/ide_gl-2.exe" 
+.\Release\callbacks.obj
+.\Release\interface.obj
+.\Release\main.obj
+.\Release\support.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSP21.tmp"
+<h3>Output Window</h3>
+Compiling...
+callbacks.c
+C:\devel\basic\sdlBasic\sdlBasicDevel\ide\ide_glade2\src\callbacks.c(48) : warning C4013: 'exit' undefined; assuming extern returning int
+interface.c
+main.c
+support.c
+Linking...
+
+
+
+<h3>Results</h3>
+ide_gl-2.exe - 0 error(s), 1 warning(s)
+</pre>
+</body>
+</html>

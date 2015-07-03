@@ -1,0 +1,8 @@
+WARNING: Environment does not contain HOME variable...using local dir
+Found new graphics-theme: classic 
+Found new graphics-theme: lanzz 
+Game starts using theme: lanzz
+
+----------------------------------------------------------------------
+Termination of Freedroid initiated...Thank you for playing Freedroid.
+

@@ -1,0 +1,43 @@
+' Fillcircle Spotlight graphics example
+' Paulo Silva - april 04 - GPL
+' writed over a template coded from Vroby 
+
+sub FillcircleSpotlight(x,y,r,c,a)
+'--- alpha is from 0 to 255
+'--- bug: fillcircle from here is 1 pixel radius smaller
+'---     than default fullcircle
+'---    (issue related to sin(acos()) formula)
+    for yd=-r to r
+        xl=(sin(acos(yd/r)))*r
+      for xd=-xl to xl
+        xp=x+xd:yp=y+yd
+      r0=(int(point(xp,yp)/0x10000))mod 256
+       g0=(int(point(xp,yp)/0x100))mod 256
+       b0=(point(xp,yp))mod 256
+      r1=(int(c/0x10000))mod 256
+       g1=(int(c/0x100))mod 256
+       b1=c mod 256
+      r2=(r0+((r1)*(a/255))):if r2>255 then:r2=255:end if
+       g2=(g0+((g1)*(a/255))):if g2>255 then:g2=255:end if
+       b2=(b0+((b1)*(a/255))):if b2>255 then:b2=255:end if
+        c2=(r2*0x10000)+(g2*0x100)+b2
+        ink(c2):dot (xp,yp)
+    next: next
+ end sub
+
+setdisplay(320,240,32,1)
+paper (0xffffff):ink (0x000000)
+pen (0x000000):cls
+setautoback(25)
+prints("draw some spotlight filled circles")
+
+ink(0): bar(10,20,200,200)
+
+FillcircleSpotlight(80,90,60,0xFF0000,191)
+FillcircleSpotlight(120,110,60,0x00FF00,191)
+FillcircleSpotlight(100,130,60,0x0000FF,191)
+
+locate(2,17):prints("press space to exit" )
+waitkey(k_space)
+
+

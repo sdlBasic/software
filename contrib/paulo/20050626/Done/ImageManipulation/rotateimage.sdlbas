@@ -1,0 +1,14 @@
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+screenopen(7,32,32,0,0,0,0,0)
+   paper(8^8-1):ink(0):pen(0):cls:setcolorkey(8^8-1)
+    line(0,0,32,32):line(32,0,0,32):grab(1,0,0,32,32)
+ screenclose(7)
+   a=0
+while key(27)=0
+   locate(0,0):prints("rotateimage(2,"+str$(a)+")")
+   a=a+1:if a>359 then:a=0:end if:copyimage(1,2)
+   rotateimage(2,a)
+   hotspot(2,1,1):sprite(1,xmouse,ymouse,2):waitvbl
+ end while
+
+

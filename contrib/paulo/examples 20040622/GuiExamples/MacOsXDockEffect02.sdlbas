@@ -1,0 +1,59 @@
+  MX=0:MY=0:OX=0:OY=0:IMIN=32:IMAX=128:ICN=8:DISTX=8:DISTY=8
+  Dim POSX[ICN],POSY[ICN],SIZP[ICN]
+  XEDGE=640:YEDGE=480
+'   Screen Open 0,XEDGE,YEDGE,16,32772
+    setdisplay(xedge,yedge,32,1)
+    paper (0xffffff):ink (0x000000):pen (0x000000):cls
+
+Function SZ(X,Y,MX,MY,IMIN,IMAX)
+     TMPR=IMIN: DIFX=Abs(Abs(X)-Abs(MX)): DIFY=Abs(Abs(Y)-Abs(MY))
+   PITGD=Sqr(DIFX*DIFX+DIFY*DIFY)
+     If PITGD<(IMAX-IMIN) then
+        TMPR=IMAX-PITGD
+      End If
+    SZ=TMPR 
+ End Function
+
+Sub DISPICN(X,Y,S)
+    line (X-2,Y,X+2,Y):line (X,Y-2,X,Y+2)
+    line (X-(S/2),Y-(S/2),X+(S/2),Y-(S/2))
+    line (X-(S/2),Y+(S/2),X+(S/2),Y+(S/2))
+    line (X-(S/2),Y-(S/2),X-(S/2),Y+(S/2))
+    line (X+(S/2),Y-(S/2),X+(S/2),Y+(S/2))
+ End Sub
+
+
+   CNTX=0
+For I=0 To ICN-1
+   SIZP[I]=IMIN:CNTX=CNTX+DISTX+(IMIN/2)
+   POSX[I]=CNTX:POSY[I]=YEDGE-(DISTY+(IMIN/2))
+     DISPICN(POSX[I],POSY[I],SIZP[I])
+   CNTX=CNTX+IMIN/2
+ Next 
+
+'lpz=0
+while (key(27)=0)
+
+'   MX=(X Mouse*2)-256:MY=(Y Mouse*2)-96
+
+
+    MX=xmouse:MY=ymouse
+   If (OX<>MX) and (OY<>MY) then 
+    OX=MX: OY=MY
+
+'   Plot MX,MY:Cls 
+    Dot (MX,MY):Cls 
+
+
+    CNTX=0
+   For I=0 To ICN-1
+      SIZP[I]=SZ(POSX[I],POSY[I],MX,MY,IMIN,IMAX)
+      CNTX=CNTX+DISTX+(SIZP[I]/2)
+      POSX[I]=CNTX:POSY[I]=YEDGE-(DISTY+(SIZP[I]/2))
+        DISPICN(POSX[I],POSY[I],SIZP[I])
+      CNTX=CNTX+SIZP[I]/2
+    Next 
+       CNTX=CNTX-DISTX
+    End If 
+
+end while

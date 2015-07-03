@@ -1,0 +1,26 @@
+'
+'      Screen tutorial #06 - Getting a palette         
+'
+Screen Open 0,320,90,16,Lowres
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+Paste Bob 100,0,1
+'
+'Open a new screen 
+'
+Screen Open 1,320,90,16,Lowres
+Screen Display 1,,150,,
+Flash Off 
+Cls 0
+Wait 100
+'
+'Copy the image from screen 0 to screen 1
+'
+Screen Copy 0,100,0,170,90 To 1,100,0
+Wait 100
+'
+'Set the palette of screen 1 to that of screen 0 
+'
+Get Palette 0

@@ -1,0 +1,16 @@
+setdisplay(320,200,8,0)
+paper(0xFFFFFF):pen(0):ink(0):cls:mousehide
+enablepalette(1)
+
+
+
+for y=0 to 15:for x=0 to 15: c=x+(y*16)
+   ink(c): bar(120+x*10,y*10,124+x*10,4+y*10)
+ next:next
+
+while 0=0
+  color(rnd(255),rgb(rnd(255),rnd(255),rnd(255)))
+'  waitvbl
+   if key(27)<>0 then:end :end if
+wend
+

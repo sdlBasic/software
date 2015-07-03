@@ -1,0 +1,26 @@
+'
+'      Bob tutorial #11 - Bob Priorities 
+'
+Dim BX(3),BY(3),BXD(3),BYD(3),BIMAGE(3)
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Double Buffer 
+Cls 0 : Pen 1 : Paper 0 : Hide 
+'
+Z=1
+For Y=170 To 90 Step -10
+   Bob Z,Y,Y,1
+   Z=Z+1
+Next Y
+Wait 100
+'
+'Using Priority On switchs the order of Bob drawing. 
+'
+Priority On 
+'
+'Again, the effect wont take effect until the Bob draw routine is asked
+'to draw the Bobs again
+'
+Bob 1,,,
+Wait 100

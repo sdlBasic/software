@@ -1,0 +1,10 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.8         * 
+Rem *             BARS                 *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Menu$(1)="Bar "
+Rem Create a bar (default pattern is empty)
+Menu$(1,1)="(BA 100,100)(LO 0,50)  Hi there  "
+Menu On 
+Direct 

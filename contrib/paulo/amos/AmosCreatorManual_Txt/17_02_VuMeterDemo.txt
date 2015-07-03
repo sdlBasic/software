@@ -1,0 +1,27 @@
+Rem ************************************ 
+Rem *        AMOS Example 17.2         * 
+Rem *          VUmeter demo            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Close Editor 
+Rem Load some music
+Load "FunkeyMus.abk"
+Rem Load some sprites
+Load "OctopusSpr.abk"
+Rem Play music 
+Music 1 : Led Off 
+Rem Initialise screen
+Flash Off : Fade 1 To -1
+Dim Y(4)
+Rem Main loop
+Repeat 
+   Rem Animate each of the four voices  
+   For N=0 To 3
+      Rem Calculate horizontal sprite position 
+      Add Y(N),Vumeter(N)
+      If Y(N)>64 Then Y(N)=64
+      If Y(N)>0 Then Add Y(N),-3
+      Rem Display sprites
+      Sprite 8+N,128+Y(N)*3,50+N*32,1
+   Next 
+Until Mouse Key

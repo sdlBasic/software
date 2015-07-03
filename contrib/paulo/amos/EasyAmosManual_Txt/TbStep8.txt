@@ -1,0 +1,296 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                          STEP EIGHT: the Title 
+'----------------------------------------------------------------------------
+'
+' The title is an important part of any game. It gives the player the first  
+' tantalising glimpse into the program we have created, and motivates him  
+' to pick up his joystick, and prepare for action! 
+' So I have taken great care to make the title as impressive as possible.    
+'
+' Since the title procedures are completely independant of the main
+' program, I've omitted all the usual game routines from this listing.   
+' If you're feeling adventurous, you can even turn the title into a separate 
+' program that calls the game program from a file, using RUN 
+'  
+'
+' Feel free to grab these procedures for your own titles:  
+' Just  replace the pictures with your own graphics, and you are ready to go!  
+'
+' You can also add the HISCORES procedures to handle the hiscores. 
+' I haven't included them here, because they are not right for a football game.
+'  
+'
+'----------------------------------------------------------------------------  
+Close Editor 
+Hide On 
+PATH$="Easy_Examples:"
+' ***
+' Load the necessary image files 
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+Load PATH$+"Sounds/Tricycle_Music.Abk"
+'
+Load PATH$+"Pictures/Tricycle_Tricycle.Abk",12
+' main title screen
+Load PATH$+"Pictures/Tricycle_Main.Abk",13
+' programming credits
+Load PATH$+"Pictures/Tricycle_Credits.Abk",14
+' options menu 
+Load PATH$+"Pictures/Tricycle_Choice.Abk",15
+' ***  
+' Call the title 
+TITLE_PAGE
+' ***
+' After TITLE_PAGE has finished, the PARAM variable holds the option selected
+' by the user: 
+'   0 : starts a one player easy game, 
+'   1 : starts a one player difficult, 
+'   2 : starts a two player game,  
+'   3 : exits, 
+'   4 : plays the demo 
+'  
+' If you insert TITLE_PAGE in a small loop, you can make the demo continuous!  
+'
+ALL_ERASE
+Edit 
+'
+'
+Procedure TITLE_PAGE
+   ' ***
+   ' Define a few global variables  
+   Global XSCR,PSCR,ANSCR,SY,PY
+   ' ***
+   ' Music maestro! 
+   Music 1
+   ' ***
+   ' Position the screen display  
+   SY=80 : PY=10
+   ' If NTSC, we move it up a bit 
+   If Ntsc : PY=PY-48 : End If 
+   Bob Update On 
+   ' ***
+   ' Unpack the tricycle screen.
+   ' This is long and thin (640x80) and contains four trikes  
+   ' in various stages of movement  
+   Unpack 12 To 0 : Screen Hide 0
+   Get Block 1,0,0,320,SY,1 : Put Block 1,320,0
+   Screen Display 0,,PY,,
+   ' ***
+   ' Paste a REVERSED copy on screen one and display it below screen 0  
+   Screen Open 1,640,SY,16,0 : Screen Hide 1
+   Curs Off : Flash Off : Cls 0 : Get Palette 0
+   Hrev Block 1 : Put Block 1,0,0 : Put Block 1,320,0
+   Screen Display 1,,PY+SY,,
+   Del Block 
+   ' ***
+   ' Now clone screen 2. This creates a separate copy of screen 0 
+   ' which can be repositioned anywhere on the screen.
+   Screen 0 : Screen Clone 2 : Screen Hide 2
+   ' We'll move it directly below screen 1
+   Screen Display 2,,PY+SY*2,,
+   ' ***
+   ' Now, we'll clone screen 3 using screen 1 as the source 
+   Screen 1 : Screen Clone 3 : Screen Hide 3
+   ' We'll position it immediately below screen 3 
+   Screen Display 3,,PY+SY*3,,
+   ' The display is now in the following format:  
+   '  
+   ' ----------------------------------------   
+   '                Screen 0  
+   ' ---------------------------------------- 
+   '  Screen 1 (Reversed version of screen 0) 
+   ' ---------------------------------------- 
+   '        Screen 2 (Clone of screen 0)  
+   ' ---------------------------------------- 
+   '        Screen 3 (Clone of screen 1)  
+   ' ---------------------------------------- 
+   '  
+   ' ***
+   ' Unpack all the other pictures
+   Unpack 13 To 4 : Screen Hide 4 : Screen Display 4,,PY+SY,,
+   Unpack 14 To 5 : Screen Hide 5 : Screen Display 5,,PY+SY,,
+   Unpack 15 To 6 : Screen Hide 6 : Screen Display 6,,PY+SY,,
+   ' ***
+   ' Make sure the tricycle is displayed on the front screen  
+   Screen To Front 0 : Screen To Front 3
+   For S=0 To 3 : Screen Show S : Next 
+   ' ***
+   ' Title loop 
+   Repeat 
+      ' ***
+      ' Twice through the titles 
+      For N=1 To 2
+         '
+         ' First the picture
+         TITLE_SCREENS[100,150,4,-1] : If Param : Exit : End If 
+         '
+         ' Then the credits 
+         TITLE_SCREENS[100,250,5,-1] : If Param : Exit : End If 
+         '  
+         ' If we did NOT press the joystick, CHOICE=4: the DEMO!
+         CH=4
+      Next 
+      ' ***
+      ' Has the player pressed the joystick? 
+      If Param
+         '
+         ' YES: display the CHOICE screen for the menu
+         TITLE_SCREENS[0,-1,6,%10] : Screen 6
+         '
+         XC=24 : YC=7 : TIM=500
+         CH=0 : OCH=-1 : OK=Param
+         Bob Update Off 
+         'Select on option using the joystick 
+         Do 
+            '
+            ' Has the choice changed?
+            If CH<>OCH
+               Bob 1,XC,YC+CH*37+8,45 : OCH=CH
+               S=46 : If CH=3 : S=47 : End If 
+               Bob 2,82,YC+CH*37,S
+               Bob Update 
+            End If 
+            '
+            ' We'll wait for a joystick command, and animate the screen    
+            Repeat 
+               SCR_MOVE
+               TIM=TIM-1 : If TIM<0 : CH=-1 : Exit 2 : End If 
+            Until Param<>OK : OK=Param
+            '
+            ' Joystick UP
+            If OK and 1
+               If CH>0 : CH=CH-1 : End If 
+               TIM=500
+            End If 
+            '
+            ' Joystick DOWN
+            If OK and 2
+               If CH<3 : CH=CH+1 : End If 
+               TIM=500
+            End If 
+            '
+            ' Joystick FIRE
+            If OK and 16
+               '
+               ' Display the "OK" bob, and wait a bit 
+               Bob Off 2 : Bob Update : Paste Bob 82,7+37*CH,S
+               For N=1 To 96
+                  SCR_MOVE
+                  Bob 1,XC+(N and 15),YC+CH*37+8,45 : Bob Update 
+               Next 
+               Exit 
+            End If 
+         Loop 
+         ' ***
+         ' Shut down the CHOICE screen
+         TITLE_SCREENS[0,0,6,%1000]
+         '
+      End If 
+      '
+   Until CH>=0
+   ' ***
+   ' Close down everything
+   For S=0 To 6 : Screen Hide S : Next : Wait Vbl 
+   For S=6 To 0 Step -1 : Screen Close S : Next 
+   ' ***
+   ' Returns the choice (0 to 3: normal choice, 4: demo)
+End Proc[CH]
+Procedure TITLE_SCREENS[T1,T2,S,F]
+   ' ***
+   ' This procedure performs the title animation. 
+   Global XSCR,PSCR,ANSCR,SY,PY
+   ' ***
+   ' The animation is done using a simple trick: Four different 
+   ' tricycles are drawn on each screen. By changing the SCREEN OFFSET of each  
+   ' screen, we can animate four ENORMOUS drawings simultaneously, at HIGH  
+   ' speed, using practically NO processor time!!!  
+   ' This procedure also returns the state of joystick. It exits gracefully 
+   ' when you press FIRE, and closes the middle screen. 
+   ' ***
+   ' Animate the tricycles  
+   If F and 1
+      For N=0 To T1
+         SCR_MOVE : J=Param
+         If J : F=0 : Exit : End If 
+      Next 
+   End If 
+   ' ***
+   ' Open the two middle screens (1 and 2) to show the title screen underneath
+   If F and 2
+      Screen Show S : Screen To Back S
+      For N=0 To SY Step 5
+         ' Move screen 1 up   
+         Screen Display 1,,PY+SY-N,,
+         ' and move screen 2 down 
+         Screen Display 2,,PY+SY*2+N,,
+         SCR_MOVE
+      Next 
+   End If 
+   ' ***
+   ' Animate the top and bottom screen, with the title screen in the middle 
+   If F and 4
+      For N=0 To T2
+         SCR_MOVE : J=Param
+         If J : Exit : End If 
+      Next 
+   End If 
+   ' ***
+   ' Close the middle screens 
+   If F and 8
+      For N=SY To 0 Step -5
+         ' Move screen 1 back down  
+         Screen Display 1,,PY+SY-N,,
+         ' and screen 2 up
+         Screen Display 2,,PY+SY*2+N,,
+         SCR_MOVE
+      Next 
+      Screen Hide S
+   End If 
+   '
+End Proc[J]
+Procedure SCR_MOVE
+   ' ***
+   ' Always the same variables
+   Global XSCR,PSCR,ANSCR,SY,PY
+   ' ***
+   ' A small procedure that changes SCREEN OFFSET of the four screens 
+   ' to make this clever (I must say) animation effect. 
+   '
+   ' This scrolls the screens RIGHT by XSCR and moves the display 
+   ' to trike number PSCR. Every four loops, the trike at the current 
+   ' position seems to change. Actually, it stays as steady as a rock!  
+   ' We're simply positioning our display directly over the next trike in     
+   ' the animation sequence to create a convincing illusion of movement 
+   '
+   Screen Offset 0,XSCR+PSCR*80,
+   ' LEFT 
+   Screen Offset 1,320-XSCR-PSCR*80,
+   ' RIGHT
+   Screen Offset 2,XSCR+PSCR*80,
+   ' and LEFT again 
+   Screen Offset 3,320-XSCR-PSCR*80,
+   Wait Vbl 
+   '
+   ' Set the scrolling speed to two points per loop 
+   XSCR=XSCR-2
+   ' Restart when the screen has reached the end
+   If XSCR<0 : XSCR=XSCR+80 : End If 
+   ' Now comes the clever bit!  
+   ' We'll move the screen offset so the the screen starts at the NEXT trike
+   ' in the animation sequence
+   '
+   ' Count down from 3 to -1. (The trike changes every four steps)
+   ANSCR=ANSCR-1
+   If ANSCR<0
+      ANSCR=3
+      ' Change trike to next one in the sequence 
+      PSCR=PSCR+1 : If PSCR>3 : PSCR=0 : End If 
+   End If 
+   '
+   F=Joy(1)
+   '
+End Proc[F]
+Procedure ALL_ERASE
+   For B=1 To 15 : Erase B : Next 
+End Proc

@@ -1,0 +1,77 @@
+'
+'      Screen tutorial #02 - Screen Display and Screen Offset  
+'
+'
+' Open one heck of a big screen! 
+'
+Screen Open 0,1000,800,4,Lowres
+'
+'Display a matrix of 320x200 of the screen and position the X start
+'of the screen a little to the right.
+'
+Screen Display 0,140,,320,200
+'
+'Print text onto the screen. At some weird x,y co-ordinates! 
+'
+Print At(0,0);"Top Left of a very big screen"
+Print At(0,87);"Bottom Left";
+Print At(111,0);"Top Right"
+Print At(107,87);"Bottom Right";
+'
+' Fill the main area of the screen full of characters
+'
+Locate 0,2
+For A=0 To 83
+   For B=0 To 55
+      Print Chr$(A+32);" ";
+   Next B
+   Print 
+Next A
+'
+' Tell user they can scroll around the screen
+'
+Pen 3
+Locate 5,5
+Print " Move the screen using "
+Locate 5,6
+Print "    the arrow keys     "
+'
+' Check up, down, left and right keys. If one is pressed change the
+' screen offset. 
+'
+Do 
+   TAKE_KEY:
+   A$=Inkey$ : If A$="" Then Goto TAKE_KEY
+   S=Scancode
+'
+' Checks for up arrow key. (Change -8 to -4,-2 or -1)
+'
+   If S=76
+      If SYO<>0
+         SYO=SYO-8
+      End If 
+   Else 
+      If S=77 : Rem       Check for down arrow 
+         If SYO<>520
+            SYO=SYO+8
+         End If 
+      Else 
+         If S=79 : Rem    Check for left arrow  
+            If SXO<>0
+               SXO=SXO-8
+            End If 
+         Else 
+            If S=78 : Rem Check for down arrow   
+               If SXO<>640
+                  SXO=SXO+8
+               End If 
+            End If 
+         End If 
+      End If 
+   End If 
+   Wait Vbl 
+'
+' Set screen to its new offset. Remember, it's a port hole over the whole
+' screen.
+   Screen Offset 0,SXO,SYO
+Loop 

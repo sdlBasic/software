@@ -1,0 +1,13 @@
+'makebat.sdlbas
+'only for windows(at this time)
+chdir("examples")
+shell ("dir /s /b *.sdlbas>out.txt") 
+open "out.txt" for input as 1
+while eof(1)=0 
+    file input #1,a$
+    prints(a$)
+    chdir (left$(a$,rinstr(a$,"\\")-1))
+    shell("sdlBasic "+"\""+mid$(a$,rinstr(a$,"\\")+1)+"\"")
+end while
+close 1
+waitkey

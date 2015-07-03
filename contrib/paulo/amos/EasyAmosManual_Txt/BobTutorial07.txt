@@ -1,0 +1,64 @@
+'
+'      Bob tutorial #07 - Paste, Get, Delete and Clear your Bobs!      
+'
+'                      The silly heads demo! 
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+Double Buffer 
+'
+' Let's first paste a couple of Bobs onto the screen 
+'
+Paste Bob 60,50,4
+Paste Bob 150,50,9
+'
+' Now let's clear the Bob bank. There are 9 Bobs in this bank
+'
+For A=1 To 9
+   Del Bob 1
+Next A
+'
+'Now let's get the heads of the images on screen 0 
+'
+WIDTH=58 : HEIGHT=42
+X1=60 : Y1=50 : X2=X1+WIDTH : Y2=Y1+HEIGHT
+Get Bob 1,X1,Y1 To X2,Y2
+X1=150 : X2=X1+WIDTH
+'
+Get Bob 2,X1,Y1 To X2,Y2
+Cls 0
+B1X=80 : B1Y=100
+Bob 1,B1X,B1Y,1
+B2X=160 : B2Y=100
+Bob 2,B2X,B2Y,2
+'
+' OK, now let's move the heads.
+'
+C#=1.0
+For A=1 To 160
+   '
+   'This first bit jiggles the teacher's head 
+   '
+   XJIG=Rnd(4) : YJIG=Rnd(3)
+   XJIG=XJIG-2 : YJIG=YJIG-2
+   B1X=B1X+XJIG : B1Y=B1Y+YJIG
+   Bob 1,B1X,B1Y,1
+   '
+   ' Using a big of trig we can easily circle the bad tempered AMOS 
+   '
+   B2X=Sin(C#)*50+100
+   B2Y=Cos(C#)*50+100
+   Bob 2,B2X,B2Y,2
+   Wait Vbl 
+   C#=C#+0.2
+Next A
+'
+' Now we'll make the heads disappear one by one. 
+'
+Wait 20
+Bob Off 1 : Bell 
+Wait 100
+Bob Off 2 : Bell 
+Direct 

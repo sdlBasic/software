@@ -1,0 +1,3 @@
+Runtime error on line number 4 of /home/devel_linux/basic/sdlBasic/sdlBasic_opengl/test/first/first_test.sdlbas
+glsetdisplay has not been defined yet
+GLsetdisplay(800,600,32,1)

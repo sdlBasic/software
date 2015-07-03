@@ -1,0 +1,26 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.9          * 
+Rem *     Horizontal slider bar        * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Curs Off : Double Buffer : Cls 0
+Locate 0,0 : Centre "Move the slider with the mouse"
+Autoback 0
+Reserve Zone 1
+Set Zone 1,0,175 To 319,195
+HSLIDE[10]
+Do 
+   SREAD[1]
+Loop 
+Procedure SREAD[Z]
+   XM=X Screen(X Mouse)
+   While Mouse Zone=Z
+      X=X Screen(X Mouse)
+      If X<>XM and Mouse Key=1 Then HSLIDE[X] : XM=X
+   Wend 
+End Proc[X]
+Procedure HSLIDE[X]
+   Hslider 0,180 To 319,190,319,X,5
+   Screen Swap : Wait Vbl 
+End Proc

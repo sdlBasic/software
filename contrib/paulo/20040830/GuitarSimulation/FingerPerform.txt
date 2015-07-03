@@ -1,0 +1,24 @@
+'- this algorythm will be useful when need to play back the edited
+'- tablature (for example from the guitar simulator)
+
+Function narmpos(trst,note)
+  tmpr=trst
+    if note<trst then
+      tmpr=not: end if
+    if note>(trst+so) then
+      tmpr=note-30: end if
+   narmpos=tmpr
+ end function
+
+function ntrstx(trst,note)
+   x=((note-trst)mod 5)+trst:y=(note-trst)\5
+     if y>5 then:x=x+(5*y):y=5:end if
+   ntrstx=x
+ end function
+
+function ntrsty(trst,note)
+   x=((note-trst)mod 5)+trst:y=(note-trst)\5
+     if y>5 then:x=x+(5*y):y=5:end if
+   ntrsty=y
+ end function
+

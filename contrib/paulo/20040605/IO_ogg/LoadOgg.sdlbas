@@ -1,0 +1,3 @@
+loadmusic ("io.ogg")
+playmusic (1)
+waitkey

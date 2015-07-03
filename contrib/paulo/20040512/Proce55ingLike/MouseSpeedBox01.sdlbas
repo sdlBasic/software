@@ -1,0 +1,50 @@
+' Bar Overprint graphics example
+' Paulo Silva - april 04 - GPL
+' writed over a template coded from Vroby 
+
+xedge=640:yedge=480
+setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+sub waitick(t)
+   tkc=ticks:while ticks<tkc+t:wend
+ end sub
+
+    xn=xmouse:yn=ymouse
+    xo=xn:yo=yn
+
+while(0=0)
+   waitick(32)
+    xd=xn-xo:yd=yn-yo
+    xda=abs(xd):yda=abs(yd)
+
+    xo=xn:yo=yn
+    xn=xmouse:yn=ymouse
+
+   box(xn-yda,yn-xda,xn+yda,yn+xda)
+
+
+'   locate(2,0):prints(str$(xd)+"     ")
+'    locate(2,1):prints(str$(yd)+"     ")
+
+   if key(27) then : end :end if
+ wend
+
+
+
+
+
+'  crdm=rgb(rnd(255),rnd(255),rnd(255))
+
+
+'while(0=0)
+'  xn=xmouse:yn=ymouse
+'   sz=32
+'   szx=rnd(sz)
+'   szy=rnd(sz)
+'     BarOverprint(xn-szx,yn-szy,xn+szx,yn+szy,0x000000,4)
+' wend
+
+
+
+

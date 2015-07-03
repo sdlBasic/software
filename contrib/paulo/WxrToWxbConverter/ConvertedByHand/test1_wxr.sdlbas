@@ -1,0 +1,65 @@
+
+include "interface.sdlblib"
+
+
+paper(0x777777):cls
+
+'--- bug: i have to define frame position as variable
+'---   because frame's objects coordinates are from top-left window edge,
+'---   not top-left display edge...
+
+' conversion from .wxr needs fine tuning... =((((
+
+
+xwp=15:ywp=20+8
+
+'-- frame=new wxFrame( Null, -1, "dialog1", wxPoint(15,20), wxSize(319,214),wxRAISED_BORDER | wxCAPTION | wxSYSTEM_MENU)
+setnew(0,window,-1,xwp,ywp-8,319-20,214-38,"dialog1")
+
+'frame.Centre()
+'panel=new wxPanel(frame, -1 )
+'-- ?????
+
+'-- control= new wxRadioButton( panel, -1, "TextVersion1", wxPoint(147,70), wxSize(144,20))
+setnew(1,radio,0,xwp+147,ywp+70,144,20,"TextVersion1")
+
+'  control= new wxRadioButton( panel, -1, "TextVersion2", wxPoint(147,90), wxSize(144,20))
+setnew(2,radio,0,xwp+147,ywp+90,144,20,"TextVersion2")
+
+'-- control= new wxStaticText( panel, -1, "StaticText", wxPoint(7,118), wxSize(284,12))
+setnew(3,label,0,xwp+7,ywp+118,284,12,"StaticText")
+
+'-- control= new wxStaticBox( panel, -1, "", wxPoint(7,6), wxSize(100,100))
+'--- provisory - StaticBitmap here (using now a button instead for space took notion)
+setnew(4,button,0,xwp+7,ywp+6+8,100,100,"")
+
+'-- control= new wxButton( panel, -1, "Button1", wxPoint(7,138), wxSize(87,20))
+setnew(5,button,0,xwp+7,ywp+138,87,20,"Button1")
+
+'-- control= new wxButton( panel, -1, "Button2", wxPoint(105,138), wxSize(87,20))
+setnew(6,button,0,xwp+105,ywp+138,87,20,"Button2")
+
+'-- control= new wxButton( panel, -1, "Button3", wxPoint(203,138), wxSize(87,20))
+setnew(7,button,0,xwp+203,ywp+138,87,20,"Button3")
+
+'-- control= new wxButton( panel, -1, "1", wxPoint(115,14), wxSize(29,30))
+setnew(8,button,0,xwp+115,ywp+14,29,30,"1")
+
+'-- control= new wxButton( panel, -1, "2", wxPoint(154,14), wxSize(28,30))
+setnew(9,button,0,xwp+154,ywp+14,29,30,"2")
+
+'-- control= new wxButton( panel, -1, "3", wxPoint(190,14), wxSize(28,30))
+setnew(10,button,0,xwp+190,ywp+14,29,30,"3")
+
+'-- control= new wxButton( panel, -1, "4", wxPoint(231,14), wxSize(28,30))
+setnew(11,button,0,xwp+231,ywp+14,29,30,"4")
+
+'frame.Show(True)
+
+while (0=0)
+    waitevent()
+
+    if key(27) then : end :end if
+    if getparam(5,_state)=clicked then :end :end if
+wend
+

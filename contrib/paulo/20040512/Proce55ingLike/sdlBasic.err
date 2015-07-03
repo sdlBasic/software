@@ -1,0 +1,3 @@
+Runtime error on line number 235 of DrawingOpacity.sdlblib
+Division by zero
+  pr=s1+((ds/db)*(ct-b1))

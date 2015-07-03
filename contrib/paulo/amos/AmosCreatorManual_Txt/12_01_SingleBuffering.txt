@@ -1,0 +1,33 @@
+Rem ************************************ 
+Rem *        AMOS Example 12.1         *   
+Rem *    Single buffering and bobs     * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load sprite bank 
+Load "amos_data:sprites/octopus.abk"
+Curs Off 
+Flash Off : Get Sprite Palette 
+Hide On : D=0
+IMAGE=1 : Rem Choose bob image 
+INFO
+Repeat 
+   Rem Get co-ordinates of mouse cursor   
+   X=X Screen(0,X Mouse)-16*2 : Y=Y Screen(0,Y Mouse)*2
+   Rem Display one or more octopuses  
+   For O=1 To B : Bob O,X+32*O,Y,IMAGE : Next O
+   Wait Vbl : Rem wait until whole screen drawn before continuing  
+   Rem Remove next line and see what happens
+   If D Then Wait Vbl : Rem It's needed to keep DOUBLE BUFFERing tidy    
+   Rem Check left button
+   M=Mouse Click : If M=1 Then Inc B : Wait 5
+   Rem Check right button 
+   If M=2 and D=0 Then Bob Off : D=1 : Cls : INFO : Double Buffer : Bell 
+Until Mouse Key=3
+Procedure INFO
+   Shared D
+   Centre "<Move the octopus with the mouse>"
+   Locate 0,2 : Centre "<Click LEFT button to add an octopus>"
+   If D=0 Then Locate 0,4 : Centre "<Press RIGHT button to remove flicker>"
+   Locate 0,24 : Centre "<Hold down both keys to quit>"
+End Proc

@@ -1,0 +1,4 @@
+'nemico1.sdlbas
+sub nemico1_run
+	prints("boom")
+end sub

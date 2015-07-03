@@ -1,0 +1,8 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+a$="    trimming the string    "
+prints("before trim$")
+prints("a$="+chr$(34)+a$+chr$(34))
+a$=trim$(a$)
+prints("after trim$")
+prints("a$="+chr$(34)+a$+chr$(34))
+waitkey

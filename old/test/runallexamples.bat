@@ -1,0 +1,1 @@
+sdlBasic "runallexamples.sdlbas"

@@ -1,0 +1,44 @@
+
+xedge=320:yedge=200
+  setdisplay(xedge,yedge,32,0)
+screen(0)
+
+function clr12bit(c)
+      ' where are the very important bitwise operators?
+'   r=(c and 0xF00)*0x11
+'   g=(c and 0x0F0)*0x11
+'   b=(c and 0x00F)*0x11
+    r=((int(c/0x100))mod 16)*0x11
+    g=((int(c/0x10))mod 16)*0x11
+    b=((int(c/0x1))mod 16)*0x11
+   clr12bit=(r*0x10000)+(g*0x100)+b
+ end function
+
+color(00,clr12bit(0x000)):color(01,clr12bit(0xA40))
+color(02,clr12bit(0xFFF)):color(03,clr12bit(0x000))
+color(04,clr12bit(0xF00)):color(05,clr12bit(0x0F0))
+color(06,clr12bit(0x00F)):color(07,clr12bit(0x666))
+color(08,clr12bit(0x555)):color(09,clr12bit(0x333))
+color(10,clr12bit(0x733)):color(11,clr12bit(0x373))
+color(12,clr12bit(0x773)):color(13,clr12bit(0x337))
+color(14,clr12bit(0x737)):color(15,clr12bit(0x377))
+color(16,clr12bit(0x000)):color(17,clr12bit(0xEC8))
+color(18,clr12bit(0xC60)):color(19,clr12bit(0xEA0))
+color(20,clr12bit(0x27F)):color(21,clr12bit(0x49D))
+color(22,clr12bit(0x5AE)):color(23,clr12bit(0xADF))
+color(24,clr12bit(0xBDF)):color(25,clr12bit(0xCEF))
+color(26,clr12bit(0xFFF)):color(27,clr12bit(0x408))
+color(28,clr12bit(0xA0E)):color(29,clr12bit(0xE0E))
+color(30,clr12bit(0xE08)):color(31,clr12bit(0xEEE))
+
+paper (color(01)):ink(color(02)):pen(color(02)):cls
+
+for y=0 to 31
+   ink(color(y))
+   bar (64,2+(y*6),280,6+(y*6))
+ next
+
+waitkey
+
+
+

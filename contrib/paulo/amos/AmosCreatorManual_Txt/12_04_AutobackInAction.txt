@@ -1,0 +1,46 @@
+Rem ************************************ 
+Rem *        AMOS Example 12.4         * 
+Rem *        Autoback in action        * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Activate double buffering
+Double Buffer 
+Rem Create some images 
+MAKE_OBJECTS
+Rem Turn off autoback mode 
+Autoback 0
+Rem stop automatic bob updates 
+Bob Update Off 
+Rem set up screem
+Hide : Flash Off : Ink 15,0
+Rem Create an animated background using set pattern
+Do 
+   For I=1 To 8
+      Rem Erase bob from old position
+      Bob Clear 
+      Rem draw pattern 
+      Set Pattern -I
+      Bar 0,0 To 320,200
+      Rem move bob to mouse coords 
+      Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),9
+      Rem redraw bob 
+      Bob Draw 
+      Rem swap physical and logical screens
+      Screen Swap : Wait Vbl 
+   Next I
+Loop 
+Procedure MAKE_OBJECTS
+   Rem Generate expanding circle
+   For O=1 To 8
+      Cls 0,0,0 To 17,17
+      Circle 8,8,O
+      Get Bob O,0,0 To 17,17
+   Next O
+   Cls 0
+   Rem Make ship  
+   Polygon 8,0 To 16,16 To 0,16 To 8,0
+   Ink 0
+   Polygon 8,10 To 16,16 To 0,16 To 8,10
+   Get Bob 9,0,0 To 16,16
+End Proc

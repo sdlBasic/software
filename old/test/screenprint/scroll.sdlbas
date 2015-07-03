@@ -1,0 +1,17 @@
+'
+'scroll print
+'
+setautoback(25)
+setdisplay(800,600,32,1)
+screenopen (0,800,600,0,0,800,600,0)
+screenopen (1,320,200,0,0,320,200,0)
+screen(0)
+curson
+
+for i= 0 to 200
+    prints(str$(i))
+
+    if key(27) then: end:end if
+next
+
+waitkey

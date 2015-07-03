@@ -1,0 +1,31 @@
+Rem ********************************************** 
+Rem *            AMOS Example 3.3.AMOS           * 
+Rem *                                            * 
+Rem * To run this example do the following:      * 
+Rem *                                            * 
+Rem * 1 Ensure the directory path is set to:     *   
+Rem *   "MANUAL/CHAPTER_3/"                      * 
+Rem * 2 Select the ACCNEW/LOAD option (Shift+F6) * 
+Rem * 3 Insert AMOS_DATA disc into Df0:          * 
+Rem * 4 Run this program (Shift+F1)              * 
+Rem *                                            * 
+Rem *         (c) Mandarin / Jawx 1990           *   
+Rem ********************************************** 
+Rem Load some sprite images
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Locate 0,23 : Centre "Program # 1 - Press a key..."
+Rem Get sprite colours 
+Get Sprite Palette : Flash Off 
+Rem Call sprite demo 
+SPDEMO
+Wait Key 
+Rem Run second program 
+Prun "Example3_03.acc"
+Rem After second program has finished, return to first program 
+Locate 0,23 : Centre "Program # 1 again -  Press key..."
+Wait Key 
+Procedure SPDEMO
+   Sprite 1,0,100,1
+   Amal 1,"L: Move 320,0,80; Move -320,0,80; Jump L"
+   Amal On 
+End Proc

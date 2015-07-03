@@ -1,0 +1,51 @@
+Rem ************************************ 
+Rem *        AMOS Example 14.3         * 
+Rem *             Vumeters             * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Close Editor 
+Fade 1
+Rem Load music 
+Load "AMOS_DATA:Music/Funkey.abk"
+Rem Start music
+Music 1 : Volume 0
+Rem Load sprite images 
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Rem Fade in sprite palette 
+Curs Off : Flash Off : Fade 4 To -1
+Double Buffer 
+Rem AMAL program to animate sprite using the Vu function 
+A$=A$+"       AUtotest(Let R1=Vu(R0)*3; If R1=0 eXit else Direct Start)"
+A$=A$+"Start: Let R2=R1; Let X=R0*32+R2; Let Y=RA-R1; Anim 4,(1,2)(2,2)(3,2)(4,2); Pause;"
+A$=A$+"       Move 0-R2,R2,RB; Wait;"
+Rem set RA and RB to 100 and 25 repecitively 
+Amreg(0)=180 : Amreg(1)=25
+Rem Intailise bobs 
+   For N=0 To 3
+   Rem Position bob   
+   Bob N,N*32,Amreg(0),1
+   Rem Assign channel to bob
+   Channel N To Bob N
+   Rem Assign amal command to bob 
+   Amal N,"Let R0="+Str$(N)+A$
+Next N
+Amal On 
+Rem main loop
+Repeat 
+   Rem Get y coord of mouse and convert it into a volume  
+   V=(200-Y Screen(Y Mouse))/3
+   If V>63 Then V=63
+   If V<0 Then V=0
+   Centre At(,0)+" Volume:"+Str$(V)+" "
+   Rem Get x coord of mouse and convert it into a tempo 
+   T=X Screen(X Mouse)/3
+   If T>100 Then T=100
+   If T<0 Then T=0
+   Centre At(,1)+" Tempo:"+Str$(T)+" "
+   Rem If volume changed then update it 
+   If V<>OLDV Then Mvolume V : OLDV=V
+   Rem If temp changed then update it 
+   If T<>OLDT Then Tempo T : OLDT=T
+Until Mouse Key
+Direct 

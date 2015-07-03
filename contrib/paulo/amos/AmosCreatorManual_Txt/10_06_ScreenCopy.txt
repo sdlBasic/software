@@ -1,0 +1,24 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.6         * 
+Rem *          Screen Copy             * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Save some memory 
+Close Editor 
+Rem Load screen
+F$=Fsel$("*.*","","Load a screen") : If F$="" Then Edit 
+Load Iff F$,0
+Rem Use double buffer for maximum smoothness 
+Double Buffer 
+Rem Move screen  
+Repeat 
+   Rem Read mouse 
+   X=X Screen(X Mouse)*3-320
+   Y=Y Screen(Y Mouse)*3-200
+   Rem Copy display into both logical and physical screens
+   Screen Copy 0,X,Y,X+320,Y+320 To 0,0,0
+   Screen Swap : Wait Vbl 
+   Screen Copy 0,X,Y,X+320,Y+320 To 0,0,0
+   Screen Swap : Wait Vbl 
+Until Mouse Key

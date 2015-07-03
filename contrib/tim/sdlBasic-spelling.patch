@@ -1,0 +1,12 @@
+diff -urN sdlBasic/src/sdlBasic.c sdlBasic-old/src/sdlBasic.c
+--- sdlBasic/src/sdlBasic.c	Sat Aug  7 18:44:24 2004
++++ sdlBasic-old/src/sdlBasic.c	Tue Aug  3 12:54:41 2004
+@@ -176,7 +176,7 @@
+ 
+     r=initialize();
+     if (r==1){
+-	ePrintf( Init,"vera fonts not found\nplease reinstall sdlBasic\n");
++	ePrintf( Init,"vera fonts not found  \n please reistall sdlbasic");
+ 	return -1;
+     }
+     init_membank();

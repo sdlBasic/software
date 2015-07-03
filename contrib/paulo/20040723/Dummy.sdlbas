@@ -1,0 +1,19 @@
+wdwd=0
+ setdisplay(320,200,32,wdwd)
+   ScreenOpen (1,320,200,0,0,0,0,0)
+ Loadimage("sprites.png",1): pasteicon(0,0,1): Screen(1)
+    For x=0 To 3: grab(1+x,x*16,0,16,16):Next
+  screen(0):paper(rgb(96,96,96)):ink(0):pen(0):cls
+
+xpos=100:ypos=100
+
+while(key(27)=0)
+  if key(K_left) then:xpos=xpos-1:end if
+   if key(K_right)then:xpos=xpos+1:end if
+  if key(K_up) then:ypos=ypos-1:end if
+   if key(K_down)then:ypos=ypos+1:end if
+       bob (4,xpos,ypos,1)
+       bob (3,40,70,2):bob (2,90,80,3): bob (1,70,150,4)
+
+waitvbl
+ wend

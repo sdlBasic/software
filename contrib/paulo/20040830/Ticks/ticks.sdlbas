@@ -1,0 +1,40 @@
+
+dim tkst$[4]
+clntim=0
+
+function bitwiseand(a,b)
+'--- this function is also known as andbits(a,b)
+      c=0:while ((2^c)<a) or ((2^c)<b):c=c+1:end while
+  tmpr=0:for d=0 to c
+    a0=(int(a/(2^d)))mod 2:b0=(int(b/(2^d)))mod 2
+    n0=a0 and b0:tmpr=tmpr+(n0*(2^d)):next
+      bitwiseand=tmpr
+ end function
+
+
+Function ByteFromWord(value,byteadr)
+    xpn=2^(byteadr*8)
+    flag=255*xpn
+    tmpr=(bitwiseand(value,flag))/xpn
+    ByteFromWord=tmpr
+ end function
+
+
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls
+
+while(0=0)
+
+tks1=ticks-clntim
+
+
+for i=0 to 3
+tkst$[i]=str$(ByteFromWord(tks1,i))+"     "
+locate(2,i):prints(tkst$[i])
+next
+
+if key(27) then : end :end if
+if key(32) then : clntim=ticks:end if
+
+
+wend
+

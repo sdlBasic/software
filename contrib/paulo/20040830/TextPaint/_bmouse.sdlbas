@@ -1,0 +1,21 @@
+
+xedge=640:yedge=480
+xprop=9:yprop=12
+
+setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+
+while(0=0)
+  xn=xmouse:yn=ymouse
+
+     locate (0,0)
+
+     prints(bmouse)
+
+
+ wend
+
+
+
+

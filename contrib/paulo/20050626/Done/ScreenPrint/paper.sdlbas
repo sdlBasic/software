@@ -1,0 +1,12 @@
+setdisplay(320,240,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+while 0=0
+   paper(0x00FFFF):cls
+     locate (1,10):prints("paper(0x00FFFF)")
+     for i=0 to 99:waitvbl:if key(27)<>0 then:end:end if:next
+   paper(rgb(255,192,255)):cls
+     locate (1,10):prints("paper(rgb(255,192,255))")
+     for i=0 to 99:waitvbl:if key(27)<>0 then:end:end if:next
+   paper(65535*256):cls
+     locate (1,10):prints("paper(65535*256)")
+     for i=0 to 99:waitvbl:if key(27)<>0 then:end:end if:next
+ wend

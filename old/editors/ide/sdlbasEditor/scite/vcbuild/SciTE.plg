@@ -1,0 +1,50 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: SciTE - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPAC.tmp" with contents
+[
+/nologo /MD /W4 /GX /Ox /I "..\src" /I "..\..\scintilla\include" /I "..\..\scintilla\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "NO_LUA" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\devel\basic\sdlBasic\share\sdlBasic\sdlBasicDevel\ide\sdlbasEditor\scite\win32\SciTEWinBar.cxx"
+]
+Creating command line "cl.exe @C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPAC.tmp" 
+Creating temporary file "C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPAD.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib imm32.lib comctl32.lib /nologo /incremental:no /pdb:"Release/SciTE.pdb" /machine:I386 /out:"Release/SciTE.exe" /opt:nowin98 
+.\Release\DirectorExtension.obj
+.\Release\Exporters.obj
+.\Release\MultiplexExtension.obj
+.\Release\PlatWin.obj
+.\Release\PropSet.obj
+.\Release\SciTEBase.obj
+.\Release\SciTEBuffers.obj
+.\Release\SciTEIO.obj
+.\Release\SciTEProps.obj
+.\Release\SciTEWin.obj
+.\Release\SciTEWinBar.obj
+.\Release\SciTEWinDlg.obj
+.\Release\SingleThreadExtension.obj
+.\Release\UniConversion.obj
+.\Release\UniqueInstance.obj
+.\Release\Utf8_16.obj
+.\Release\WindowAccessor.obj
+.\Release\XPM.obj
+.\Release\SciTERes.res
+]
+Creating command line "link.exe @C:\DOCUME~1\PROPRI~1\IMPOST~1\Temp\RSPAD.tmp"
+<h3>Output Window</h3>
+Compiling...
+SciTEWinBar.cxx
+Linking...
+
+
+
+<h3>Results</h3>
+SciTE.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,23 @@
+'setdisplay(640,480,32,0)
+directscreen()
+'autoback(0)
+
+loadmusic("../../lizard.mod")
+loadimage("../../sdlBasic.gif",1)
+
+playmusic(-1)
+prints ("ciao ciao")
+prints ("ciao ciao")
+text(100,100,32,"ok")
+ink(0xffffff)
+bar(10,10,100,100)
+line(0,0,640,480)
+'waitkey(27)
+i=0
+while(key(27)=0)
+    i=i+1
+    bob(1,100,i,1)
+    screenswap
+	waitvbl
+end while
+waitkey(27)

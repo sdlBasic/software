@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+while key(27)=0
+   locate(1,1):prints(date)
+   waitvbl
+ wend
+

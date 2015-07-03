@@ -1,0 +1,22 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.3          * 
+Rem *       Memorize/Remember          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Initialise screen
+Curs Off : Cls 0 : Pen 1 : Paper 0
+Rem print some text at the top of the screen 
+Locate 0,0 : Print "AMOS";
+Rem Save cursor coordinates
+Memorize X : Memorize Y 
+Rem Display some text at random positions
+For B=1 To 200
+   Rem Generate random numbers  
+   X=Rnd(32) : Y=Rnd(20)+2 : T=Rnd(15) : P=Rnd(15)
+   Rem Output text at coords x,y
+   Pen T : Paper P : Locate X,Y : Print "Testing..."
+Next B
+Rem Restore original cursor position 
+Pen 1 : Paper 0 : Remember X : Remember Y 
+Print " Basic"

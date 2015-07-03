@@ -1,0 +1,350 @@
+'----------------------------------------------------------------------------- 
+' Easy AMOS Typing Tutor 
+' By Francois Lionet 
+' (c) Europress Software 1992
+'----------------------------------------------------------------------------- 
+' This game was written in just three hours! I timed it with a watch!  
+'  
+' It's quite intelligent, as the difficulty level very quickly   
+' adapts itself to the player's ability: Even if you are a great typist, 
+' you can always play the game with a maximum speed : Very very hard!  
+'
+' Add a title page, the high score table, and you've got a superb product! 
+'----------------------------------------------------------------------------- 
+'
+' This sets the speed of the game at the start. This number will be adapted
+' to your personal skill.
+'
+Do 
+   '
+   'Select game 1 or 2 or quit
+   '
+   SELECT_GAME
+   SPEED=5
+   '
+   'Well, is it a game or a request to finsih this game?
+   '
+   If GAME$=Chr$(27) Then Edit 
+   If GAME$="1"
+      GAME_LETTER
+   End If 
+   If GAME$="2"
+      GAME_PHRASES
+   End If 
+Loop 
+'
+Procedure SELECT_GAME
+   '
+   ' Ask user if he/she wants to play the letters game, phrase game or
+   ' to quit the Typing Tutor.
+   '
+   Global GAME$
+   Screen Open 0,320,200,8,Lowres
+   Curs Off 
+   Cls 0 : Paper 0 : Pen 1
+   Flash Off 
+   Palette $0,$EEE,0,$4D,0,$F40
+   Locate 0,2
+   Centre "Typing Tutor"
+   Locate 12,5
+   Print "[1] Letter Game"
+   Locate 12,7
+   Print "[2] Phrase Game"
+   Locate 0,10
+   Centre "Press 1 or 2 to play, or [ESC] to quit"
+   Do 
+      GAME$=Inkey$
+      If GAME$="1" or(GAME$="2") or(GAME$=Chr$(27)) Then Exit 
+   Loop 
+End Proc
+Procedure GAME_LETTER
+   '
+   ' This procedure handles the first part of the game. 
+   '
+   Global SPEED,SCORE
+   '
+   ' Open a lowres screen,
+   Screen Open 0,320,200,8,Lowres
+   Cls 0 : Paper 0 : Pen 1
+   Curs Off : Flash Off 
+   '
+   ' Rough palette
+   Palette $0,$EEE,0,$4D,0,$F40
+   '
+   ' Set the position of the large letter on the screen 
+   XBIG=80 : YBIG=24 : SXBIG=160 : SYBIG=100
+   '
+   ' Set the number of tests in the game
+   TIMES=50
+   '
+   ' Wonderful title!   
+   Pen 1 : Centre At(,0)+"Typing Tutor Letter Game"
+   DISPLAY_SCORE
+   '
+   ' Game loop
+   For NUM=1 To TIMES
+      '
+      A$=Chr$(Rnd(25)+Asc("A"))
+      '
+      ' Draw the time bar
+      INIT_TIMER[100]
+      '
+      ' Turns colour 2 to zero: So the zooming process will be invisible!  
+      Colour 2,0 : Wait Vbl 
+      '
+      ' Draw a small letter: First print it in top left corner of the screen 
+      Pen 2 : Print At(0,0);A$;
+      ' Then enlarge it with ZOOM! 
+      Cls 0,XBIG,YBIG To XBIG+SXBIG,YBIG+SYBIG
+      Zoom 0,0,0,8,8 To 0,XBIG,YBIG,XBIG+SXBIG,YBIG+SYBIG
+      ' Lets not forget the small letter 
+      Print At(0,0);" ";
+      ' Make the letter pop up!
+      Colour 2,$FF0
+      '
+      ' Remove any extra key-presses from the keyboard   
+      While Inkey$<>"" : Wend 
+      '  
+      ' Wait for a key (with time out option)  
+      GKEY : K$=Param$
+      F=-1
+      '
+      If K$<>""
+         '
+         K$=Upper$(K$)
+         '
+         ' ESC: quit
+         If K$=Chr$(27) : Exit : End If 
+         '
+         If K$=A$
+            '
+            ' Correct key, let's make some sound 
+            Play %1,49,0 : Play %10,53,0 : Play %100,56,0 : Play %1000,84,25
+            ' Increase the playing speed 
+            SPEED=Min(SPEED+1,100)
+            ' Update the score 
+            SCORE=SCORE+SPEED : DISPLAY_SCORE
+            ' Set the WIN flag to zero 
+            F=0
+            '
+         End If 
+         '
+      End If 
+      '
+      ' If the WIN flag equals 1, the player has FAILED
+      If F
+         '
+         ' Buuuup 
+         Play 5,25
+         ' Reduce the speed 
+         SPEED=Max(SPEED-1,1)
+         ' Display the new speed
+         DISPLAY_SCORE
+         '
+      End If 
+      '
+   Next 
+   '
+End Proc
+Procedure GAME_PHRASES
+   '
+   ' This procedure handles the second part of the game.  
+   ' As it is not very different from the first one, I have 
+   ' only commented on the new parts... 
+   '
+   Global SPEED,SCORE
+   '
+   ' Set the maximum number of phrases. 
+   PMAX=100
+   Dim P$(PMAX)
+   '
+   ' Read the data
+   For P=0 To PMAX
+      Read P$(P)
+      If P$(P)="" : Exit : End If 
+   Next 
+   PMAX=P-2
+   '
+   Screen Open 0,320,200,8,Lowres
+   Cls 0 : Paper 0 : Pen 1
+   Curs Off : Flash Off 
+   Palette $0,$EEE,0,$4D,0,$F40
+   '
+   XBIG=0 : YBIG=64 : SYBIG=24 : YTYPE=12
+   '
+   ' Only 25 loops! 
+   TIMES=25
+   '
+   Pen 1 : Centre At(,2)+"Typing Tutor Phrase Game"
+   DISPLAY_SCORE
+   '
+   For NUM=1 To TIMES
+      '
+      A$=P$(Rnd(PMAX)) : L=Len(A$)
+      '
+      ' Same zooming process, but here, we must adapt ourselves
+      ' to the length of the string... 
+      Colour 2,0 : Wait Vbl 
+      '
+      Pen 2 : Print At(0,0);A$;
+      Cls 0,0,YBIG To 320,YBIG+SYBIG
+      Zoom 0,0,0,L*8,8 To 0,160-L*4,YBIG,160+L*4,YBIG+SYBIG
+      Print At(0,0);String$(" ",L);
+      Centre At(,YTYPE)+String$(" ",39)
+      '
+      ' Timing changes. We count to 100 per letter, just to be fair. 
+      INIT_TIMER[L*100] : DISPLAY_SCORE
+      '
+      Colour 2,$FF0
+      '
+      While Inkey$<>"" : Wend 
+      P=1 : R$=""
+      '
+      ' We need one more loop to check each letter in turn 
+      Repeat 
+         '
+         GKEY : K$=Param$
+         '
+         ' Out of time? 
+         If K$="" : Exit : End If 
+         '
+         ' Quit?
+         If K$=Chr$(27) : Exit 2 : End If 
+         '
+         ' Are we correct?
+         If K$=Mid$(A$,P,1)
+            '
+            ' Yes: make some sound 
+            Play %1,49,0 : Play %10,53,0 : Play %100,56,0 : Play %1000,84,5
+            ' Display the phrase 
+            R$=R$+K$ : Pen 1 : Centre At(,12)+" "+R$+" "
+            ' Compute new score  
+            SCORE=SCORE+TIM
+            ' Go to next letter
+            P=P+1
+            '
+         Else 
+            '
+            ' Missed, play a buuurrrppp  
+            Play 15,5,5
+            '
+         End If 
+         '  
+         ' Are we finished? 
+      Until P>L
+      '
+      If P>L
+         '
+         ' We have won. A bonus!  
+         SCORE=SCORE+SPEED*5 : DISPLAY_SCORE
+         '
+         ' Nice sound 
+         For F=13 To 85
+            Play %1,F,0 : Play %10,F+3,0 : Play %100,F+6,1
+         Next 
+         ' Faster now 
+         SPEED=Min(SPEED+5,100)
+         '
+      Else 
+         '
+         ' Sad sound
+         For F=50 To 1 Step -1
+            Play %1,F,0 : Play %10,F+3,0 : Play %100,F+6,1
+         Next 
+         ' Slower 
+         SPEED=Max(SPEED-10,5)
+         '
+      End If 
+      '
+   Next 
+   '
+   'Change these to what you like. Football teams, friends, records...
+   'But make sure you don't make them too big!
+   PHRASES:
+   Data "LIGHTNING NEVER STRIKES TWICE"
+   Data "TOO MANY COOKS SPOIL THE BROTH"
+   Data "MANY HANDS MAKE LIGHT WORK"
+   Data "BLOOD IS THICKER THAN WATER"
+   Data "TOO HOT TO HANDLE"
+   Data "CLEANLINESS IS NEXT TO GODLINESS"
+   Data "A ROLLING STONE GATHERS NO MOSS"
+   Data "A STICH IN TIME SAVES NINE"
+   Data "COLD HANDS WARM HEART"
+   Data "MORE HASTE LESS SPEED"
+   Data "MANY A TRUE WORD IS SPOKEN IN JEST"
+   Data "POOR AS A CHURCH MOUSE"
+   Data "PENNY WISE POUND FOOLISH"
+   Data "THE SUN SHINES ON THE RIGHTEOUS"
+   Data "EMPTY VESSELS MAKE THE MOST SOUND"
+   Data "IT NEVER RAINS BUT IT POURS"
+   Data "NO SMOKE WITHOUT FIRE"
+   Data "I'LL HAVE YOUR GUTS FOR GARTERS"
+   Data "TWO HEADS ARE BETTER THAN ONE"
+   Data "MONEY HAS NO SMELL"
+   Data "MARRY IN HASTE REPENT AT LEISURE"
+   Data "THE MOON IS A BALLOON"
+   Data ""
+   '
+End Proc
+Procedure DISPLAY_SCORE
+   '
+   Global SCORE,SPEED
+   '
+   ' Simply centre the text!
+   Pen 1 : Locate ,23
+   Centre "   Score:"+Str$(SCORE)+" / Speed:"+Str$(SPEED)+"   "
+   '
+End Proc
+Procedure INIT_TIMER[M]
+   '
+   Global XTIM,YTIM,SXTIM,SYTIM,TMAX,TIM
+   '
+   ' Initialise variables for the timer 
+   XTIM=16 : YTIM=135 : SXTIM=320-XTIM*2 : SYTIM=32
+   Cls 3,XTIM-2,YTIM-2 To XTIM+SXTIM+2,YTIM+SYTIM+2
+   Cls 4,XTIM-1,YTIM-1 To XTIM+SXTIM+1,YTIM+SYTIM+1
+   Cls 5,XTIM,YTIM To XTIM+SXTIM,YTIM+SYTIM
+   '
+   ' Set the scale  
+   TMAX=M : TIM=TMAX
+   '
+End Proc
+Procedure DISPLAY_TIMER[T]
+   '
+   Global XTIM,YTIM,SXTIM,SYTIM,TMAX
+   '
+   ' Just CLS from the current position to the right of screen
+   If T<TMAX
+      '
+      X=XTIM+(SXTIM*T)/TMAX
+      Cls 0,X,YTIM To XTIM+SXTIM,YTIM+SYTIM
+      '
+   End If 
+   '  
+End Proc
+Procedure GKEY
+   '
+   Global TIM,SPEED
+   '
+   Repeat 
+      '
+      ' Check the time 
+      TIM=Max(TIM-SPEED,0) : DISPLAY_TIMER[TIM]
+      '
+      ' Generate a "tick" sound  
+      Play 15,50,1 : Play 15,0,0 : DISPLAY_TIMER[TIM]
+      '
+      ' Wait for a key press for 10 vbl (about 1/5 of a second)  
+      For TT=0 To 9
+         '
+         K$=Inkey$
+         If K$<>"" : Exit 2 : End If 
+         Wait Vbl 
+         '
+      Next 
+      '  
+   Until TIM=0
+   '
+   K$=Upper$(K$)
+   '
+End Proc[K$]

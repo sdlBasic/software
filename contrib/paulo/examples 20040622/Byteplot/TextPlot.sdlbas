@@ -1,0 +1,126 @@
+'--- An example to avoid installed fonts and pictures for
+'---   a mere text displaying (is it useful or useless?)
+'--- Font drawing readed from the hexdump below (z$[]) (8x8pixels)
+'--- Bug: hard to define Textplot(a$) as a sub-routine 
+'--- Bug: prints(asc(chr$(237))) command provides -19 as result (237-256)
+'---   isn't it weird? - can this be related to signed integers?
+
+dim z$[255]
+
+for i=0 to 255:z$[i]="55aa55aa55aa55aa":next
+
+z$[032]="0000000000000000":z$[033]="183c3c1818001800"
+z$[034]="6c6c000000000000":z$[035]="6c6cfe6cfe6c6c00"
+z$[036]="183e603c067c1800":z$[037]="00c6cc183066c600"
+z$[038]="386c6876dccc7600":z$[039]="1818300000000000"
+z$[040]="0c18303030180c00":z$[041]="30180c0c0c183000"
+z$[042]="00663cff3c660000":z$[043]="0018187e18180000"
+z$[044]="0000000000181830":z$[045]="0000007e00000000"
+z$[046]="0000000000181800":z$[047]="03060c183060c000"
+z$[048]="3c666e7e76663c00":z$[049]="1838181818187e00"
+z$[050]="3c66061c30667e00":z$[051]="3c66061c06663c00"
+z$[052]="1c3c6cccfe0c1e00":z$[053]="7e607c0606663c00"
+z$[054]="1c30607c66663c00":z$[055]="7e66060c18181800"
+z$[056]="3c66663c66663c00":z$[057]="3c66663e060c3800"
+z$[058]="0018180000181800":z$[059]="0018180000181830"
+z$[060]="0c18306030180c00":z$[061]="00007e00007e0000"
+z$[062]="30180c060c183000":z$[063]="3c66060c18001800"
+z$[064]="7cc6dededec07800":z$[065]="183c3c667ec3c300"
+z$[066]="fc66667c6666fc00":z$[067]="3c66c0c0c0663c00"
+z$[068]="f86c6666666cf800":z$[069]="fe6660786066fe00"
+z$[070]="fe6660786060f000":z$[071]="3c66c0cec6663e00"
+z$[072]="6666667e66666600":z$[073]="7e18181818187e00"
+z$[074]="0e06060666663c00":z$[075]="e6666c786c66e600"
+z$[076]="f06060606266fe00":z$[077]="82c6eefed6c6c600"
+z$[078]="c6e6f6decec6c600":z$[079]="386cc6c6c66c3800"
+z$[080]="fc66667c6060f000":z$[081]="386cc6c6c66c3c06"
+z$[082]="fc66667c6c66e300":z$[083]="3c6670380e663c00"
+z$[084]="7e5a181818183c00":z$[085]="6666666666663e00"
+z$[086]="c3c366663c3c1800":z$[087]="c6c6c6d6feeec600"
+z$[088]="c3663c183c66c300":z$[089]="c3c3663c18183c00"
+z$[090]="fec68c183266fe00":z$[091]="3c30303030303c00"
+z$[092]="c06030180c060300":z$[093]="3c0c0c0c0c0c3c00"
+z$[094]="10386cc600000000":z$[095]="00000000000000fe"
+z$[096]="18180c0000000000":z$[097]="00003c061e663b00"
+z$[098]="e0606c7666663c00":z$[099]="00003c6660663c00"
+z$[100]="0e06366e66663b00":z$[101]="00003c667e603c00"
+z$[102]="1c36307830307800":z$[103]="00003b66663cc67c"
+z$[104]="e0606c766666e600":z$[105]="1800381818183c00"
+z$[106]="060006060606663c":z$[107]="e060666c786ce600"
+z$[108]="3818181818183c00":z$[109]="000066776b636300"
+z$[110]="00007c6666666600":z$[111]="00003c6666663c00"
+z$[112]="0000dc66667c60f0":z$[113]="00003d66663e0607"
+z$[114]="0000ec766660f000":z$[115]="00003e603c067c00"
+z$[116]="08183e18181a0c00":z$[117]="0000666666663b00"
+z$[118]="00006666663c1800":z$[119]="0000636b6b363600"
+z$[120]="000063361c366300":z$[121]="00006666663c1870"
+z$[122]="00007e4c18327e00":z$[123]="0e18187018180e00"
+z$[124]="1818181818181800":z$[125]="7018180e18187000"
+z$[126]="729c000000000000":z$[127]="cc33cc33cc33cc33"
+
+function hexvl(a$)
+   e=asc(ucase$(a$))
+   hexvl=abs(((e>=48 and e<=57)*(e-48))+((e>=65 and e<=70)*(e-55)))
+ end function
+
+function bytefromhexdump(a$,byteadr)
+   i=(byteadr*2)+1
+   m1$=mid$(a$,i,1):m2$=mid$(a$,i+1,1)
+   tmpr=(hexvl(m1$)*16)+hexvl(m2$) 
+   bytefromhexdump=tmpr
+ end function
+
+sub HexdumpPlot(x,y,a$,i,p)
+  for e=0 to (len(a$)/2)-1
+      v=bytefromhexdump(a$,e)
+    for z=0 to 7:ik=p:z2=7-z   
+      if (((int(v/(2^z2)))mod 2) and (2^z2)) then:ik=i:end if
+      ink(ik):dot(x+z,y+e):next:next
+ end sub
+
+xedge=320:yedge=200:wndwd=1
+setdisplay(xedge,yedge,32,wndwd):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+'--- bug: this way doensn't work - i don't know why
+'text$="Hello world!"
+'for i=1 to len(text$)
+'   hx$=z$[asc(mid$(text$,i,1))]
+'     HexdumpPlot (x*8,y*8,hx$,i1,p1):xpz=xpz+1
+' next
+
+i1=0xFFFFFF
+p1=0xAA4400
+x=5:y=10
+
+
+
+xpz=0
+
+   hx$=z$[asc("H")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("e")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("l")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("l")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("o")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc(" ")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("w")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("o")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("r")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("l")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("d")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+   hx$=z$[asc("!")]
+     HexdumpPlot ((x+xpz)*8,y*8,hx$,i1,p1):xpz=xpz+1
+
+waitkey(k_esc)
+

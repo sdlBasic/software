@@ -1,0 +1,27 @@
+
+xedge=640:yedge=480:xprop=9:yprop=12
+xedgt=xedge\xprop:yedgt=yedge\yprop
+xcur=4:ycur=4
+
+  dim tmx$[xedgt,yedgt]
+
+setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+'- falta TypingDelay
+while(0=0)
+
+  ikv=inkey
+  if ikv<>0 then
+    ik$=chr$(ikv)
+    locate (xcur,ycur)
+    prints(ik$)
+    xcur=xcur+1
+     if xcur>(xedgt-1) then: ycur=ycur+1:xcur=0:end if
+     if ycur>(yedgt-3) then: ycur=0:xcur=0:end if
+  end if
+ wend
+
+
+
+

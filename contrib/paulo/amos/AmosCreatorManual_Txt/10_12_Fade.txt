@@ -1,0 +1,31 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.12        * 
+Rem *               FADE               * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem main loop
+Do 
+   Rem select an image from the disc
+   S$=Fsel$("*.*","","Load screen") : If S$="" Then Edit 
+   Rem fade in picture  
+   NICEIFF[S$]
+   Rem fade out picture 
+   Wait Key : Fade 2 : Wait 16*2
+Loop 
+'--------------------------------------------------------------------------- 
+' This little procedure loads a screen, and makes a FADE 
+' using a clone to store the temporary palette!  
+Procedure NICEIFF[A$]
+   Rem fade colours to zero 
+   Fade 1 : Wait 16
+   Auto View Off 
+   Rem load screen  
+   Load Iff A$,0 : Screen Clone 1 : Screen To Front 0
+   Rem set all colours in screen zero to black
+   For X=0 To 31 : Colour X,0 : Next 
+   View : Auto View On 
+   Rem fade in screen one 
+   Fade 3 To 1 : Screen Close 1
+End Proc
+'--------------------------------------------------------------------------- 

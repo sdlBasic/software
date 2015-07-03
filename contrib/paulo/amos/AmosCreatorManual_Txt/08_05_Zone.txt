@@ -1,0 +1,31 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.5          * 
+Rem *             ZONE$                * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Initialise screen
+Curs Off : Cls 0 : Pen 1 : Paper 0
+Reserve Zone 20
+Rem draw a box 
+Box 0,40 To 310,92
+Rem display the entire list of current keyboard macros 
+For X=0 To 3
+   For Y=0 To 4
+      KN=X*5+Y+1 : K$=Key$(KN)
+      If Len(K$)>9 Then K$=Left$(K$,9)
+      Locate X*10+1,Y+6
+      Rem Create a screen zone around each entry 
+      Print Zone$(K$,KN)
+   Next Y
+Next X
+Rem read zones 
+Do 
+   Rem Get zone number
+   MZ=Mouse Zone
+   If Mouse Key=1 and MZ>0 and MZ=<20
+      Bell 
+      Rem Print option selected
+      Locate 0,23 : Cline : Print "You selected key ";MZ
+   End If 
+Loop 

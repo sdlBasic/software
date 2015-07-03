@@ -1,0 +1,20 @@
+Rem ****************************************** 
+Rem *        AMOS Example 13.1               * 
+Rem *          X and Y Mouse                 *   
+Rem *    (c) Mandarin / Jawx 1990            * 
+Rem ****************************************** 
+Rem
+Curs Off : Cls 0 : Paper 0
+Rem Centre mouse 
+X Mouse=X Screen(160) : Y Mouse=Y Screen(100)
+Rem Print headings 
+Locate 0,0 : Centre "<Reading the mouse>"
+Locate 0,6 : Print "X coordinate is ";
+Locate 0,7 : Print "Y coordinate is ";
+Rem Move mouse 
+Do 
+   Rem Display location using HARDWARE coordinates  
+   Locate 20,6 : Print X Mouse;"  ";
+   Locate 20,7 : Print Y Mouse;"  ";
+   Wait Vbl 
+Loop 

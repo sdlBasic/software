@@ -1,0 +1,23 @@
+'
+'      Bob tutorial #12 - Set Bob with no background replacement   
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0
+Double Buffer 
+'
+'Set Bob 1 up so that it will not replace graphics when moved. Note that 
+'Bob 2 is left in the normal mode and does replace graphics. 
+Set Bob 1,1,%111111,%11101010
+For X=0 To 320 Step 50
+   Plot X,0
+   Draw To 320-X,200
+Next X
+'
+'Bob 1 is displayed higher (y=100) than Bob 2 (y=190)
+For X=200 To 100 Step -1
+   Bob 1,X,100,6
+   Bob 2,300-X,190,5
+Wait Vbl 
+Next X

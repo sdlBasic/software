@@ -1,0 +1,13 @@
+'- i'm not sure if .cin (Kodak Cineon) supports 48-bitdepth (rgb)
+'- or 64-bitdepth (rgb+alpha) - it seems to be supported on CinePaint
+'- (seems to be very useful on 35mm film edition, for example)
+  finp$="cin.cin"
+xedge=256:yedge=212
+  setdisplay(xedge,yedge,32,1)
+  paper (0xffffff):ink (0x000000): pen (0x000000):cls
+  loadimage(finp$,1):pasteicon(0,0,1)
+  waitkey
+
+
+
+

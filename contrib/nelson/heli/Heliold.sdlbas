@@ -1,0 +1,122 @@
+SetDisplay(640,480,32,1)
+SetCaption("HeliAttack V 0.1")
+Randomize()
+SetAutoBack(-3)
+'hide the mouse in the screen
+HideMouse()
+'load fonts
+SetFont("fonts/6809char.TTF")
+'load images
+LoadImage("Images/back.png",0)
+LoadImage("Images/sun.png",1)
+LoadImage("Images/clouds.png",2)
+LoadImage("Images/heli.png",3)
+LoadImage("Images/Sub.png",5)
+'virtual screen for the heli
+screenopen (1,imagewidth(3),imageheight(3),0,0,0,0,0)
+PasteIcon(0,0,3)
+Screen(1)
+k=0
+for y=0 to 0
+	for x =0 to 1
+		k=k+1
+		grab(2+k,x*92,y*82,92,82)
+	next
+next
+
+Common Player_x = int((screenwidth()/2)+imagewidth(3))
+Common Player_y = int((screenheight()/2)+imageheight(3))
+
+common leftd=0, PlayerSpeed = 2
+common rightd=1
+common side = leftd
+ScreenClose(1)
+Screen(0)
+
+Common EnemySpeed[20], EnemyVisible[20], Enemy[20,2], EnemySlot[20]
+'vars global
+dim clouds=0
+
+'Upadate Player sub
+Sub UpdatePlayer()
+	if key(K_UP) then
+		Player_y = Player_y - PlayerSpeed
+	end if
+	if key(K_DOWN) then
+		Player_y = Player_y + PlayerSpeed
+	end if
+	if key(K_LEFT) then
+		side = leftd
+		Player_x = Player_x - PlayerSpeed
+	end if
+	if key(K_RIGHT) then
+		side = rightd
+		Player_x = Player_x + PlayerSpeed
+	end if
+End Sub
+
+Sub Bounderies()
+	player_x = max(player_x,0)
+	player_x = min(player_x,640-BobWidth(3))
+	player_y = max(player_y,0)
+	if player_y > 220 then
+		player_y = 220
+	end if
+End Sub
+
+
+	for i = 0 to 6
+		Enemy[i,1] = 640
+		Enemy[i,2] = 480/2//+rnd(480/2) + BobWidth(5)/2
+		EnemySpeed[i] = int(rnd(3)+1)
+		EnemyVisible[i] = true
+	next
+
+'main loop
+while not key(K_ESC)
+	cls()
+	PasteIcon(0,0,0)
+	Bob(0,540,40,1)
+	Bob(1,0-clouds,0,2)
+	Bob(2,640-clouds,0,2)
+	Bob(3,player_x,player_y,3+side)
+	UpdatePlayer()
+	Bounderies()
+
+	for x = 0 to 6
+		EnemySlot[x] = 4+x
+    next
+
+
+	for s = 0 to 6
+		if EnemyVisible[s] then
+			if Enemy[s,1] < 0 - 92 then
+				Enemy[s,1]=640
+				Enemy[s,2]=480/2//+rnd(480/2) + BobWidth(5)/2
+				EnemySpeed[s]=int(rnd(3)+1)
+				EnemyVisible[s] = true
+			else
+				Enemy[s,1] = Enemy[s,1] - EnemySpeed[s]
+			end if
+		end if
+		if Enemy[s,2] > 480 - 64 then
+			Enemy[s,2] = 480 + 64
+		end if
+	next
+
+	for m = 0 to 6
+		if EnemyVisible[m] then
+			Bob(EnemySlot[m],Enemy[m,1],Enemy[m,2],5)
+		end if
+	next
+
+	clouds = clouds + 1
+	if clouds > 640 then
+		clouds = 0
+	end if
+	Ink(Rgb(255,0,0))
+	text(0,0,20,"Clouds " & clouds)
+	ScreenSwap()
+wend
+'update the screen
+screenswap()

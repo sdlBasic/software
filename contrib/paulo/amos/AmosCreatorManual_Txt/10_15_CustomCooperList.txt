@@ -1,0 +1,47 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.15        * 
+Rem *        Custom copper list        * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Screen Open 0,320,300,16,Lowres
+Cls 0 : Flash Off : Hide On 
+Copper Off 
+Rem Initialise copper list   
+Rem generates a little garbage at the start of the program 
+Cop Move $102,0
+Cop Move $104,0
+Cop Move $108,0
+Cop Move $10A,0
+Rem Set up position and size of current screen 
+Cop Move $8E,$3081
+Cop Move $90,$30C1
+Cop Move $92,$38
+Cop Move $94,$D3
+Rem Give Copper the address of the current screen
+Cop Movel $E0,Logbase(0)
+Cop Movel $E4,Logbase(1)
+Cop Movel $E8,Logbase(2)
+Cop Movel $EC,Logbase(3)
+Cop Move $100,$4200
+Cop Move $96,$8180
+Rem Create a custom copper list
+Rem change colours every three lines from lines 42 to 306
+For Y=42 To 306 Step 3
+   Rem Load colour palette with new values
+   For C=0 To 15
+      Cop Wait 0,Y
+      Cop Move $180+C*2,Y*16+C
+   Next C
+Next Y
+Rem End of copper list 
+Cop Wait 254,255
+Rem Swap Logical and physical copper lists 
+Cop Swap 
+Wait Vbl 
+Rem Draw 15 bars on the screen 
+Hide On 
+For I=1 To 15
+   Ink I : Bar I*20,0 To I*20+19,256
+Next I
+Wait Key 

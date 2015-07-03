@@ -1,0 +1,41 @@
+
+function mousezonedp(x,y,w,h)
+      tmpr=0:xq=xmouse-x:yq=ymouse-y
+   
+   if (yq>0) and (xq>0) and (xq<=w) and (yq<=h) then
+         tmpr=1
+      if (xq+yq)>((w+h)/2) then
+         tmpr=2
+       end if
+    end if
+      mousezonedp=tmpr
+ end function
+
+
+setdisplay (320,240,32,1)
+paper(8^8-1):ink(0):pen(0):cls
+
+box(100,100,120,120)
+line(120,100,100,120)
+
+
+while 0=0
+    waitvbl
+
+if bmouse<>0 then
+  if mousezonedp(100,100,20,20)=0 then:locate(0,0):prints("0   "):end if
+  if mousezonedp(100,100,20,20)=1 then:locate(0,0):prints("1   "):end if
+  if mousezonedp(100,100,20,20)=2 then:locate(0,0):prints("2   "):end if
+else
+  locate(0,0):prints("off ")
+end if
+
+wend
+
+waitkey
+
+
+
+
+
+

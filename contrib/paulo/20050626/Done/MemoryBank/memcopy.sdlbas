@@ -1,0 +1,12 @@
+setdisplay(320,200,32,1)
+   screenopen(1,320,200,0,0,320,200,0):paper(8^8-1):ink(0):pen(0):cls
+   basescreen(2,1)
+for i=(4*320*7)+(4*20) to (4*320*25)+(4*54)
+   poke(2,i,rnd(255))
+ next
+memcopy(2,0,2,4*320*35,4*320*32)
+memcopy(2,0,2,4*320*92,4*320*32)
+memcopy(2,0,2,4*320*150,4*320*32)
+
+
+   waitkey

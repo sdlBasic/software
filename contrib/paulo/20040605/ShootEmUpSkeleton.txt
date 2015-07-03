@@ -1,0 +1,18 @@
+'--    (a shoot-em-up game skeleton)
+'--    (i still don't know how to develop it deeply)
+'--    (i don't know if BossDefeating() is part of GamePlay())
+    AppStartup()
+While appquit=0
+  While gameplaying=0
+     ShowGameLabel()
+     ShowGameStory()
+     ShowDemoPlaying()
+   End While
+  While gameover=0
+     ShowStageStory()
+     StagePlay()
+     StageBoss()
+      stage=stage+1
+   End While
+     RecordScore()
+ End While

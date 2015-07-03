@@ -1,0 +1,17 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.4          * 
+Rem *             REPEAT$              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Initialise screen
+Curs Off : Cls 0 : Pen 1 : Paper 0
+Rem main loop
+Do 
+   Input "Enter some text?";T$
+   Rem Create a repeat string 
+   R$=Repeat$(T$,100)
+   Print R$
+   Rem Display length of repeat string
+   Print : Print "Repeat string is ";Len(R$);" characters long"
+Loop 

@@ -1,0 +1,34 @@
+Rem ************************************ 
+Rem *        AMOS Example 14.6         * 
+Rem *   Beating the 16 object limit    * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem  
+Rem Make a nice new screen 
+Screen Open 0,320,200,8,Lowres
+Rem Conserve memory. Remove on an expanded system
+Close Editor 
+Rem Load some sprite images
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Rem Set up screen
+Cls 0
+Double Buffer : Flash Off : Fade 4 To -1
+Rem Stop amal interrupts 
+Synchro Off 
+Rem Define animation string
+A$=A$+"Anim 0,(1,1)(2,1)(3,1)(4,1);"
+A$=A$+"Update: Let R0=Z(255)+Z(63)-X; Let R1=Z(127)+Z(63)-Y; Let RZ=Z(15)+4;"
+A$=A$+"Move R0,R1,RZ; Jump Update"
+Rem animate 64 octupusses
+For I=0 To 63
+   Set Bob I,1,%111,
+   Bob I,Rnd(320)+1,Rnd(200)+1,Rnd(3)+1
+   Channel I To Bob I
+   Amal I,A$
+Next I
+Amal On 
+Rem Main loop
+Repeat 
+   Rem Execute AMAL programs
+   Synchro : Wait Vbl 
+Until Mouse Key

@@ -1,0 +1,23 @@
+'-- ScreenSaver - rnd8x8
+'-- Paulo Silva (GPL) - 200405091855 (sdlBasic version)
+'-- (HotSoupProcessor version (tokenized and interpreted)
+'--    is about 100 times faster =(((( )
+
+xedge=800:yedge=600
+'-- xedge and yedge vars would be from current
+'-- OS display mode
+
+setdisplay(xedge,yedge,32,0)
+ autoback(0):mousehide()
+ paper(0x7f7f7f):cls
+
+while(0=0)
+   c=rgb(rnd(255),rnd(255),rnd(255))
+   xp=rnd(xedge-8):yp=rnd(yedge-8)
+   ink(c):pen(c)
+   bar(xp,yp,xp+8,yp+8)
+
+    screenswap()
+     if key(27) then : end :end if
+
+ wend

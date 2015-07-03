@@ -1,0 +1,18 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.2         * 
+Rem *           Limit mouse            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Curs Off : Cls 0 : Paper 0
+Centre "Use LEFT mouse button to activate limit"
+Locate 0,1
+Centre "RIGHT button removes it again"
+Box 80,50 To 240,150
+Do 
+   If Mouse Key=1
+      Limit Mouse X Hard(0,80),Y Hard(0,50) To X Hard(0,240),Y Hard(0,150)
+      X Mouse=X Hard(0,160) : Y Mouse=Y Hard(0,100)
+   End If 
+   If Mouse Key=2 Then Limit Mouse 
+Loop 

@@ -1,0 +1,8 @@
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+for a=1 to 15
+    b=rnd(10):c=rnd(10)
+  if b>c then
+     prints(str$(b)+","+str$(c)+": b is greater than c")
+   end if
+ next
+waitkey

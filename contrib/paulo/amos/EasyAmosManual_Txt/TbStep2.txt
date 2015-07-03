@@ -1,0 +1,307 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                          STEP TWO: The collisions
+'----------------------------------------------------------------------------
+'
+' When we are designing our games, we need to take special care over 
+' the interactions between the various screen elements.  
+'
+' There are three main types of interactions in our Tricycle Ball program. 
+'
+' 1. The rebounds between players' trikes and the walls. 
+'  
+'    Whenever a trike hits one of the screen boundaries, it will 
+'    bounce straight back into the playing area. 
+'  
+' My first attempts checked for a collision  by simply looking under 
+' the CENTER of the tricycle. Unfortunately, this detected the rebound   
+' when the tricyle was half over a wall! So after a few hours of despair,
+' I went back to the drawing board, and placed the dimenensions of each trike    
+' image into the XH and YH arrays. This allowed me to perform my checks at 
+' the actual edges of the trikes, and improved my rebound effects no end!  
+'    
+' 2. A collision between two players trikes. 
+'      
+'
+' This turned out to be very easy. Since both trikes are being displayed 
+' using Bobs, I was able to make use of a simple BOB COL function. 
+'
+' 3. The interaction between the player and the ball (See a later tutorial)  
+'
+'
+' Note I have only commented the NEW lines in this program, and I have 
+' removed the existing remarks from program 1. 
+' Hopefully this will make it much easier to spot the additions.   
+' Just search for the *** from the editor to jump straight to the new stuff! 
+'
+' Here goes! 
+'----------------------------------------------------------------------------  
+'
+Close Editor 
+Hide On 
+PATH$="Easy_Examples:"
+'
+' These variables are exactly the same as the ones in the first program    
+Dim XP(1),YP(1),XDP(15),YDP(15),DB(1),DP(1),SP(1),IP(15,1),FL(1)
+Dim XR(1),YR(1)
+' ***
+' XH() and YH() hold the SIZE of the player's tricycle, in each direction. 
+Dim XH(15),YH(15)
+' ***
+' XHH() and YHH() hold the size of the front of the player's tricycle. 
+Dim XHH(15),YHH(15)
+' ***
+' CP() is a counter for collision detection
+' CB() hold the numbers of the bobs which have collided    
+' CC() counts the number of collisions we have detected  
+' XC() and YC() store the coordinates on the screen we'll display the BANG bob 
+Dim CP(1),CB(1),CC(1),XC(1),YC(1)
+'
+' As always we'll make our main variables global 
+' to allow them to be accessed from within our procedures
+Global XP(),YP(),XDP(),YDP(),DB(),DP(),SP(),IP(),FL()
+Global XR(),YR()
+Global P2BOB,BBP,BBB,PSIZE
+Global PLA
+Global XC(),YC()
+Global XH(),YH(),XHH(),YHH(),CP(),CB(),CC()
+'
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+Load PATH$+"Pictures/Tricycle_Screen.Abk",10
+Load PATH$+"Pictures/Tricycle_Playfield.Abk",11
+'
+GAME_INIT
+'
+For P=0 To 1
+   XP(P)=160*32 : YP(P)=50*32+P*25*32
+Next 
+'
+GAME
+'
+ALL_ERASE
+Edit 
+'
+Procedure GAME_INIT
+   '
+   BBP=1 : P2BOB=10
+   ' ***
+   ' BBB holds the image number used by the BANG BoB. 
+   BBB=4
+   ' ***
+   ' PSIZE stores the size of our trikes. It's used later in our calculations 
+   PSIZE=10
+   ' ***
+   ' This is the same loop as the previous version, but it also calculates the  
+   ' contents of the XH and YH arrays. These hold to the size of the  
+   ' tricycle in each possible movement direction...
+   Restore _DIRECTIONS
+   ANGLE#=Pi#/2.0 : A=32 : B=3 : S=8
+   For D=0 To 15
+      XDP(D)=S*Cos(ANGLE#) : YDP(D)=-S*Sin(ANGLE#)
+      XH(D)=A*Cos(ANGLE#) : YH(D)=-A*Sin(ANGLE#)
+      XHH(D)=B*Cos(ANGLE#-Pi#/2) : YHH(D)=-B*Sin(ANGLE#-Pi#/2)
+      ANGLE#=ANGLE#-Pi#/8.0
+      Read IP(D,0),IP(D,1)
+   Next 
+   '
+   Unpack 11 To 1
+   ' ***
+   ' We'll now create some screen zones for the borders of the playfield
+   ' This will allow us to instantly find out whether a trike has hit a wall, 
+   ' using the ZONE function. 
+   ' Ten screen zones 
+   Reserve Zone 10
+   ' There's one zone for each side of the playing area 
+   ' Set Top and Bottom edges 
+   Set Zone 1,21,0 To 223,24 : Set Zone 2,21,487 To 220,511
+   ' Set left and right edges 
+   Set Zone 3,0,21 To 25,487 : Set Zone 4,220,24 To 256,487
+   ' Set Top left and Top right corners 
+   Set Zone 5,0,0 To 21,24 : Set Zone 6,220,0 To 256,24
+   ' Set Bottom Left and Bottom Right corner points 
+   Set Zone 7,0,486 To 24,511 : Set Zone 8,220,487 To 256,511
+   '
+   Pop Proc
+   '
+   _DIRECTIONS:
+   Data 1,2
+   Data 3,4
+   Data 5,6
+   Data 7,8
+   Data 9,10
+   Data Vrev(7),Vrev(8)
+   Data Vrev(5),Vrev(6)
+   Data Vrev(3),Vrev(4)
+   Data Vrev(1),Vrev(2)
+   Data Rev(3),Rev(4)
+   Data Rev(5),Rev(6)
+   Data Rev(7),Rev(8)
+   Data Hrev(9),Hrev(10)
+   Data Hrev(7),Hrev(8)
+   Data Hrev(5),Hrev(6)
+   Data Hrev(3),Hrev(4)
+   '
+End Proc
+Procedure GAME
+   ' As before
+   Repeat 
+      '
+      MOVE_PLAYER[0]
+      MOVE_PLAYER[1]
+      '
+      A$=Inkey$
+      If A$=Chr$(27) : Exit : End If 
+      If A$=" " : PLA=1-PLA : End If 
+      '
+      Wait Vbl : Wait Vbl : Wait Vbl 
+      '
+   Until 0
+   '
+End Proc
+Procedure C0LLIDE[P,C]
+   ' ***
+   ' This procedure handles the rebounds between the players' trikes
+   '
+   ' P holds the number of the player,  
+   ' C the number of the bob colliding with it. 
+   '
+   ' Let's  use an ON GOTO command to choose the player.  
+   ' We can extend this later to handle the ball.   
+   On C Goto CYCLE,CYCLE
+   Pop Proc
+   ' ***
+   ' Do collision 
+   CYCLE:
+   ' ***
+   ' We'll first work out the number of the opposing player.
+   Q=1-P
+   ' ***
+   ' Now to make him bounce (see in MOVE_PLAYER)  
+   CP(Q)=1 : SP(Q)=SP(P)+4*Sgn(SP(P)) : DP(Q)=DP(P) : Bob Off BBB+Q
+   ' ***
+   ' Finally, we'll bounce the colliding player (P) 
+   CB(P)=B : CP(P)=1 : CC(P)=CC(P)+1 : SP(P)=-Min(SP(P),8)
+   Pop Proc
+   '
+End Proc
+Procedure MOVE_PLAYER[P]
+   '
+   FL(P)=FL(P)+1
+   ' ***
+   ' If a collision has been detected, the CP() flag is SET to 1
+   ' and the tricycle is bouncing 
+   If CP(P)
+      If SP(P)
+         ' ***
+         ' If the player is still moving, we have got to stop it! 
+         SP(P)=SP(P)-Sgn(SP(P))
+      Else 
+         ' ***
+         ' When speed is zero, the rebound has stopped
+         ' So we can reset the movement direction back to normal, using to      
+         ' the bob's original direction...  
+         CP(P)=CP(P)-1 : DP(P)=DB(P)
+      End If 
+   End If 
+   ' ***
+   ' If there hasn't been a collision, we can test the joystick!
+   If CP(P)=0
+      ' Read the joystick  
+      If P=PLA : J=Joy(1) : End If 
+      ' ***
+      ' No collision: So we'll set the collision flags to zero 
+      CB(P)=0 : CC(P)=0
+      ' If joystick UP then go faster  
+      If J and 1 : If SP(P)<16 : SP(P)=SP(P)+3 : End If : End If 
+      ' If DOWN then go slower 
+      If J and 2 : If SP(P)>-16 : SP(P)=SP(P)-3 : End If : End If 
+      ' If  LEFT then turn left  
+      If J and 4 : DP(P)=DP(P)-1 : If DP(P)<0 : DP(P)=15 : End If : DB(P)=DP(P) : End If 
+      ' IF RIGHT then turn right 
+      If J and 8 : DP(P)=DP(P)+1 : If DP(P)>15 : DP(P)=0 : End If : DB(P)=DP(P) : End If 
+      ' FIRE slams on the brake! 
+      If J and 16 : SP(P)=0 : End If 
+      '  
+   End If 
+   '
+   XP(P)=XP(P)+XDP(DP(P))*SP(P)
+   YP(P)=YP(P)+YDP(DP(P))*SP(P)
+   '
+   XR(P)=XP(P)/32 : YR(P)=YP(P)/32
+   '
+   S=Sgn(SP(P))
+   I=IP(DB(P),Abs(S)*(FL(P) mod 2))
+   Bob BBP+P,XR(P),YR(P),I+P2BOB*P
+   ' ***
+   ' Handle rebounds
+   '
+   ' Depending on the direction, we find the screen position of the front 
+   ' of the tricycle.   
+   ' PSIZE holds the minimum distance between the trike and a wall before   
+   ' a collision will be detected. Try experimenting with different values
+   ' XD and YD point to the CENTER FRONT of the tricycle (the front wheel!) 
+   ' S =1 if the trike is moving forwards, and -1 if it's reversing 
+   XD=XR(P)+S*(XH(DP(P))*PSIZE)/32 : YD=YR(P)+S*(YH(DP(P))*PSIZE)/32
+   ' ***
+   ' Check for  collisions with the other trike 
+   C=Bob Col(BBP+P,BBP To 5)
+   ' ***
+   ' Now, we check the zones under the wheel, and left and right of it...   
+   ' If the Zone function finds a screen boundary, it will return a positive
+   ' value, otherwise it will return a zero. So if a collision has been 
+   ' successfully detected, the MAX's will automatically give us  
+   ' the required Zone number.      
+   ' Note: If the trike hit a couple of zones, we'd get the MAXIMUM zone  
+   ' number rather than the closest. That's why we've defined separate zones  
+   ' for the corner points. 
+   A=Max(Zone(XD,YD),Max(Zone(XD+XHH(DP(P)),YD+YHH(DP(P))),Zone(XD-XHH(DP(P)),YD-YHH(DP(P)))))
+   ' ***
+   ' If we are bouncing too much, we'd better stop! 
+   If CC(P)>3
+      SP(P)=0 : CP(P)=0 : CC(P)=1
+      A=0 : C=0 : Bob Off BBB+P
+   End If 
+   '  
+   If A
+      ' ***
+      ' If a player has hit a border, we'll generate the appropriate bounce
+      ' effect. There are four stages. 
+      '
+      ' 1: Set the CP() flag. This tells the rest of our program that we 
+      '    are going to display the BANG effect on the screen (CP(P)=3)
+      '  
+      ' 2: Set the position where to put the BANG bob (XC(P)=XD:YC(P)=YD)  
+      '  
+      ' 3: Increment the collision counter. (CC(P)=CC(P)+1)  
+      '
+      CP(P)=3 : XC(P)=XD : YC(P)=YD : CC(P)=CC(P)+1
+      '
+      ' 4: Calculate the rebound speed.  
+      '    Since we are bouncing, this will be negative
+      SP(P)=-S*Min(Max(Abs(SP(P)+6),4),8)
+   Else 
+      If C
+         ' ***
+         ' Handle rebounds between two players  
+         '  
+         ' 1: Get the number of the bob involved in collision 
+         '  
+         ' 2: If it's different from the last time, call the collision    
+         '    procedure again 
+         '
+         B=Col(-1) : If B<>CB(P) : C0LLIDE[P,B] : End If 
+      End If 
+   End If 
+   ' ***
+   ' BANG!
+   ' If CP() flag=3, we'll display the BANG bob at the selected position  
+   If CP(P)=3 : Bob BBB+P,XC(P)+Rnd(4),YC(P)+Rnd(4),21 : End If 
+   ' ***
+   ' When the counter in CP(P) returns to zero, the bob will be erased. 
+   If CP(P)=2 : Bob Off BBB+P : End If 
+   '
+End Proc
+Procedure ALL_ERASE
+   For B=1 To 15 : Erase B : Next 
+End Proc

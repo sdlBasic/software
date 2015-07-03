@@ -1,0 +1,6 @@
+setdisplay(240,320,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for f=1 to 20
+a=100-int(rnd(200))
+prints("abs("+str$(a)+")="+str$(abs(a)))
+next
+waitkey

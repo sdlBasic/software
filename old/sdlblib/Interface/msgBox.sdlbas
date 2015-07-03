@@ -1,0 +1,26 @@
+'
+' sdlBasic test: msgBox  
+' 
+'   Name:      msgbox.sdlbas
+'   Purpose:   test the command msgbox 
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+'  Bugs: slow	 
+'
+' Todo:
+'   key commands
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+include "interface.sdlblib"
+setautoback(50)
+
+sub main
+	prints( "Restituito:" + str$( msgbox("prova",1,"test tipo 1")))
+	prints("Restituito:" + str$( msgbox("prova",2,"test tipo 2")))
+	prints("Restituito:" + str$( msgbox("prova",3,"test tipo 3")))
+	prints("Restituito:" + str$( msgbox("prova",4,"test tipo 4")))
+
+	msgBox("il test e' finito",1,"test msgBox")
+end sub
+
+main

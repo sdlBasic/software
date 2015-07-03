@@ -1,0 +1,96 @@
+'
+' sdlBasic game: IO
+' 
+'   Name:      io.sdlbas
+'   Purpose:   simple clone of cult c64 shotem'up  
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+' Bugs:
+'
+' Todo:
+'  ALL!!!
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+setdisplay(640,480,32,1)
+autoback(0)
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'common variables
+
+common level		' current level
+common xpos		'current scroll position
+
+'player
+common live 		'number of lives
+common x
+common y
+common state
+common bullet_x[10]
+common bullet_y[10]
+common bullet_type[10]
+common bullet_state [10]	
+ 
+'enemy
+common enemy_type[250]
+common enemy_state[250]
+common enemy_x[250]
+common enemy_y[250]
+common enemy_bullet_state[250]
+common enemy_bullet_x[250]
+common enemy_bullet_y[250]
+
+
+
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'modules
+
+include "filegraphics.sdlblib"
+
+include "title/title.sdlbas"
+
+include "player/player.sdlbas"
+
+'include "enemy/enemy1/enemy1.sdlbas"
+
+
+include "level/level1/level1.sdlbas"
+
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'init
+sub init
+player_init
+
+end sub
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'game
+sub game
+	live=3
+	level=1
+
+	while key(27)=0
+		select  case level
+			case 1
+				level1	
+		end select
+		
+	if live=0 then
+		exit while
+	end if	
+	end while
+end sub
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'main loop
+sub main
+	init
+	while key(27)=0
+		title
+		game
+	end while
+end sub
+main

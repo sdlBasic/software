@@ -1,0 +1,20 @@
+After some work, sdlBasic now works completely on FreeBSD!
+
+For compile sdlBasic on FreeBSD you'll need:
+gmake, libsdl, libsdl_mixer, libsdl_image, libsdl_net, libsdl_ttf and smpeg (libsmpeg)
+All of these packages are available in the ports collection
+
+Then, if you've installed the packages above,
+do:
+
+gmake -f Makefile.fbsd
+
+For install sdlBasic, do:
+
+gmake -f Makefile.fbsd install
+
+clean the sources:
+
+gmake -f Makefile.fbsd clean
+
+Tails92 _ The "open source" two-tailed fox _ aka %gsan92%

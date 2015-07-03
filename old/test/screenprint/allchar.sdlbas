@@ -1,0 +1,22 @@
+'
+' allchar sdlBasic Test
+'
+setautoback(25)
+curson
+x=0
+y=0
+for i = 0 to 255
+	x=x+1
+	if x>16 then
+		x=0
+		y=y+1
+	end if
+	locate(x,y)
+	print i
+	prints ( chr$(i))
+next
+prints("fine")
+ prints(space$(201))
+ locate(atx,aty)
+screenswap
+ waitkey

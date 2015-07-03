@@ -1,0 +1,9 @@
+setdisplay(240,320,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+ clocktimer=val(mid$(time$,7,2))
+ clocktimer=((val(mid$(time$,4,2)))*60)+clocktimer
+ clocktimer=((val(mid$(time$,1,2)))*3600)+clocktimer
+ randomize(clocktimer)
+for f=1 to 20
+prints(rnd(30000))
+next
+waitkey

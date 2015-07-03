@@ -1,0 +1,17 @@
+'
+'      Screen tutorial #09 - Zoom  
+'
+Screen Open 0,320,100,16,Lowres
+Curs Off : Cls 0 : Flash Off 
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Get Sprite Palette 
+Paste Bob 120,10,1
+Screen Open 1,320,100,16,Lowres
+Curs Off : Cls 0 : Flash Off 
+Get Sprite Palette 
+Screen Display 1,,151,,
+For WIDTH=40 To 320 Step 20
+   Cls 0
+   Zoom 0,120,10,181,97 To 1,0,0,WIDTH,100
+   Wait Key 
+Next WIDTH

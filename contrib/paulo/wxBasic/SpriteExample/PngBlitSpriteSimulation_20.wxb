@@ -1,0 +1,104 @@
+'___ how can i remove the flicker?
+  randomize: common xsz=480,ysz=360,tx=0,ty=0:dim dc
+
+  dim sprn=1600,maxspd=4
+
+  dim xdr[sprn],ydr[sprn],xpo[sprn],ypo[sprn]
+for i=0 to sprn
+'   xdr[i]=rnd(maxspd*2)-maxspd:ydr[i]=rnd(maxspd*2)-maxspd:xpo[i]=1:ypo[i]=1
+   xdr[i]=1:ydr[i]=1:xpo[i]=1:ypo[i]=1
+ next
+  frame=new wxFrame(Null,-1,"wxBasic sprite example (hard to close window)",wxPoint(0,0),wxSize(xsz,ysz+26),wxSIMPLE_BORDER|wxCAPTION|wxSYSTEM_MENU)
+  frame.Centre()
+  Const wxID_Timer=wxID_HIGHEST+1
+  Common myTimer=New wxTimer(frame,wxID_Timer):myTimer.Start(10,False) 
+  Common bmp=wxEmptyBitmap(xsz,ysz):Common bmpDC=wxMemoryDC()
+  bmpDC.SelectObject(bmp):bmpDC.Clear()
+Function loadBmp(name)
+   Dim myXPM=New wxEmptyBitmap(0,0)
+   If !myXPM.LoadFile(name,wxBITMAP_TYPE_PNG) Then:frame.Close():End If
+   Dim myDC=new wxMemoryDC():myDC.SelectObject(myXPM):Return myDC
+ End Function
+   Common crop=loadBmp("PngBlitSpriteSimulation.png")
+
+
+
+
+Sub RedrawScr () 
+  dc=wxClientDC(frame)  
+  bmpDC.Clear () 
+  //bground 
+  for xt=0 to xsz step 32        
+    for yt=0 to ysz step 32 
+      bmpDC.Blit(xt,yt,32,32,crop,0,0,wxCOPY) 
+    next      
+  next 
+  //cubes 
+  for i=0 to sprn     
+    bmpDC.Blit(xpo[i],ypo[i],32,32,crop,64,0, wxAND) 
+    bmpDC.Blit(xpo[i],ypo[i],32,32,crop,32,0,wxXOR)  
+  next 
+  dc.Blit (0,0, dc.GetSizeX (),dc.GetSizeY (), bmpDC, 0,0) 
+End Sub 
+
+Sub DoTimer(event) 
+  //just calculate positions 
+  for i=0 to sprn 
+    xpo[i]+=xdr[i] 
+    if xpo[i]>(xsz-32) then 
+      xpo[i]=0 
+    end if 
+    if xpo[i]<0 then 
+      xpo[i]=(xsz-32) 
+    end if 
+    ypo[i]+=ydr[i] 
+    if ypo[i]>(ysz-32) then 
+      ypo[i]=0 
+    end if 
+    if ypo[i]<0 then 
+      ypo[i]=(ysz-32) 
+    end if       
+  next 
+  //refresh 
+  RedrawScr () 
+  i=rnd(sprn) 
+  xdr[i]=rnd(8)-4 
+  ydr[i]=rnd(8)-4   
+End Sub 
+Connect(frame,wxID_Timer,wxEVT_TIMER,"DoTimer") 
+
+
+
+
+
+
+
+
+
+
+
+'Sub DoTimer(event)
+'    bmpDC.Clear:dc=wxClientDC(frame) 
+'  for xt=0 to xsz-1 step 32:for yt=0 to ysz-1 step 32
+'     dc.Blit(xt,yt,32,32,crop,0,0,wxCOPY)
+'   next:next
+'  for i=0 to sprn
+'    xpo[i]+=xdr[i]
+'      if xpo[i]>(xsz-32) then:xpo[i]=0:end if
+'      if xpo[i]<0 then:xpo[i]=(xsz-32):end if
+'     ypo[i]+=ydr[i]
+'      if ypo[i]>(ysz-32) then:ypo[i]=0:end if
+'      if ypo[i]<0 then:ypo[i]=(ysz-32):end if
+'    dc.Blit(xpo[i],ypo[i],32,32,crop,64,0,wxAND)
+'    dc.Blit(xpo[i],ypo[i],32,32,crop,32,0,wxXOR)
+'  next
+'   if rnd(100)<7 then
+'    i=rnd(sprn):xdr[i]=rnd(8)-4:ydr[i]=rnd(8)-4
+'   end if
+' End Sub
+'   Connect(frame,wxID_Timer,wxEVT_TIMER,"DoTimer")
+
+
+
+
+frame.Show(True)

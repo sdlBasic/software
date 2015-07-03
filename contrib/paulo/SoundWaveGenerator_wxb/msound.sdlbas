@@ -1,0 +1,83 @@
+ common wvfat=0,xscnv=256,yscnv=128
+ randomize
+
+setdisplay(640,480,0,1)
+
+'---------------------------------------------------------------------------------------------------------------------------------------
+Function mdle(a,b)
+    mdle=((a/b)-(int(a/b)))*b
+End Function
+'---------------------------------------------------------------------------------------------------------------------------------------
+Function wvf(a,k)
+    if k=0 then
+	wvf=sin(a*6.283184)
+    End If
+    if k=1 then
+	tmpr=(mdle(a+.75,1))*4
+	if tmpr >= 2 then
+	    tmpr=4-tmpr
+	end if
+	tmpr=tmpr-1
+	wvf=tmpr*(-1)
+    End If
+    if k=2 then
+	tmpr=-1
+	if (mdle(a,1))>=.5 then
+	    tmpr=1
+	end if
+	wvf=tmpr*(-1)
+    End If
+End Function
+'---------------------------------------------------------------------------------------------------------------------------------------
+Sub waveout(freq,k)
+    ws=5000 '5916
+    hws=int(ws/256)
+    lws=andbit(ws,255)
+    hs=127
+    '    R   I   F   F   D   ?   ?   ?   W   A   V   E   f   m   t
+    a$="082 073 070 070 068 023 000 000 087 065 086 069 102 109 116 032 016 000 000 000 001 000 001 000 017 "
+    '                                                      d   a   t   a
+    a$= a$ + "043 000 000 017 043 000 000 001 000 008 000 100 097 116 097 "
+    '             Len data low byte            len data hi byte
+    a$= a$ + right$("000"+str$(lws),3)+" "+right$("000"+str$(hws),3)+" "+"000 000 000 000 000 000 "
+
+    open "test.wav" for output as #1
+
+
+    for i=1 to len(a$) step 4
+	b=val(mid$(a$,i,3))
+	WriteByte(1,b)
+    next
+
+    f1=2^(freq/10) 'freq
+    print f1
+
+    wsp=(5000/ws)
+    print wsp
+    for i=1 to ws
+	select case (k)
+	    case "0"
+		a1=sin((i/ws)*(f1/wsp)*6.283184)
+	    case "1"
+		a1=wvf((i/ws)*(f1/wsp),1)
+	    case "2"
+		a1=wvf((i/ws)*(f1/wsp),2)
+	end select
+
+	'am=hs+(hs*(clpam(((a1)/3),clpn,ampr)))
+	am=hs+(a1*hs)
+	am=(0*(abs(am<0)))+(255*(abs(am>255)))+(am*((am>=0)and(am<=255)))
+	WriteByte(1,am)
+    next
+    close #1
+ End Sub
+'---------------------------------------------------------------------------------------------------------------------------------------
+i=90
+for i = 50 to 150
+    locate(1,1)
+    prints(i)
+    waveout(i,0)
+    loadsound("test.wav",1)
+    playsound(1,1)
+next
+waitkey

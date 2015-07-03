@@ -1,0 +1,27 @@
+Rem ************************************ 
+Rem *        AMOS Example 15.1         * 
+Rem *           Icon  masks            *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem create some icons
+MAKE_ICONS
+Rem set up screen
+Curs Off : Cls 0
+Centre "<Click the mouse to create mask>"
+Rem main loop
+Do 
+   Rem display a random icon at a random position 
+   Paste Icon Rnd(Screen Width)+1,Rnd(Screen Height)+10,Rnd(8)+1
+   Rem make icon mask 
+   If Mouse Key Then Make Icon Mask : Cls 0
+Loop 
+Procedure MAKE_ICONS
+ Rem generate nine simple icons 
+ For I=1 To 9
+   Cls 0,0,0 To 65,65
+   Ink 2,0 : Box 0,0 To 63,63
+   Ink 3 : Text 32,32,Str$(I)-" "
+      Get Icon I,0,0 To 64,64
+   Next I
+End Proc

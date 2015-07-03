@@ -1,0 +1,50 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.3         * 
+Rem *          Menu tutorial           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Open a high resolution screen
+Screen Open 0,640,200,8,Hires
+Rem Set up menu style
+Menu Tline 1
+Menu Bar 2
+Menu Separate 3
+Rem Define menu
+For L1=1 To 4
+   Rem define title 
+   Menu$(L1)=Str$(L1)
+   For L2=1 To 4
+      Rem create first level 
+      Menu$(L1,L2)="(lo 2,0)"+Str$(L1)+Str$(L2)+" "
+      For L3=1 To 4
+         Rem generate second level
+         Menu$(L1,L2,L3)=Str$(L1)+Str$(L2)+Str$(L3)+" "
+         For L4=1 To 2
+            Rem create third menu
+            Menu$(L1,L2,L3,L4)=Str$(L1)+Str$(L2)+Str$(L3)+Str$(L4)+" "
+         Next 
+      Next 
+   Next 
+Next 
+Menu On 
+Locate 0,5 : Centre "<Menu tutorial>"
+Locate 0,14 : Print "First press the RIGHT button to bring the menu onto the screen."
+Do 
+   If Mouse Key=2 Then Exit 
+Loop 
+Locate 0,0 : Print "                                       "
+Print 
+Locate 0,14 : Print "Now position the mouse pointer over a number and drag it ";
+Print "down to hightlight " : Print "one of the options. A second menu level will be ";
+Print "displayed to the right. " : Print "Each item in the first menu has its own separate menu box."
+Print "Move the mouse over the new menu to bring up a third level." : 
+Print "As you position the cursor over each item, the menu on the right will change."
+Print "Place the cursor over any item in the third menu and release the mouse button."
+Print "The option you have selected will be displayed on the screen."
+Rem Main loop
+Do 
+   Rem Read menu
+   If Choice Then Locate 0,22 : Print "You selected item",Choice(1),Choice(2),Choice(3),Choice(4)
+Loop 
+Wait Key 

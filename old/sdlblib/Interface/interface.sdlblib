@@ -1,0 +1,724 @@
+'
+' sdlBasic library: interface
+'
+'   Name:      interface.sdlblib
+'   Purpose:   basic library to implements
+'
+'
+'
+'
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+' Bugs:
+'
+' Todo:
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'state
+const i_Draw=-1
+const i_Wait=0
+const i_MouseIn=1
+const i_MouseOut=2
+const i_Clicked=3
+const i_ClickedOut=4
+
+'common variables
+common paper_color
+common panel_color
+common pen_color
+common parentx,parenty
+
+'preset variable
+paper_color=0
+panel_color=rgb(80,80,255)
+pen_color=rgb(255,255,255)
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function iFrame(state,x,y,w,h,title$)
+	parentx=x
+	parenty=y-1
+
+	gx=x*9
+	gy=(y)*12
+	gw=w*9
+	gh=h*12+1
+	if state<> i_wait then
+		ink(panel_color)
+		bar(gx+2,gy+2,gx+gw-2,gy+gh-2)
+		ink(pen_color)
+		box(gx+1,gy+1,gx+gw-1,gy+gh-1)
+		'titolo
+		ink(pen_color)
+		bar(gx,gy,gx+gw,gy+20)
+		paper(pen_color)
+		pen(paper_color)
+		locate (x,y):prints(title$)
+	end if
+	screenswap
+	return state
+end function
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function iBox(state,x,y,w,h)
+	parentx=x
+	parenty=y
+	gx=x*9
+	gy=y*12
+	gw=w*9
+	gh=h*12+1
+
+	if state= i_draw then
+		ink(panel_color)
+		bar(gx-1,gy-1,gx+gw+1,gy+gh+2)
+		ink(pen_color)
+		box(gx-2,gy-2,gx+gw+2,gy+gh+3)
+		state=i_wait
+	end if
+
+	if mousezone(gx,gy,gw,gh) then
+		if bmouse=1 then
+			if state= i_mousein then
+				state=i_Clicked
+			end if
+		else
+			if state= i_wait then
+				state=i_mousein
+			end if
+		end if
+	else
+		if bmouse=1 then
+			ink(paper_color)
+			bar(gx-2,gy-2,gx+gw+3,gy+gh+4)
+			state=i_clickedout
+		else
+			state=i_mouseout
+
+		end if
+	end if
+	screenswap
+	return state
+end function
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function ilabel(state,cx,cy,caption$)
+
+	x=cx+parentx
+	y=cy+parenty
+
+	gx=x*9
+	gy=y*12
+                   gw= len(caption$)*9
+	gh=16
+
+	if mousezone(gx,gy,gw,gh)=1 then
+		if bmouse=1 then
+			if state =i_mousein then
+				pen(pen_color)
+				paper(panel_color)
+				locate (x,y):prints(caption$)
+				state=i_clicked
+				while bmouse <>0:end while
+			end if
+		else
+			if state =i_wait then
+				pen(pen_color)
+				paper(panel_color)
+				locate (x,y):prints(caption$)
+				state=i_mousein
+			end if
+		end if
+	else
+		if state <>i_wait then
+			pen(pen_color)
+			paper(panel_color)
+			locate (x,y):prints(caption$)
+			state=i_wait
+		end if
+	end if
+	screenswap
+	return state
+end function
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function iMenu(state,cx,cy,caption$)
+
+	x= cx +  parentx
+	y= cy + parenty
+
+	gx=x*9
+	gy=y*12
+                   gw= len(caption$)*9
+	gh=14
+
+	if mousezone(gx,gy,gw,gh)=1 then
+		if bmouse=1 then
+			if state =i_mousein then
+				pen(panel_color)
+				paper(pen_color)
+				locate (x,y):prints(caption$)
+				state=i_clicked
+				while bmouse <>0:end while
+			end if
+		else
+			if state =i_wait then
+				pen(panel_color)
+				paper(pen_color)
+				locate (x,y):prints(caption$)
+				state=i_mousein
+			end if
+		end if
+	else
+		if state <>i_wait then
+			pen(pen_color)
+			paper(panel_color)
+			locate (x,y):prints(caption$)
+			state=i_wait
+		end if
+	end if
+	screenswap
+	return state
+end function
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function  iButton(state,cx,cy,caption$)
+
+	x=cx+parentx
+	y=cy+parenty
+
+	gx=x*9
+	gy=(y)*12
+                   gw= len(caption$)*9+1
+	gh=16
+
+	if mousezone(gx,gy,gw,gh)=1 then
+		if bmouse=1 then
+			if state =i_mousein then
+				ink(pen_color):bar (gx+1,gy+1,gx+gw-2,gy+gh-2)
+				ink(panel_color):box (gx,gy,gx+gw,gy+gh)
+				pen(panel_color):paper(pen_color):locate (x,y):prints(caption$)
+				state=i_clicked
+				while bmouse <>0:end while
+
+			end if
+		else
+			if state =i_wait then
+				ink(pen_color):bar (gx,gy,gx+gw-1,gy+gh-1)
+				ink(panel_color):box (gx-1,gy-1,gx+gw+1,gy+gh+1)
+				pen(panel_color):paper(pen_color):locate (x,y):prints(caption$)
+				state=i_mousein
+			end if
+		end if
+	else
+		if state <>i_wait then
+			ink(panel_color):bar (gx,gy,gx+gw-1,gy+gh-1)
+			ink(pen_color):box (gx-1,gy-1,gx+gw+1,gy+gh+1)
+			pen(pen_color):	paper(panel_color):locate (x,y):prints(caption$)
+			state=i_wait
+		end if
+	end if
+	screenswap
+	return state
+end function
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function iText(state,cx,cy,w,text$)
+	x=cx+parentx
+	y=cy+parenty
+
+	gx=x*9
+	gy=(y)*12
+                   gw= w*9+1
+	gh=18+1
+
+	if mousezone(gx,gy,gw,gh)=1 then
+		if bmouse=1 then
+			if state =i_mousein then
+				ink(paper_color):bar (gx,gy,gx+gw-1,gy+gh-1)
+				pen(pen_color):	paper(paper_color):text$=zoneinputs(x,y,w,text$)
+				state=i_clicked
+			end if
+		else
+			if state =i_wait then
+				ink(paper_color):bar (gx,gy,gx+gw-1,gy+gh-1)
+				pen(pen_color):	paper(paper_color):locate (x,y):prints(text$)
+				state=i_mousein
+			end if
+		end if
+	else
+		if state <>i_wait then
+			ink(paper_color):bar (gx,gy,gx+gw-1,gy+gh-1)
+			pen(pen_color):	paper(paper_color):locate (x,y):prints(text$)
+			state=i_wait
+		end if
+	end if
+	screenswap
+	return state
+end function
+
+
+
+
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function msgBox(prompt$,type,title$)
+
+	screenopen(7,320,200,displaywidth/2-160,displayheight/2-100,320,200,0)
+	pres_pen=pen
+	pres_paper=paper
+	paper(0):cls
+	frame=i_draw
+	frame=iframe(frame,0,0,35,12,title$)
+	'prompt
+
+	ilabel(i_draw,1,3,prompt$)
+
+	ink(pen_color)
+	line (10,140,310,140)
+
+
+	' 1=ok
+	' 2=ok cancel
+	' 3= yes not
+	' 4=yes not cancel
+
+	if type = 1 then
+		r=0
+		buttonOk=i_draw
+		while key(13)=0
+			if iButton(buttonOK,16,14," OK ")=i_Clicked then
+				r=1
+				exit while
+			end if
+			screenswap
+		end while
+		r=1
+	end if
+
+	if type = 2 then
+		r=0
+		buttonOk=i_draw
+		buttonCancel=i_draw
+		while key(27)=0
+			if iButton(buttonOk,8,14," OK ")=i_Clicked then
+				r=1
+				exit while
+			end if
+			if iButton(buttonCancel,20,14,"Cancel")=i_Clicked then
+				r=0
+				exit while
+			end if
+			screenswap
+		end while
+	end if
+
+	if type = 3 then
+		r=0
+		buttonYes=i_draw
+		buttonNo=i_draw
+		while key(27)=0
+			if iButton(buttonYes,8,14," yes ")=i_Clicked then
+				r=2
+				exit while
+			end if
+			if iButton(buttonNo,20,14," no ")=i_Clicked then
+				r=3
+				exit while
+			end if
+			screenswap
+		end while
+	end if
+
+	if type = 4 then
+		r=0
+		buttonYes=i_draw
+		buttonNo=i_draw
+		buttonCancel=i_draw
+		while key(27)=0
+			if iButton(buttonOk,4,14," OK ")=i_Clicked then
+				r=1
+				exit while
+			end if
+			if iButton(buttonNo,14,14," no ")=i_Clicked then
+				r=3
+				exit while
+			end if
+			if iButton(buttonCancel,24,14,"Cancel")=i_Clicked then
+				r=0
+				exit while
+			end if
+			screenswap
+		end while
+	end if
+
+	screenclose(7)
+	pen(pres_pen)
+	paper(pres_paper)
+	return r
+end function
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function inputBox(prompt$,title$)
+	screenopen(7,480,200,displaywidth/2-240,displayheight/2-100,480,200,0)
+	cls
+	iFrame(i_draw,0,0,480,200,title$)
+
+	ilabel(i_draw,1,3,prompt$)
+
+	'linea
+	ink(rgb(255,255,25))
+	line (10,140,470,140)
+
+	buttonOk=i_draw
+	buttonCancel=i_draw
+	text1=i_draw
+	text1_text=""
+	while key(27)=0
+		if iText(text1,2,8,50,text1_text)=i_clicked then
+			r$=text1_text
+			exit while
+		end if
+		if iButton(buttonOk,8,14," OK ")=i_Clicked then
+			r$=text1_text
+			exit while
+		end if
+		if iButton(buttonCancel,20,14,"Cancel")=i_Clicked then
+			r=0
+			exit while
+		end if
+		screenswap
+	end while
+
+	screenclose(7)
+	paper(0)
+	pen(pen_color)
+	return r$
+
+end function
+
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function oldfsel(path$,filter$,default$,title$)
+	screenopen(7,320,200,displaywidth/2-160,displayheight/2-100,320,200,0)
+	paper(0):cls
+	frame=i_draw
+	frame=iframe(frame,0,0,35,12,title$)
+
+        prompt$=default$
+
+
+	b_ok=1
+	b_cancel=1
+	b_enter_filename=1
+	b_enter_path=1
+	b_list=1
+	list_pos=0
+	list_sel=0
+
+
+	while 0=0
+
+		if key(k_esc)then
+			r$=""
+			exit while
+		end if
+
+
+		'Ok button state machine
+		xbut=27
+		ybut=5
+		wbut=8
+		hbut=1.5
+		if  mousezone(xbut*9,ybut*13,(wbut*9),(hbut*13)) then
+			if b_ok<>2 then
+				b_ok=2
+				paper(pen_color)
+				pen(panel_color)
+				ink(pen_color)
+				bar (xbut*9,ybut*13,xbut*9+(wbut*9),ybut*13+(hbut*13))
+				locate (xbut+1,ybut):prints("  ok ")
+			end if
+			if bmouse=1 then
+				r$=path$+filename$
+				 exit while
+			end if
+		else
+			if b_ok=2 then
+				b_ok=1
+			end if
+		end if
+		if b_ok=1 then
+			ink(panel_color)
+			bar (xbut*9,ybut*13,xbut*9+(wbut*9),ybut*13+(hbut*13))
+			paper(panel_color)
+			pen(pen_color)
+			ink(pen_color)
+			box (xbut*9,ybut*13,xbut*9+(wbut*9),ybut*13+(hbut*13))
+			locate (xbut+1,ybut):prints("  ok ")
+			b_ok=0
+		end if
+
+
+		'Cancel button  state machine
+		xbut=27
+		ybut=8
+		wbut=8
+		hbut=1.5
+		if  mousezone(xbut*9,ybut*13,wbut*9,(hbut*13)) then
+			if b_cancel<>2 then
+				b_cancel=2
+				paper(pen_color)
+				pen(panel_color)
+				ink(pen_color)
+				bar (xbut*9,ybut*13,xbut*9+(wbut*9),ybut*13+(hbut*13))
+				locate (xbut+1,ybut):prints("cancel")
+			end if
+			if bmouse=1 then
+				r$=""
+				 exit while
+			end if
+		else
+			if b_cancel=2 then
+				b_cancel=1
+			end if
+		end if
+		if b_cancel=1 then
+			ink(panel_color)
+			bar (xbut*9,ybut*13,xbut*9+(wbut*9),ybut*13+20)
+			paper(panel_color)
+			pen(pen_color)
+			ink(pen_color)
+			box (xbut*9,ybut*13,xbut*9+(wbut*9),ybut*13+20)
+			locate (xbut+1,ybut):prints("cancel")
+			b_cancel=0
+		end if
+
+		'Input enter result
+		xbut=1
+		ybut=13
+		wbut=24
+		hbut=1.5
+		if mousezone ((xbut*9),(ybut*13),wbut*9,hbut*13) or b_enter=3 then
+			if b_enter_filename<>2 then
+				pen(pen_color)
+				paper(0)
+				ink(0)
+
+				bar((xbut*9),(ybut*13),(xbut*9)+((wbut+2)*9),(ybut*13)+(hbut*13) )
+				locate (xbut,ybut):fprints(left$(prompt$,wbut))
+			end if
+			if bmouse=1 or b_enter=3 then
+				b_enter_filename=1
+				locate (xbut,ybut)
+				'curson
+				r$=zoneinputs(xbut,ybut,wbut,prompt$)
+				prompt$=r$
+				'cursoff
+				while inkey=13:end while
+				 'exit while
+			end if
+		else
+			if b_enter_filename=2 then
+				b_enter_filename=1
+			end if
+		end if
+		if b_enter_filename=1 then
+			pen(pen_color)
+			paper(0)
+			ink(0)
+			bar((xbut*9),(ybut*13),(xbut*9)+((wbut+2)*9),(ybut*13)+(hbut*13) )
+			locate (xbut,ybut):fprints(left$(prompt$,wbut))
+			r$=prompt$
+			b_enter_filename=0
+		end if
+
+		'input enter path
+		xbut=1
+		ybut=3
+		wbut=24
+		hbut=1.5
+		if mousezone ((xbut*9),(ybut*13),wbut*9,hbut*13) or b_enter=3 then
+			if b_enter_path<>2 then
+				pen(pen_color)
+				paper(0)
+				ink(0)
+
+				bar((xbut*9),(ybut*13),(xbut*9)+((wbut+2)*9),(ybut*13)+(hbut*13) )
+				locate (xbut,ybut):fprints(left$(path$,wbut))
+			end if
+			if bmouse=1 or b_enter=3 then
+				b_enter_path=1
+				b_list=1
+				locate (xbut,ybut)
+				'curson
+				path$=zoneinputs(xbut,ybut,wbut,path$)
+				if right$(path$,1)<>"/" then
+					path$=path$+"/"
+				end if
+				'cursoff
+				while inkey=13:end while
+				 'exit while
+			end if
+		else
+			if b_enter_path=2 then
+				b_enter_path=1
+			end if
+		end if
+		if b_enter_path=1 then
+			pen(pen_color)
+			paper(0)
+			ink(0)
+			bar((xbut*9),(ybut*13),(xbut*9)+((wbut+2)*9),(ybut*13)+(hbut*13) )
+			locate (xbut,ybut):fprints(left$(path$,wbut))
+			b_enter_path=0
+		end if
+
+		'list file
+		xbut=1
+		ybut=5
+		wbut=24
+		hbut=7
+
+		if key(k_return) then
+			if (prompt$<> filename$) then
+				b_ok=1
+				b_cancel=1
+				b_enter_filename=1
+				b_enter_path=1
+				b_list=1
+				list_pos=0
+				list_sel=0
+				if left$(filename$,5)="(dir)" then
+					path$=path$+mid$(filename$,5,len(filename$))+"/"
+				else
+					prompt$=filename$
+				end if
+				while key(k_return):end while
+			else
+				exit while
+			end if
+		end if
+
+
+		if key(k_up) and list_sel >0 then
+			list_sel=list_sel-1
+			if (list_sel-list_pos)<0 then
+				list_pos=list_pos-1
+				ink(0)
+				bar((xbut*9),(ybut*13),(xbut*9)+((wbut+2)*9),(ybut*13)+(hbut*13)+4 )
+			end if
+			b_list=1
+		end if
+		if key(k_down) then
+			list_sel=list_sel+1
+			if (list_sel-list_pos)>6 then
+				list_pos=list_pos+1
+				ink(0)
+				bar((xbut*9),(ybut*13),(xbut*9)+((wbut+2)*9),(ybut*13)+(hbut*13)+4 )
+			end if
+			b_list=1
+		end if
+		if mousezone ((xbut*9),(ybut*13),wbut*9,hbut*13) or b_enter=3 then
+			if b_list<>2 then
+				oldlist_sel=list_sel
+				list_sel=int(ymousescreen(7)/13)-ybut
+				if list_sel <> oldlist_sel then
+					i=0
+					file$=dirfirst(path$)
+					if direxists(path$+file$) then
+						file$="(dir)"+file$
+					end if
+					while file$<>""
+						if (i-list_pos)<hbut  and (i-list_pos)>=0 then
+							if (i=list_sel) then
+								pen(0)
+								paper(pen_color)
+								ink(paper)
+								bar((xbut*9),((ybut+i-list_pos)*13),(xbut*9)+((wbut+2)*9),((ybut+i-list_pos)*13)+13+4 )
+								filename$=file$
+							else
+								pen(pen_color)
+								paper(0)
+								ink(paper)
+								bar((xbut*9),((ybut+i-list_pos)*13),(xbut*9)+((wbut+2)*9),((ybut+i-list_pos)*13)+13+4 )
+
+							end if
+						locate (xbut,ybut+i-list_pos):fprints(left$(file$,wbut))
+						end if
+						i=i+1
+						file$=dirnext
+						if file$="" then
+							exit while
+						end if
+						if direxists(path$+file$) then
+							file$="(dir)"+file$
+						end if
+					end while
+				end if
+			end if
+			if bmouse=1 then
+				b_ok=1
+				b_cancel=1
+				b_enter_filename=1
+				b_enter_path=1
+				b_list=1
+				list_pos=0
+				list_sel=0
+				if left$(filename$,5)="(dir)" then
+					path$=path$+mid$(filename$,6,len(filename$))+"/"
+				else
+					prompt$=filename$
+				end if
+			end if
+		else
+			if b_list=2 then
+				b_list=1
+			end if
+		end if
+		if b_list=1 then
+			pen(pen_color)
+			paper(0)
+			i=0
+			file$=dirfirst(path$)
+			if direxists(path$+file$) then
+				 file$="(dir)"+file$
+			end if
+			while file$<>""
+				if (i-list_pos)<hbut  and (i-list_pos)>=0 then
+					if (i=list_sel) then
+						pen(0)
+						paper(pen_color)
+						ink(paper)
+						bar((xbut*9),((ybut+i-list_pos)*13),(xbut*9)+((wbut+2)*9),((ybut+i-list_pos)*13)+13+4 )
+					else
+						pen(pen_color)
+						paper(0)
+						ink(paper)
+						bar((xbut*9),((ybut+i-list_pos)*13),(xbut*9)+((wbut+2)*9),((ybut+i-list_pos)*13)+13+4 )
+					end if
+					locate (xbut,ybut+i-list_pos):fprints(left$(file$,wbut))
+				end if
+				i=i+1
+				file$=dirnext
+				if file$="" then
+					exit while
+				end if
+
+				if direxists(file$) then
+					file$="(dir)"+file$
+				end if
+			end while
+			b_list=0
+		end if
+
+		screenswap
+	end while
+
+	'screen(0) bug resolved
+	screenclose(7)
+	paper(0)
+	pen(pen_color)
+	return r$
+end function
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

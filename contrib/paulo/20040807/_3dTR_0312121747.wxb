@@ -1,0 +1,228 @@
+
+fout$="3dtrar_040329a.ai"
+
+global xedge=256,yedge=192
+
+global xobs,yobs,zobs
+global xtgt,ytgt,ztgt
+global qdst,zoom
+
+const radiano=57.2957792
+const bl$=chr$(13)+chr$(10)
+
+'-- funcoes
+
+function wdrandom(n)
+   tmpr1=(n*20000)
+   tmpr=(rnd(tmpr1))-(n*10000)
+   wdrandom=tmpr/10000
+ end function
+
+function lstinf$(a$,b$,c$)
+    adra=1:adrb=1:blngt=len(b$):d$=""
+  while adrb<=blngt
+     if mid$ (a$,adra,1)=mid$ (b$,adrb,1) then:adrb+=1:end if
+     adra+=1
+   end while
+  while mid$(a$,adra,1)<>left$(c$,1)
+     d$=d$+mid$(a$,adra,1):adra+=1
+   end while
+     lstinf$=d$
+ end function
+
+function distpitag(x,y)
+   ax=abs(x):ay=abs(y)
+   distpitag=sqr((ax*ax)+(ay*ay))
+ end function
+function angulo(x,y)
+       tmprq=0
+   if x<=0 and y<=0 then:tmprq=3:end if
+   if x<=0 and y>=0 then:tmprq=4:end if
+   if x>=0 and y>=0 then:tmprq=1:end if
+   if x>=0 and y<=0 then:tmprq=2:end if
+       quadt=tmprq
+   v=asin(abs(x)/distpitag(x,y))
+      tmpr=v*57.2957792:tmpr2=tmpr
+   if quadt=2 then:tmpr2=180-tmpr:end if
+   if quadt=3 then:tmpr2=180+tmpr:end if
+   if quadt=4 then:tmpr2=360-tmpr:end if
+      angulo=tmpr2
+ end function
+
+function AiQPrj$(x1,y1,z1)
+'--- funcao com erro - onde?
+   xdn=x1-xobs:ydn=y1-yobs:zdn=z1-zobs
+     xvn=xtgt-xobs:yvn=ytgt-yobs:zvn=ztgt-zobs
+   rdnang=angulo(xdn,ydn):rdndist=distpitag(xdn,ydn)
+     rvnang=angulo(xvn,yvn):rvndist=distpitag(xvn,yvn)
+   rdnang=rdnang-rvnang:rvnang=0
+     xdn=sin(rdnang/radiano)*rdndist
+     ydn=cos(rdnang/radiano)*rdndist
+     xvn=0:yvn=rvndist
+   rdnang=angulo(zdn,ydn):rdndist=distpitag(zdn,ydn)
+     rvnang=angulo(zvn,yvn):rvndist=distpitag(zvn,yvn)
+   rdnang=rdnang-rvnang:rvnang=0
+     zdn=sin(rdnang/radiano)*rdndist
+     ydn=cos(rdnang/radiano)*rdndist
+     xproj=(xedge/2)+(zoom*((qdst*xdn)/ydn))
+     yproj=(yedge/2)+(zoom*((qdst*zdn)/ydn))
+     AiQPrj$=str$(xproj)+" "+str$(yproj)
+ end function
+
+sub AiDocHeader()
+      a$="%!PS-Adobe-3.0 "+bl$+"%%Creator: "+bl$
+   a$=a$+"%%For: "+bl$+"%%Title: ": print #1,a$
+      a$="%%CreationDate: (10/10/97) (18:19:00)"+bl$
+   a$=a$+"%%BoundingBox: 70 57 166 130"+bl$
+   a$=a$+"%%HiResBoundingBox: 0.0 0.0 256.0 192.0"+bl$
+   a$=a$+"%%DocumentProcessColors: Cyan Magenta Yellow Black": print #1,a$
+      a$="%%DocumentNeededResources: procset Adobe_level2_AI5 1.0 0"+bl$
+   a$=a$+"%%+ procset Adobe_screens_AI5 1.0 0"+bl$
+   a$=a$+"%%+ procset Adobe_typography_AI5 1.0 0"+bl$
+   a$=a$+"%%+ procset Adobe_blend_AI5 1.0 0": print #1,a$
+      a$="%%+ procset Adobe_Illustrator_AI5 1.0 0"+bl$
+   a$=a$+"%AI5_FileFormat 2.0"+bl$+"%AI3_ColorUsage: Color"+bl$
+   a$=a$+"%AI3_TemplateBox: 128 96 128 96 ": print #1,a$
+      a$="%AI3_TileBox: 30 31 226 161"+bl$+"%AI3_DocumentPreview: None"+bl$
+   a$=a$+"%AI5_ArtSize: 256 192 "+bl$
+   a$=a$+"%%EndComments"+bl$+"%%BeginProlog": print #1,a$
+      a$="%%IncludeResource: procset Adobe_level2_AI5 1.0 0"+bl$
+   a$=a$+"%%IncludeResource: procset Adobe_screens_AI5 1.0 0"+bl$
+   a$=a$+"%%IncludeResource: procset Adobe_typography_AI5 1.0 0"+bl$
+    print #1,a$
+      a$="%%IncludeResource: procset Adobe_blend_AI5 1.0 0"+bl$
+   a$=a$+"%%IncludeResource: procset Adobe_Illustrator_AI5 1.0 0"+bl$
+    print #1,a$
+      a$="%%EndProlog"+bl$+"%%BeginSetup"+bl$
+   a$=a$+"Adobe_level2_AI5 /initialize get exec"+bl$
+   a$=a$+"Adobe_screens_AI5 /initialize get exec"+bl$
+    print #1,a$
+      a$="Adobe_Illustrator_AI5_vars Adobe_Illustrator_AI5 Adobe_typography_AI5 /initialize get exec"+bl$
+   a$=a$+"Adobe_Illustrator_AI5_vars Adobe_Illustrator_AI5 Adobe_blend_AI5 /initialize get exec"+bl$
+   a$=a$+"Adobe_Illustrator_AI5 /initialize get exec"+bl$
+    print #1,a$
+      a$="0 Bn"+bl$+"%%EndSetup"+bl$+"1 1 1 1 0 0 0 0 256 192 Lb"+bl$
+   a$=a$+"[] 0 d 3.863708 M 1 w 0 j 0 J 0 i 0 0 0 1 k 0 0 0 1 K 0 A 0 O 0 R"+bl$
+    print #1,a$
+ End Sub
+Sub AiBeginLayer(lnm$)
+   a$="%AI5_BeginLayer"+bl$+"  1 1 0 1 0 0 0 79 128 255 Lb ("+lnm$+") Ln 300 Ar"+bl$
+   print #1,a$
+ End Sub
+Sub AiPenColour(r,g,b)
+   a$="  "+str$((255-r)/255)+" "+str$((255-g)/255)+" "+str$((255-b)/255)+" 0 K"+bl$
+   print #1,a$
+ End Sub
+Sub AiBrushColour(r,g,b)
+   a$="  "+str$((255-r)/255)+" "+str$((255-g)/255)+" "+str$((255-b)/255)+" 0 k"+bl$
+   print #1,a$
+ End Sub
+Sub AiCrossLine(x,y,s)
+   a$="    u [] 0 d "+str$(x)+" "+str$(y-s)+" m "+str$(x)+" "+str$(y+s)+" L S"+bl$
+   a$=a$+"      [] 0 d "+str$(x-s)+" "+str$(y)+" m "+str$(x+s)+" "+str$(y)+" L S U"+bl$
+   print #1,a$
+ End Sub
+Sub AiLine(x0,y0,x1,y1)
+   a$="      [] 0 d "+str$(x0)+" "+str$(y0)+" m "+str$(x1)+" "+str$(y1)+" L S"+bl$
+   print #1,a$
+ End Sub
+Sub AiBezierLine(x0,y0,x1,y1,x2,y2,x3,y3)
+   a$="      [] 0 d "+str$(x0)+" "+str$(y0)+" m"+bl$
+   a$=a$+"      "+str$(x1)+" "+str$(y1)+" "+str$(x2)+" "+str$(y2)+" "+str$(x3)+" "+str$(y3)+" C S LB"+bl$
+   print #1,a$
+ End Sub
+
+Sub AiCircle(x,y,r)
+     r2=r*0.552
+   a$="    u [] 0 d "+str$(x)+" "+str$(y-r)+" m"+bl$
+   a$=a$+"      "+str$(x+r2)+" "+str$(y-r)+" "+str$(x+r)+" "+str$(y-r2)+" "+str$(x+r)+" "+str$(y)+" c"+bl$
+   a$=a$+"      "+str$(x+r)+" "+str$(y+r2)+" "+str$(x+r2)+" "+str$(y+r)+" "+str$(x)+" "+str$(y+r)+" c"+bl$
+     print #1,a$
+   a$="      "+str$(x-r2)+" "+str$(y+r)+" "+str$(x-r)+" "+str$(y+r2)+" "+str$(x-r)+" "+str$(y)+" c"+bl$
+   a$=a$+"      "+str$(x-r)+" "+str$(y-r2)+" "+str$(x-r2)+" "+str$(y-r)+" "+str$(x)+" "+str$(y-r)+" c"+bl$
+   a$=a$+"      s "+str$(x+10)+" "+str$(y-r)+" m S U"+bl$
+     print #1,a$
+ End Sub
+
+Sub AiRectBar(x1,y1,x2,y2)
+     a$="    u "+str$(x1)+" "+str$(y1)+" m "
+  a$=a$+str$(x2)+" "+str$(y1)+" L "
+  a$=a$+str$(x2)+" "+str$(y2)+" L "
+  a$=a$+str$(x1)+" "+str$(y2)+" L "
+  a$=a$+str$(x1)+" "+str$(y1)+" L f "
+  a$=a$+str$(x2)+" "+str$(y2)+" m F U"+bl$
+     print #1,a$
+ End Sub
+
+Sub AiTriangle(x1,y1,x2,y2,x3,y3)
+     a$="    u "+str$(x1)+" "+str$(y1)+" m "
+  a$=a$+str$(x2)+" "+str$(y2)+" L "
+  a$=a$+str$(x3)+" "+str$(y3)+" L "
+  a$=a$+str$(x1)+" "+str$(y1)+" L f "
+  a$=a$+str$(x2)+" "+str$(y2)+" m F U"+bl$
+     print #1,a$
+ End Sub
+
+Sub AiRectangle3d_xy(xc1,yc1,xc2,yc2,zc1)
+     a$="[] 0 d "
+  a$=a$+AiQPrj$(xc1,yc1,zc1)+" m "
+  a$=a$+AiQPrj$(xc2,yc1,zc1)+" L "
+  a$=a$+AiQPrj$(xc2,yc2,zc1)+" L "
+  a$=a$+AiQPrj$(xc1,yc2,zc1)+" L "
+  a$=a$+AiQPrj$(xc1,yc1,zc1)+" L s "
+     print #1,a$
+ End Sub
+
+Sub AiRectBar3d(xc1,yc1,xc2,yc2,zc1)
+     a$="    u "
+  a$=a$+AiQPrj$(xc1,yc1,zc1)+" m "
+  a$=a$+AiQPrj$(xc2,yc1,zc1)+" L "
+  a$=a$+AiQPrj$(xc2,yc2,zc1)+" L "
+  a$=a$+AiQPrj$(xc1,yc2,zc1)+" L "
+  a$=a$+AiQPrj$(xc1,yc1,zc1)+" L f "
+  a$=a$+AiQPrj$(xc2,yc2,zc1)+" m F U"+bl$
+     print #1,a$
+ End Sub
+
+
+
+Sub AiEndLayer()
+   a$="LB"+bl$
+   a$=a$+"%AI5_EndLayer--"+bl$
+   print #1,a$
+ End Sub
+Sub AiDocFooter()
+      a$="%%PageTrailer"+bl$
+   a$=a$+"gsave annotatepage grestore showpage"+bl$+"%%Trailer"+bl$
+   a$=a$+"Adobe_IllustratorA_AI5 /terminate get exec"+bl$
+   a$=a$+"Adobe_blend_AI5 /terminate get exec"+bl$
+    print #1,a$
+      a$="Adobe_screens_AI5 /terminate get exec"+bl$
+   a$=a$+"Adobe_level2_AI5 /terminate get exec"+bl$
+   a$=a$+"%%EOF"+bl$
+    print #1,a$
+ End Sub
+
+'--- programa
+
+   zoom=16
+Open fout$ For Output as #1
+       AiDocHeader()
+  for frm=0 to 50 step .2
+       AiBeginLayer("desenho"+str$(frm))
+     xobs=25+frm:yobs=0:zobs=frm
+     xtgt=25:ytgt=15:ztgt=5
+     qdst=10
+
+'AiRectangle3d_xy(10,10,50,50,10)
+'AiRectangle3d_xy(10,10,50,50,20)
+
+for zz=10 to 40 step 5
+  AiRectBar3d(10,10,50,50,zz)
+next
+
+       AiEndLayer()
+   next
+       AiDocFooter()
+ Close #1
+

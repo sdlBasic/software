@@ -1,0 +1,55 @@
+Rem ************************************ 
+Rem *        AMOS Example 22.2         * 
+Rem *          SCREEN BASE             * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+
+Screen Open 0,320,200,64,0
+
+Rem Assign an amal channel to the current screen 
+Channel 0 To Screen Display 0
+Limit Mouse 130,50 To 320+130,50+255
+Amal 0,"Loop: Pause; If K1=0 Jump Loop; Let Y=YM-100; If XM-160<64 Jump Loop; Let X=XM-160; Jump Loop"
+Amal On 
+SC$="Use left mouse button to scroll me, right button to end..."
+Curs Off 
+Rem main loop
+Repeat 
+   Rem print out the screen characteristics 
+   SC_CAR
+   Rem scroll message on screem 
+   T_SCROLL
+Until Mouse Key=2
+' Display screen caracteristics! 
+Procedure SC_CAR
+   A=Screen Base+72
+   Home 
+   M=Deek(A) : Print Bin$(M,16)
+   If Btst(15,M)
+      Print "Hires"
+   Else 
+      If Btst(11,M)
+         Print "Ham!"
+      Else 
+         Print "Lowres"
+      End If 
+   End If 
+   Print "Control 2:";Hex$(Deek(A+2),4)
+   Print "X size:";Deek(A+4)
+   Print "y size:";Deek(A+6)
+   Print "Number of bitplanes:";Deek(A+8)
+   Print "Display X:";Deek(A+10);" "
+   Print "Display Y:";Deek(A+12)-$1000;" "
+   Print "Display size X:";Deek(A+14);" "
+   Print "Display size Y:";Deek(A+16);" "
+   Print "Offset X:";Deek(A+18);" "
+   Print "Offset Y:";Deek(A+20);" "
+   Print "Number of colours:";Deek(A+24)
+End Proc
+Procedure T_SCROLL
+   Rem crude text scrolling routine 
+   Shared SC$
+   SC$=Mid$(SC$,2)+Left$(SC$,1)
+   Centre At(,20)+Left$(SC$,34)
+End Proc

@@ -1,0 +1,29 @@
+'
+'      Bob tutorial #08 - Flipping Bobs!       
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Double Buffer 
+Cls 0 : Pen 1 : Paper 0
+'
+Locate 20,6 : Print "A Horizontal flip"
+Plot 85,0 : Draw To 85,120
+'
+'First we use the normal image in Bob 1  
+Bob 1,50,100,4
+Wait 50
+'
+'Now we set up Bob2 with image 4 but this time request Easy AMOS to do 
+'a horizontal flip before displaying it. 
+'
+Bob 2,121,100,Hrev(4)
+Wait 50
+Locate 20,16 : Print "A Vertical flip"
+Plot 0,102 : Draw To 100,102
+'
+'As the image in the bank is still in its normal rotation we don't need
+'to flip it back horizontally before requesting a vertical rotation. 
+'
+Bob 3,50,105,Vrev(4)
+Wait 50

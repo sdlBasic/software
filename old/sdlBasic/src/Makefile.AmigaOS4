@@ -1,0 +1,56 @@
+############################################################
+#  sdlBasic Makefile v1.03 for AmigaOS4 (Nicolas Mendoza)  #
+############################################################
+
+exec_prefix=/sdlBasic/
+
+SRC = inflate.c unzip.c SDLengine.c sdlBasic.c
+OBJECT= inflate.o unzip.o SDLengine.o sdlBasic.o
+TARGET= sdlBasic
+
+CC= ppc-amigaos-gcc
+CXX= ppc-amigaos-g++
+
+CFLAG= -Wall -ggdb -O3 -fomit-frame-pointer -mmultiple -mstring -D__USE_INLINE__ -D__USE_NETINET_IN_H -I/usr/local/amiga/ppc-amigaos/local/clib2/include/SDL/ -D_REENTRAT -DPLAY_MOD -DUNIX
+LIBS= -lsmpeg -lSDL_mixer -lSDL_image -lSDL_ttf -lfreetype -lSDL_net -lSDL -lpng -lz -ljpeg -lvorbisfile -lvorbis -logg -lauto -lm -lnet -lunix
+COMPILE=$(CXX) $(CFLAG)
+
+
+all: $(TARGET)
+
+$(TARGET):	SDLengine.o unzip.o inflate.o sdlBasic.o
+	$(COMPILE) -o $(TARGET) $(OBJECT) $(LIBS)
+#	ppc-amigaos-strip --remove-section=.comment $(TARGET)
+
+install:	all
+#	gzexe $(TARGET)
+	/usr/bin/install -c sdlBasic ${exec_prefix}sdlBasic
+	/usr/bin/install -c -m 755 -d ${exec_prefix}Fonts/_TrueType/dejavu
+	/usr/bin/install  ../shared/DejaVuSans.ttf ${exec_prefix}Fonts/_TrueType/DejaVuSans.ttf
+	/usr/bin/install  ../shared/DejaVuSansMono-Roman.ttf ${exec_prefix}Fonts/_TrueType/DejaVuSansMono-Roman.ttf
+
+
+remove:
+	rm ${exec_prefix}bin/sdlBasic
+
+remove-fonts:
+	rm ${exec_prefix}fonts/_TrueType/dejavu/DejaVuSans.ttf
+	rm ${exec_prefix}fonts/_TrueType/dejavu/DejaVuSansMono-Roman.ttf
+
+remove-all:	remove	remove-fonts
+
+unzip.o:    unzip.c unzip.h
+	$(CC) $(CFLAG) -c unzip.c
+
+inflate.o:  inflate.c
+	$(CC) $(CFLAG) -c inflate.c
+
+SDLengine.o:	SDLengine.c SDLengine.h
+	$(CC) $(CFLAG) -c SDLengine.c
+
+sdlBasic.o:	sdlBasic.c shared.h trace.h error.h stack.h data.h symbol.h var.h array.h node.h file.h dir.h datafunction.h membank.h builtin.h const.h eval.h keyword.h lexer.h class.h trace.c error.c stack.c data.c symbol.c var.c array.c node.c file.c dir.c datafunction.c membank.c builtin.c const.c eval.c y_tab.c keyword.c lexer.c class.c
+	$(CC) $(CFLAG) -c sdlBasic.c
+
+clean:
+	rm *.o
+	rm $(TARGET)

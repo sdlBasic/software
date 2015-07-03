@@ -1,0 +1,3 @@
+directscreen()
+text(10,10,16,"ciao")
+waitkey

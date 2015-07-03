@@ -1,0 +1,90 @@
+'- this .sdlblib is for filling the lack on sdlBasic on drawing lines
+'-   from string variable subcommands, like from QBasic, msx-basic and 
+'-   TrsColor-basic (maybe on other ansi-basic interpreters too)
+'- bug: hex value output not accuraced yet
+
+sub draw(a$)
+      a$=lcase$(a$+"x")
+    avlg=len(a$)
+      cmd=0:vlid=0:crvl0=0:crvl1=0:lc$="x"
+      rtmode=0:bkmode=0:rtmode=0:hxmode=0:xpos=100:ypos=100:ikvl=0
+  for i=1 to avlg
+         nc$=mid$(a$,i,1)
+   hxvl1=instr("0123456789#",nc$)
+     if (hxmode=0 and hxvl1>0) then
+       if vlid=0 then:crvl0=(crvl0*10)+val(nc$):end if
+       if vlid=1 then:crvl1=(crvl1*10)+val(nc$):end if
+       if hxvl1=11 then:hxmode=1:end if
+     end if
+   hxvl1=instr("0123456789abcdef;",nc$)
+      if (hxmode=1 and hxvl1>0) then
+       if vlid=0 then:crvl0=(crvl0*16)+(hxvl1-1):end if
+       if vlid=1 then:crvl1=(crvl1*16)+(hxvl1-1):end if
+       if hxvl1=17 then:hxmode=0:end if
+     end if
+   if (hxmode=0 and instr("udlrefghmnbcxp",nc$)>0) then
+     if (hxmode=0 and lc$="b") then: bkmode=1: end if
+     if (hxmode=0 and lc$="u") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos:yposn=ypos-crvl0
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+         rtmode=0:bkmode=0:end if
+     if (hxmode=0 and lc$="d") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos:yposn=ypos+crvl0
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="l") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos-crvl0:yposn=ypos
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="r") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos+crvl0:yposn=ypos
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="e") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos+crvl0:yposn=ypos-crvl0
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="f") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos+crvl0:yposn=ypos+crvl0
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="g") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos-crvl0:yposn=ypos+crvl0
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="h") then
+       if crvl0=0 then:crvl0=1:end if
+       xposn=xpos-crvl0:yposn=ypos-crvl0
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="p") then:ink(ikvl):dot(xpos,ypos):end if
+    if (hxmode=0 and lc$="m") then
+       xposn=crvl0:yposn=crvl1
+       if bkmode=0 then:ink(ikvl):line(xpos,ypos,xposn,yposn):end if
+       if rtmode=0 then:xpos=xposn:ypos=yposn:end if
+              rtmode=0:bkmode=0:end if
+    if (hxmode=0 and lc$="n") then:rtmode=1:end if
+'    if (hxmode=0 and lc$="#") then:hxmode=1:end if
+'    if (hxmode=1 and lc$=";") then:hxmode=0:end if
+    if (hxmode=0 and lc$="c") then:ikvl=crvl0:end if
+          lc$=nc$:crvl0=0:crvl1=0:vlid=0
+        end if
+       if nc$="," then: vlid=1: end if
+     next
+ end sub
+

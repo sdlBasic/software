@@ -1,0 +1,38 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.13        *   
+Rem *          X menu /Y menu          *   
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Intailize screen 
+Auto View Off 
+Screen Open 0,320,256,32,0
+Flash Off 
+Screen Hide 0
+Load Iff "amos_data:iff/amospic.iff"
+Screen Open 1,320,200,32,0
+Flash Off : Get Palette(0)
+Cls 0
+View 
+Rem create menu
+Menu Line 1
+Menu$(1)=" SET POINT OF VIEW "
+Menu$(1,1)="(lo 80,64:lo 0,0)"
+Menu$(1,2)="(ink 1,3:ink 2,0:bar 32,26)"
+Menu Item Movable(1,2)
+Menu On 
+Rem read menu
+ODX=-1
+Repeat 
+   Rem get x coord of item 1,2  
+   DX=X Menu(1,2)*4
+   Rem find y coord of item 1,2 
+   DY=Y Menu(1,2)*4
+   Rem if coords changed
+   If DX<>ODX or DY<>ODY
+      ODX=DX
+      ODY=DY
+      Rem update viewpoint 
+      Screen Copy 0,DX,DY,DX+128,DY+100 To 1,64,50
+   End If 
+Until Inkey$<>""

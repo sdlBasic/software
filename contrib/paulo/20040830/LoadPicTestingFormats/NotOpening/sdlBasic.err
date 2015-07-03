@@ -1,0 +1,4 @@
+Runtime error on line number 5 of pxr_LoadPicTest.sdlbas
+SDLengine Error 
+
+  loadimage(finp$,1):pasteicon(0,0,1)

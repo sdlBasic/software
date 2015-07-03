@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+a$="Hello, World!!!"
+prints("a$="+chr$(0x22)+a$+chr$(0x22))
+prints("left(a$,5)="+chr$(0x22)+left(a$,5)+chr$(0x22))
+waitkey
+

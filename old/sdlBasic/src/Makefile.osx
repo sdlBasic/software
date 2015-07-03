@@ -1,0 +1,50 @@
+#######################################
+#  sdlBasic Makefile for osX v1.06    #
+#######################################
+
+exec_prefix=/usr/local
+
+SRC = unzip.c inflate.c SDLengine.c sdlBasic.c
+OBJECT= unzip.o inflate.o SDLengine.o sdlBasic.o
+TARGET= sdlBasic
+
+CC= gcc
+CFLAG= -g -O2 -I/usr/local/include/SDL -D_REENTRAT -DPLAY_MOD -DUNIX  -Wno-long-double
+LIBS= -lobjc -framework Appkit -framework Carbon -framework IOKit `sdl-config --libs` -lSDL_mixer -lSDL_image -lSDL_ttf -lSDL_net -lsmpeg -lfreetype -ljpeg -lpng -lz
+COMPILE=$(CC) $(CFLAG) $(LIBS)
+
+
+all: 		SDLengine.o unzip.o inflate.o sdlBasic.o
+	$(COMPILE) -o $(TARGET) $(OBJECT)
+
+install:	all
+	/usr/bin/install -c -m 755 -d ${exec_prefix}/bin
+	/usr/bin/install -c sdlBasic ${exec_prefix}/bin/sdlBasic
+	/usr/bin/install -c -m 755 -d /usr/share/fonts/ttf/dejavu
+	/usr/bin/install  ../shared/DejaVuSans.ttf /usr/share/fonts/ttf/dejavu/DejaVuSans.ttf
+	/usr/bin/install  ../shared/DejaVuSansMono-Roman.ttf /usr/share/fonts/ttf/dejavu/DejaVuSansMono-Roman.ttf
+
+remove:
+	rm ${exec_prefix}/bin/sdlBasic
+
+remove-fonts:
+	rm /usr/share/fonts/ttf/dejavu/DejaVuSans.ttf
+	rm /usr/share/fonts/ttf/dejavu/DejaVuSansMono-Roman.ttf
+
+remove-all:	remove	remove-fonts
+
+unzip.o:	unzip.c unzip.h
+	$(CC) $(CFLAG) -c unzip.c
+
+inflate.o:	inflate.c
+	$(CC) $(CFLAG) -c inflate.c
+
+SDLengine.o:	SDLengine.c
+	$(CC) $(CFLAG) -c SDLengine.c
+
+sdlBasic.o:	sdlBasic.c shared.h trace.h error.h stack.h data.h symbol.h var.h array.h node.h file.h dir.h datafunction.h membank.h builtin.h const.h eval.h keyword.h lexer.h class.h trace.c error.c stack.c data.c symbol.c var.c array.c node.c file.c dir.c datafunction.c membank.c builtin.c const.c eval.c y_tab.c keyword.c lexer.c class.c
+	$(CC) $(CFLAG) -c sdlBasic.c
+
+clean:
+	rm *.o
+	rm $(TARGET)

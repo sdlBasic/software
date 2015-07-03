@@ -1,0 +1,26 @@
+
+LINST=
+LSONG=
+LPATTERN=
+
+'-----  header: 36 bytes
+
+0d0000 = "AmBk"  (4bytes - String)
+0d0004 = 3       (2bytes - BigEndian)
+0d0006 = 0       (2bytes - BigEndian)
+0d0008 = lenghts (4bytes - ver abaixo)
+   lenghts=orbits(0x80000000,8+16+LINST+LSONG+LPATTERN)
+0d0012 = "Music   " (8bytes - String)
+0d0020 = 16             (4bytes - BigEndian) 
+0d0024 = 16+LINST       (4bytes - BigEndian)
+0d0028 = 16+LINST+LSONG (4bytes - BigEndian)
+0d0032 = 0              (4bytes - BigEndian) 
+
+'----- instrument
+'----- song
+'----- pattern
+
+
+
+
+

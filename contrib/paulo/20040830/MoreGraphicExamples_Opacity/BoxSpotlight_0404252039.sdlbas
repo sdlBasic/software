@@ -1,0 +1,41 @@
+' Box Spotlight graphics example
+' Paulo Silva - april 04 - GPL
+' writed over a template coded from Vroby 
+
+sub BoxSpotlight(x1,y1,x2,y2,c,a)
+' alpha is from 0 to 255
+      if x2<x1 then: tmpr=x1:x1=x2:x2=tmpr: end if
+      if y2<y1 then: tmpr=y1:y1=y2:y2=tmpr: end if
+  for y=y1 to y2: stv=1
+       if not ((y=y1) or (y=y2)) then:stv=x2-x1: end if
+    for x=x1 to x2 step stv
+      r0=(int(point(x,y)/0x10000))mod 256
+       g0=(int(point(x,y)/0x100))mod 256
+       b0=(point(x,y))mod 256
+      r1=(int(c/0x10000))mod 256
+       g1=(int(c/0x100))mod 256
+       b1=c mod 256
+      r2=(r0+((r1)*(a/255))):if r2>255 then:r2=255:end if
+       g2=(g0+((g1)*(a/255))):if g2>255 then:g2=255:end if
+       b2=(b0+((b1)*(a/255))):if b2>255 then:b2=255:end if
+        c2=(r2*0x10000)+(g2*0x100)+b2
+        ink(c2):dot (x,y)
+    next:next
+ end sub
+
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+prints("draw some spotlight bars ")
+
+ink(0): bar(10,20,200,200)
+
+for ofs=0 to 7
+   BoxSpotlight(30+ofs,40+ofs,140+ofs,120+ofs,0xFF0000,191)
+   BoxSpotlight(80+ofs,50+ofs,180+ofs,140+ofs,0x00FF00,191)
+   BoxSpotlight(50+ofs,70+ofs,160+ofs,160+ofs,0x0000FF,191)
+ next
+
+locate(2,17):prints("press space to exit" )
+waitkey(k_space)
+
+

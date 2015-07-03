@@ -1,0 +1,38 @@
+Rem ************************************ 
+Rem *        AMOS Example 22.3         * 
+Rem *            Sprite Base           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+'--------------------------------------------------------------------
+' How to get sprite (or icons) caracteristics..
+' Note that there is NO RESOLUTION MODE for a sprite: it can be  
+' put in every screen (even HAM but it will be ugly!), a sprite
+' (or a bob) is just a part of bitmap. 
+'--------------------------------------------------------------------
+Rem load a sprite bank 
+F$=Fsel$("*.abk","","Please select the sprite bank","to display")
+If F$="" Then End 
+Load F$
+Rem initialise screen
+Flash Off : Curs Off : Get Sprite Palette 
+Rem get number of sprites in the bank
+N_SP=Length(1)
+Rem list the sprite characteristics
+For N=1 To N_SP-1
+   Rem get the start address of image N 
+   A=Sprite Base(N)
+   Rem if valid then display image  
+   If A
+      Clw 
+      Bob 1,160,100,N
+      Print "Sprite number";N
+      Rem print attributes 
+      Print "Size in X:";Deek(A)*16
+      Print "Size in Y:";Deek(A+2)
+      Print "Number of bitplanes:";Deek(A+4)
+      Print "Position of hot spot in X:";Deek(A+6)
+      Print '        "      "        Y:';Deek(A+8)
+   End If 
+   Wait Key 
+Next 

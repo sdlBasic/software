@@ -1,0 +1,28 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.8         * 
+Rem *      Horizontal scrolling        * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Screen Close 0
+Load Iff "amos_data:iff/amospic.iff",1
+Screen Open 0,320+16,256,32,Lowres
+Screen Display 0,128,,320,
+Get Palette 1
+Curs Off : Flash Off 
+Screen Copy 1 To 0
+Screen 0
+Rem Use double buffering 
+Double Buffer 
+Bob Update Off 
+S=8
+Rem Define scrolls 
+Def Scroll 1,0,60 To 320+16,160,-S,0
+Rem scroll screen
+Repeat 
+   For Y=0 To 320-S Step S
+      Screen Copy 1,Y,60,Y+S,160 To Logic(0),320,60
+      Screen Copy 1,Y,60,Y+S,160 To Physic(0),320,60
+      Scroll 1
+      Screen Swap : Wait Vbl 
+   Next Y
+Until True=False

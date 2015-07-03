@@ -1,0 +1,30 @@
+' Paulo Silva - february '00 - GPL licence
+' This is an example would be an idea for a guitar melody (not chords)
+'   composing interface
+' Goal would be, for example, composing .mod documents (or germanic notation
+'   txt files) with it
+
+Screen Open 0,320,512,32,4: Screen 0 : Curs Off : Hide 
+Load Iff "GuitarArm.iff" : Flash Off  
+  Get Bob 1,0,0 To 8,16: Get Bob 2,8,0 To 16,16
+  Get Bob 3,16,0 To 32,8: Get Bob 4,16,8 To 32,16
+  Play 4,5
+Limit Mouse 128,158 To 448,210
+CICLO2:
+  X1=(X Mouse-128)/16
+  Y1=5-((Y Mouse-166)/6)
+    If X1<0 Then X1=0
+    If Y1<0 Then Y1=0
+    If Y1>5 Then Y1=5
+    If X1>15 Then X1=15
+  Bob 1,X Mouse-132,144-(Y1*6),1
+  Bob 2,300,151-(Y1*6),3
+  Locate 0,0 : Print X1;"   ";Y1;"   ";Mouse Key;"   "
+    If Mouse Key=1 : 
+       Bob 1,X Mouse-132,144-(Y1*6),2
+       Bob 2,300,149-(Y1*6),4
+       Play(X1+(Y1*5)+16),2
+     End If 
+ Goto CICLO2
+
+

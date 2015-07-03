@@ -1,0 +1,18 @@
+Rem ************************************ 
+Rem *        AMOS Example 6.1          * 
+Rem *             Paint                * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Curs Off : Centre "<Hit a key to fill screen>"
+Rem draw filled circles
+Repeat 
+   Rem Get random numbers 
+   I=Rnd(15) : X=Rnd(300)+10 : Y=Rnd(170)+32 : R=Rnd(30)+1
+   Rem draw circles 
+   Ink I : Circle X,Y,R
+   Rem fill them
+   Paint X,Y
+Until Inkey$<>""
+Rem fill screen  
+Ink 0 : Paint 0,0

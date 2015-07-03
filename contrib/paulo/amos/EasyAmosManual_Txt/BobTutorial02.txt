@@ -1,0 +1,17 @@
+'
+'      Bob tutorial #02 - The Bob flicker problem    
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0
+'
+'Move Bob 1 from X co-ordinate 200 to 100 a pixel at a time  
+'
+'Note the use of Wait Vbl, this ensures that the Bob only moves one
+'pixel every 50th of a second. Take it out if you want and see how fast
+'Easy AMOS can move a Bob. 
+For X=200 To 100 Step -1
+   Bob 1,X,130,1
+Wait Vbl 
+Next X

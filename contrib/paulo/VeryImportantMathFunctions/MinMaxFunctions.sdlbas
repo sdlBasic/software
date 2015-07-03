@@ -1,0 +1,15 @@
+
+function _min(a,b)
+   _min=a:if b<a then:_min=b:end if
+ end function
+
+function _max(a,b)
+   _max=a:if b>a then:_max=b:end if
+ end function
+
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls
+
+a1=240:b1=63
+  prints (_min(a1,b1))
+  prints (_max(a1,b1))
+waitkey

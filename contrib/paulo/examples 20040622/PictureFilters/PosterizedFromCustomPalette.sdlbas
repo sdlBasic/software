@@ -1,0 +1,78 @@
+fnam$="pic4":finpal$=fnam$+".act":finp$=fnam$+".png":fout$=finp$+".bmp"
+
+'---- lots to be done
+'--- needed functions
+function rrgb(c1)
+   rrgb=bitwiseand(int(c1/65536),0xFF)
+ end function
+function grgb(c1)
+   grgb=bitwiseand(int(c1/256),0xFF)
+ end function
+function brgb(c1)
+   brgb=bitwiseand(c1,0xFF)
+ end function
+function eucl(x,y,z)
+    eucl=sqr((x^2)+(y^2)+(z^2))
+ end function
+function midrgb(c1,c2,a1)
+   r1=rrgb(c1):g1=grgb(c1):b1=brgb(c1)
+   r2=rrgb(c2):g2=grgb(c2):b2=brgb(c2)
+    rv=(r1*a1)+(r2*(100-a1))
+    gv=(g1*a1)+(g2*(100-a1))
+    bv=(b1*a1)+(b2*(100-a1))
+    midrgb=rgb(rv,gv,bv)
+ end function
+function distrgb(c1,c2)
+   r1=rrgb(c1):g1=grgb(c1):b1=brgb(c1)
+   r2=rrgb(c2):g2=grgb(c2):b2=brgb(c2)
+   rd=abs(r2-r1):gd=abs(g2-g1):bd=abs(b2-b1)
+     distrgb=eucl(rd,gd,bd)
+ end function
+function lum(c1)
+'- thanks to Rumiko Takahashi ;)))
+   r1=rrgb(c1):g1=rrgb(c1):b1=rrgb(c1)
+   lum=((r1*30)+(g1*59)+(b1*11))/100
+ end function
+
+
+
+'-- read custom palette document
+
+dim pal[256]
+   open finpal$ for input as #1
+for i=0 to 255
+   r1=readbyte(1):g1=readbyte(1):b1=readbyte(1)
+   pal[i]=rgb(r1,g1,b1)
+ next
+   close #1
+
+'-- open pic
+  xedge=0:yedge=0
+open finp$ for input as #1
+   for i=1 to 16: n=readbyte(1): next
+   for i=1 to 2: n=readbyte(1): next
+     xedge=readbyte(1)*256:xedge=xedge+readbyte(1)
+   for i=1 to 2: n=readbyte(1): next
+     yedge=readbyte(1)*256:yedge=yedge+readbyte(1)
+ close #1
+    setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+   ScreenOpen (1,xedge,yedge,0,0,0,0,0)
+screen(1)
+    Loadimage(finp$,1): pasteicon(0,0,1)
+
+'-- filter
+for y=0 to yedge: for x=0 to xedge
+   screen(1)
+     cpix=point(x,y)
+        distmax=512:curcl=0
+     for i=0 to 255
+        distc=distrgb(cpix,pal[i])
+        if distc<distmax then:curcl=i:distmax=distc:end if
+      next
+   screen(0)
+     ink (pal[curcl]):dot(x,y)
+ next:next
+
+'-- save pic 
+grab (1,0,0,xedge,yedge):saveimage (fout$,1)
+  waitkey

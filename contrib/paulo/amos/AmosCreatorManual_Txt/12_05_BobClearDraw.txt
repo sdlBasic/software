@@ -1,0 +1,57 @@
+Rem ************************************ 
+Rem *        AMOS Example 12.5         * 
+Rem *          Bob Clear/Draw          *     
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Open two screens with four colours   
+Screen Open 0,320,256,4,Lowres
+Screen Open 1,320,256,4,Lowres
+Rem Set a nicely subdued palette (to avoid headaches!) 
+Flash Off : Palette 0,$666,$888,$AAA
+Curs Off : Hide 
+Rem make a bob image 
+MAKE_OBJECTS
+Rem Initialize screen
+Rem Draw a random pattern
+MAKE_PATTERN
+Rem Initialise screen zero 
+Screen Copy 1 To 0 : Screen 0 : Screen To Front 0
+Flash Off : Get Palette 1
+Rem activate screen swtiching and turn off bob updates 
+Double Buffer : Bob Update Off 
+Rem Set scrolling size 
+S=4
+Repeat 
+   Rem keep logical and physical screens in step
+   For Y=0 To 240-S Step S
+      Rem remove bobs from screen
+      Bob Clear 
+      Rem scroll screen
+      Screen Copy 1,79,Y+S*2,240,240 To 0,79,0 : Rem scroll screen
+      Screen Copy 1,79,0,240,Y+S*2 To 0,79,240-(Y+S*2)
+      Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),1
+      Rem redraw bobs at new position  
+      Bob Draw 
+      Screen Swap : Wait Vbl 
+   Next Y
+   Rem Boom 
+Until Mouse Key
+Procedure MAKE_OBJECTS
+   Rem Generate an image
+   Cls 0
+   Rem Ship 
+   Ink 2
+   Polygon 8,0 To 16,16 To 0,16 To 8,0
+   Ink 0
+   Polygon 8,10 To 16,16 To 0,16 To 8,10
+   Get Bob 1,0,0 To 16,16
+End Proc
+Procedure MAKE_PATTERN
+   Cls 0
+   For S=0 To 11
+      Rem choose a colour
+      I=S mod 4 : Ink I
+      Bar 80,S*20 To 239,S*20+19
+   Next S
+End Proc

@@ -1,0 +1,60 @@
+TEXTAREA.wikiedit {
+	CLEAR: both; BORDER-RIGHT: #c3c3c3 1px solid; PADDING-RIGHT: 0.8em; BORDER-TOP: #7c7c7c 1px solid; PADDING-LEFT: 0.8em; BACKGROUND: white; PADDING-BOTTOM: 0.5em; MARGIN: 0.5ex 0px; BORDER-LEFT: #c3c3c3 1px solid; PADDING-TOP: 0.5em; BORDER-BOTTOM: #dddddd 1px solid
+}
+INPUT.wikitext {
+	CLEAR: both; BORDER-RIGHT: #c3c3c3 1px solid; PADDING-RIGHT: 0.8em; BORDER-TOP: #7c7c7c 1px solid; PADDING-LEFT: 0.8em; BACKGROUND: white; PADDING-BOTTOM: 0.5em; MARGIN: 0.5ex 0px; BORDER-LEFT: #c3c3c3 1px solid; PADDING-TOP: 0.5em; BORDER-BOTTOM: #dddddd 1px solid
+}
+TEXTAREA.summary {
+	CLEAR: both; BORDER-RIGHT: #c3c3c3 1px solid; PADDING-RIGHT: 0.8em; BORDER-TOP: #7c7c7c 1px solid; PADDING-LEFT: 0.8em; BACKGROUND: white; PADDING-BOTTOM: 0.5em; MARGIN: 0.5ex 0px; BORDER-LEFT: #c3c3c3 1px solid; PADDING-TOP: 0.5em; BORDER-BOTTOM: #dddddd 1px solid
+}
+.toolbar {
+	MARGIN: 0.5ex 0px
+}
+DIV.toolbar {
+	MARGIN: 0.5ex 0px
+}
+DIV.wikitext {
+	WIDTH: auto
+}
+IMG.linkicon {
+	VERTICAL-ALIGN: middle
+}
+.interwiki-map THEAD TD {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 1em
+}
+.interwiki-moniker {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 1em
+}
+.interwiki-url {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 1em
+}
+.diff {
+	PADDING-RIGHT: 1px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px; MARGIN: 0.5ex 0px; PADDING-TOP: 1px
+}
+.diff .block {
+	PADDING-RIGHT: 0.5em; PADDING-LEFT: 0.5em; PADDING-BOTTOM: 0.5ex; PADDING-TOP: 0.5ex
+}
+.diff .original {
+	PADDING-RIGHT: 1px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px; PADDING-TOP: 1px
+}
+.diff .deleted {
+	PADDING-RIGHT: 1px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px; PADDING-TOP: 1px
+}
+.diff .final {
+	PADDING-RIGHT: 1px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px; PADDING-TOP: 1px
+}
+.diff .added {
+	PADDING-RIGHT: 1px; PADDING-LEFT: 1px; PADDING-BOTTOM: 1px; PADDING-TOP: 1px
+}
+.diff .block DIV {
+	PADDING-LEFT: 1.5em; POSITION: relative
+}
+.diff .prefix {
+	LEFT: 0px; POSITION: absolute; TOP: 0px
+}
+.diff DEL {
+	PADDING-RIGHT: 0.5ex; PADDING-LEFT: 0.5ex
+}
+.diff INS {
+	PADDING-RIGHT: 0.5ex; PADDING-LEFT: 0.5ex
+}

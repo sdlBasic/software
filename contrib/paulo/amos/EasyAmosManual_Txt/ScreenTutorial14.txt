@@ -1,0 +1,97 @@
+'
+'      Screen tutorial #14 - HAM mode (4,096 Colours on screen at once!)     
+'
+'
+'Open a HAM screen 
+'
+Screen Open 0,320,260,4096,Lowres
+YS=30
+Screen Display 0,,YS,,
+Curs Off : Flash Off : Cls 0 : Paper 0
+'Palette 0,$FFF,$EEE,$DDD,$CCC,$BBB,$AAA,$999,$888,$F0F,$E0E,$D0D,$C0C,$B0B,$A0A,$909
+'
+' These next three nested loops run through all the 4,096 colour combinations  
+' made up of Red, Green and Blue.
+'
+X=0 : Y=0
+For R=0 To 15
+   For G=0 To 15
+      If X>320
+         Y=Y+16
+         X=0
+      End If 
+      For B=0 To 15
+'
+' Call the HAM Plot procedure and flush last block to fill in the screen 
+'
+         If R=15 and G=15
+            HAMPLOT[R,G,B,X,320,Y+B]
+         Else 
+'
+' Draw the HAM line
+'
+            HAMPLOT[R,G,B,X,X+20,Y+B]
+         End If 
+      Next B
+      X=X+20
+   Next G
+Next R
+'
+' Open another screen to display message 
+'
+Screen Open 1,640,8,16,Hires
+Curs Off : Cls 0 : Flash Off 
+Screen 1 : Paper 0
+Locate 0,0 : Centre "4,096 Colours! Move mouse up and down"
+'
+' Main loop for scrolling the coloured HAM screen up and down
+'
+Screen 0
+Do 
+   If Y Mouse>180
+      YS=YS-1
+      If YS<0
+         YS=0
+      End If 
+   Else 
+      YS=YS+1
+      If YS>100
+         YS=100
+      End If 
+   End If 
+   Screen Display 0,,YS,,
+   Wait Vbl 
+Loop 
+'  
+Procedure HAMPLOT[R,G,B,X,X2,Y]
+   '--------------------------------------------------------------------- 
+   '
+   '                        HAM plot procedure  
+   '
+   ' R, G and B are the colour combinations for the line to be drawn. 
+   '
+   ' X is the start of the line and X2 is its end position. The line must 
+   ' be drawn from left to right
+   '
+   ' Y is the position down the screen at which the line is to be drawn.
+   ' This procedure will only draw horizontal lines!  
+   '
+   '--------------------------------------------------------------------- 
+   '  
+   ' Plot the Red 'component' - Note that red shades start at +32 
+   '
+   Ink R+32 : Plot X,Y
+   '
+   ' Mix in the Green 'component' - Note green starts at + 48 
+   '
+   Ink G+48 : Plot X+1,Y
+   '
+   ' Mix the Blue 'component' - Note Blue starts at + 16
+   '
+   Ink B+16 : Plot X+2,Y
+   '
+   ' Now draw the rest of the line in the newly mixed colour
+   '
+   Draw To X2,Y
+   '
+End Proc

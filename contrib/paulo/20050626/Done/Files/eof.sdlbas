@@ -1,0 +1,9 @@
+setdisplay(320,480,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+open"eof.sdlbas" for input as #1
+  while eof(1)=0
+     file input #1,a$
+     prints(a$)
+     prints("(eof="+str$(eof(1))+")")
+   wend
+ close#1
+waitkey

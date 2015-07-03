@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+reservebank(1,512)
+prints("deek(1,41)="+str$(deek(1,41)))
+prints("doke(1,41,1234)"):doke(1,41,1234)
+prints("deek(1,41)="+str$(deek(1,41)))
+waitkey

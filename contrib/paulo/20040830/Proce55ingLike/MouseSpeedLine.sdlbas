@@ -1,0 +1,17 @@
+xedge=640:yedge=480
+ setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+ setautoback(25)
+sub waitick(t)
+   tkc=ticks:while ticks<tkc+t:wend
+ end sub
+    xn=xmouse:yn=ymouse
+    xo=xn:yo=yn
+while(0=0)
+   waitick(8)
+    xd=xn-xo:yd=yo-yn
+     xda=abs(xd):yda=abs(yd)
+    xo=xn:yo=yn
+     xn=xmouse:yn=ymouse
+   line(xn-yd,yn-xd,xn+yd,yn+xd)
+    if key(27) then : end :end if
+ wend

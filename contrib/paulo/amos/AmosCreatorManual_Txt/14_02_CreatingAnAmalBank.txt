@@ -1,0 +1,95 @@
+'----------------------------------
+' Example of creating an AMAL bank 
+Erase 4 : Reserve As Data 4,4000
+'----------------------------------
+' Creates a bank with one movement 
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Get Sprite Palette 
+Flash Off 
+Gosub TAPE
+Double Buffer 
+Do 
+   AB=Start(4)
+   A$="Amal    "
+   For N=1 To Len(A$) : Poke AB-8+N-1,Asc(Mid$(A$,N,1)) : Next 
+   Loke AB,0 : Add AB,4
+   ' Number of movements
+   Doke AB,1 : Add AB,2
+   ' Offset/2 to first movement: the offset here is 2!  
+   Doke AB,2/2+1 : Add AB,2
+   ' First movement .SPEED  
+   Doke AB,1 : Add AB,2
+   '                .Offset to Y Move 
+   Doke AB,LX+2+4 : Add AB,2
+   '                .XMove definition 
+   Poke AB,0 : Inc AB
+   For N=0 To LX-1
+      Poke AB,Peek(Varptr(X$)+N) : Inc AB
+   Next 
+   Poke AB,0 : Inc AB
+   '                .YMove definition 
+   Poke AB,0 : Inc AB
+   For N=0 To LY-1
+      Poke AB,Peek(Varptr(Y$)+N) : Inc AB
+   Next 
+   Poke AB,0 : Inc AB
+   For N=1 To 10
+      Bob N,0,0,1
+      Channel N To Bob N
+      Amal N,"PL1"
+      Amal On 
+      Wait 5
+   Next 
+   Repeat : Until Mouse Key
+   Bob Off 
+   Wait 50
+Loop 
+'----------------------------------
+' Tape one movement in strings 
+TAPE:
+Home : Print "Recoding mouse movements" : Print : Print "Press button to play back"
+LMVE=2000
+X$=Space$(LMVE) : Y$=Space$(LMVE)
+ADX=Varptr(X$) : ADY=Varptr(Y$) : LX=0 : LY=0
+X Mouse=X Hard(0) : Y Mouse=Y Hard(0)
+XM=X Mouse : YM=Y Mouse
+CPTX=-1 : CPTY=-1
+Repeat 
+   '
+   ' Tape X movements 
+   X=X Mouse
+   If X=XM
+      Inc CPTX
+      If CPTX>126
+         Bset 7,CPTX : Poke ADX,CPTX : Inc ADX : Inc LX : CPTX=-1
+      End If 
+   Else 
+      If CPTX>-1
+         Bset 7,CPTX : Poke ADX,CPTX : Inc ADX : Inc LX : CPTX=-1
+      End If 
+      D=X-XM
+      D=Min(D,63) : D=Max(D,-63)
+      Bclr 7,D : Poke ADX,D : Inc ADX : Inc LX
+      XM=X
+   End If 
+   '
+   ' Tape Y movements 
+   Y=Y Mouse
+   If Y=YM
+      Inc CPTY
+      If CPTY>126
+         Bset 7,CPTY : Poke ADY,CPTY : Inc ADY : Inc LY : CPTY=-1
+      End If 
+   Else 
+      If CPTY>-1
+         Bset 7,CPTY : Poke ADY,CPTY : Inc ADY : Inc LY : CPTY=-1
+      End If 
+      D=Y-YM
+      D=Min(D,63) : D=Max(D,-63)
+      Bclr 7,D : Poke ADY,D : Inc ADY : Inc LY
+      YM=Y
+   End If 
+   Wait Vbl 
+Until Mouse Key or LX>=LMVE or LY>=LMVE
+Clw 
+Return 

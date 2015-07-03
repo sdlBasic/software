@@ -1,0 +1,17 @@
+   setdisplay(256,192,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+sub star5e(vx,vy,vr)
+   stp=(3.141592*4)/5
+   for i=1 to 5
+     vx1=vx+vr*sin(i*stp):vy1=vy-vr*cos(i*stp)
+     vx2=vx+vr*sin((i+1)*stp):vy2=vy-vr*cos((i+1)*stp)
+     line(vx1,vy1,vx2,vy2)
+    next
+ end sub
+for f=1 to 90
+   x=rnd(256):y=rnd(192):r=rnd(30)
+   c=rgb(rnd(255),rnd(255),rnd(255))
+   ink(c):star5e(x,y,r)
+ next
+   waitkey
+
+

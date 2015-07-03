@@ -1,0 +1,69 @@
+#! /usr/bin/sdlbrt
+xed=640: yed=400:wdwd=1
+
+setdisplay(xed,yed,32,wdwd):paper(88-1):ink(0):pen(0):cls
+
+function havintersect(yq,y1,y2)
+  tmpr=0
+  if y1>y2 then:ty=y1:y1=y2:y2=ty:end if
+  if yq>y1 and yq<=y2 then: tmpr=1: end if
+  return tmpr
+  end function
+
+function xintersect(yq,x1,y1,x2,y2)
+  if y1>y2 then
+    tx=x1:ty=y1:x1=x2:y1=y2:x2=tx:y2=ty
+    end if
+  dx=x2-x1:dy=y2-y1:dy2=yq-y1
+  if dy=0 then:dy=.1:end if
+  xypr=dx/dy
+  tm=x1+(dy2*xypr)
+  return tm
+  end function
+
+arsz=255:dim xa1[arsz],ya1[arsz],xa2[arsz],ya2[arsz],xnt[arsz]
+while 0=0
+  arsz=3+rnd(29)
+  ink (rgb(rnd(255),rnd(255),rnd(255)))
+  for i=1 to arsz
+    xa1[i]=rnd(xed):ya1[i]=rnd(yed)
+    next
+  for i=2 to arsz
+    xa2[i]=xa1[i-1]:ya2[i]=ya1[i-1]
+    next
+  xa2[1]=xa1[arsz]:ya2[1]=ya1[arsz]
+  ymin=yed:ymax=0
+  for i=1 to arsz
+    if ya1[i]<ymin then:ymin=ya1[i]:end if
+    if ya1[i]>ymax then:ymax=ya1[i]:end if
+    next
+  for yp=ymin to ymax
+    for i=1 to arsz
+      xnt[i]=xintersect(yp,xa1[i],ya1[i],xa2[i],ya2[i])
+      if havintersect(yp,ya1[i],ya2[i])<>1 then: xnt[i]=-1: end if
+      next
+    for i=1 to arsz-1
+      for j=i to arsz
+        if xnt[i]>xnt[j] then: tm=xnt[i]:xnt[i]=xnt[j]:xnt[j]=tm:end if
+        next
+      next
+    for xq=arsz-1 to 1 step -2
+     ' ink (rgb(rnd(255),rnd(255),rnd(255)))
+      line(xnt[xq],yp,xnt[xq+1],yp)
+      next
+    next
+  prints(xintersect(7,1,5,3,9))
+  prints(xintersect(8,1,5,3,9))
+  prints(xintersect(3,1,5,3,9))
+  prints(xintersect(11,1,5,3,9))
+  prints(havintersect(7,5,9))
+  prints(havintersect(8,5,9))
+  prints(havintersect(3,5,9))
+  prints(havintersect(11,5,9))
+  waitkey
+  'wait(2000)
+  cls
+  wend
+
+
+

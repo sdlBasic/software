@@ -1,0 +1,3 @@
+Syntax error on line number 3 of /home/devel_linux/basic/sdlBasic/sdlBasicDevel/paulo/VeryImportantMathFunctions/MinMaxFunctions.sdlbas
+function min expects 2 args, not 0
+   _min=a:if b<a then:min=b:end if

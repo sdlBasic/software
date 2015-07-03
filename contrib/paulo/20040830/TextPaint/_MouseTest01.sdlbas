@@ -1,0 +1,33 @@
+
+xedge=640:yedge=480
+xprop=9:yprop=12
+
+setdisplay(xedge,yedge,32,1):paper(8^8-1):ink(0):pen(0):cls
+setautoback(25)
+
+
+while(0=0)
+  xn=xmouse:yn=ymouse
+
+     locate (xn\xprop,yn\yprop)
+
+
+
+  if bmouse=1 then
+     prints("1")
+   end if
+
+  if bmouse=4 then
+     prints("4")
+   end if
+
+  if bmouse=5 then
+     prints("5")
+   end if
+
+
+ wend
+
+
+
+

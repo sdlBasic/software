@@ -1,0 +1,9 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+   a$="sdlBasic - SetCaption example - "
+while key(27)=0
+   a$=right$(a$,len(a$)-1)+left$(a$,1)
+   setcaption(a$)
+   b$=caption:locate(1,1):prints(b$)
+   for i=0 to 3:waitvbl:next
+ wend
+

@@ -1,0 +1,6 @@
+'mappa.sdlbas
+include "nemico1.sdlbas"
+
+sub mappa_run
+	nemico1_run
+end sub

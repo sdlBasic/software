@@ -1,0 +1,8 @@
+print"if your operative system"
+print"and sdlBasic distribution allows,"
+print"(or the way you're running sdlBasic)"
+print"this example will printout"
+print"a message"
+print"on the console window!"
+print"(i don't know much more about it)"
+waitkey

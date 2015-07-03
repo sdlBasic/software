@@ -1,0 +1,20 @@
+'-- converted from Amos version (from Ragnar Fyri) - found in Aminet
+
+  XEDGE=320 : YEDGE=240
+setdisplay(xedge,yedge,32,0):paper(8^8-1):ink(0):pen(0):cls
+  X=XEDGE/2 : Y=YEDGE/2 : D=0
+Dim M[3,1] : M[0,1]=-1 : M[1,0]=1 : M[2,1]=1 : M[3,0]=-1
+While(0=0)
+      X=X+M[D,0] : Y=Y+M[D,1]
+        If X>(XEDGE-8) then: X=8 : End If 
+        If Y>(YEDGE-8) then: Y=8 : End If 
+        If X<8 then: X=XEDGE-8 : End If 
+        If Y<8 then: Y=YEDGE-8 : End If 
+      C=Point(X,Y)
+      ink(0xffffff-c)
+       dot(x,y)
+   If C=0xffffff then:D=D+1:Else:D=D-1:End If 
+      D=bitwiseand(D,3)
+'      wait(1)
+      if key(27) then:end:end if
+ Wend 

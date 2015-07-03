@@ -1,0 +1,19 @@
+Rem ************************************ 
+Rem *          Example 16.16           *   
+Rem *           Menu Mouse             *     
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Menu$(1)="Menu"
+Menu$(1,1)="Option 1"
+Menu$(1,2)="Option 2"
+Rem Open a hi rez screen 
+Screen Open 0,640,200,16,Hires
+Rem Initialise screen
+Curs Off : Cls 0
+Centre "<Move the mouse and select an item>"
+Rem Active menu mouse system 
+Menu Mouse On 
+Rem Start menu 
+Menu On 
+Do 
+Loop 

@@ -1,0 +1,7 @@
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+reservebank(1,200000)
+for i=0 to 200000-1
+poke(1,i,rnd(255))
+next
+basesound(2,1)
+playsound(2,1,0)

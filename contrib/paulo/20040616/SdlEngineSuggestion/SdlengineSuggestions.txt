@@ -1,0 +1,58 @@
+
+//SDLengine.c
+//(line close 1739)
+// xrgb per uso interno
+//. int xrgb8(int colR,int colG,int colB)
+//. {return (colB/64) + ((colG/64) * 8)+((colR/64)*8*8); }
+//--- below: cleaning up for easier understanding
+//. {return ((colR/64)*64) + ((colG/64)*8) + (colB/64) ;}
+//--- now comes my suggestion for a more accuraced version
+//--- i'm not sure if backslash works as same as int division on C language
+
+int xrgb8(int colR,int colG,int colB)
+{ return ((ColR\43)*36) + ((ColG\43)*6) + (ColB\43);}
+
+
+
+
+
+
+
+//(line close 1764)
+// rrgb per uso interno
+// int rrgb8(int col){
+//  int colR,colG,colB;
+//  colB = (col & 3)*64;
+//  colG =((col / 8) & 3)*64 ;
+//  colR =((col / (8*8)) & 3)*64;
+//  return colB + (colG * 256)+(colR*256*256);}
+//--- i'm not sure if backslash and Mod operands works on C language
+
+int rrgb8(int col){
+ int colR,colG,colB;
+ colB = (col mod 6)*51;
+ colG =((col\6) mod 6)*51 ;
+ colR =((col\36) mod 6)*51;
+ return colB + (colG * 256)+(colR*256*256);}
+
+
+
+
+
+
+// (i don't know where it is)
+// is the 8bit palette set from the starting line 2171 part (schermo) ?
+//  at SDLdisplay=SDL_SetVideoMode() ?
+// when testing both above, the change below must be set because
+//  the palette is significantly different (now looking like web216 palette)
+// in sdlBasic, assuming color() would affect 8bit hardware palette,
+//  should be something like this:
+
+for r=0 to 5: for g=0 to 5: for b=0 to 5
+   idx=(r*36)+(g*6)+b
+   color(idx,rgb(51*r,51*g,51*b))
+ next:next:next
+
+
+
+

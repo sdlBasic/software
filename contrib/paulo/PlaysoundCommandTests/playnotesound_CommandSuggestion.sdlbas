@@ -1,0 +1,61 @@
+'-
+
+'- Suggestion:
+'-  A new command alternate to playfreqsound(a,b,freq,d)
+'-  My idea is you having both available on sdlBasic (playnotesound and playfreqsound)
+'-  Some coders may want one or another, for suit their closest idiosincratic needs
+'-  (i think is not hard to convert to C and making it part of SDLengine.c too)
+
+sub playnotesound(a,b,note,d)
+   freq=2^(note/12)
+   playfreqsound(a,b,freq,d)
+ end sub
+
+'---- that's it!
+
+
+setdisplay (400,200,32,1)
+paper(8^8-1):ink(0):pen(0):cls
+
+text (10, 10,12,"(please get assured you're testing sdlbasic.exe bugfixed...)")
+
+text (10, 30,12,"1) E string, fret 4 (note -1)")
+text (10, 45,12,"2) A string, fret 0 (note +0)")
+text (10, 60,12,"3) A string, fret 1 (note +1)")
+text (10, 75,12,"4) A string, fret 2 (note +2)")
+text (10, 90,12,"5) A string, fret 3 (note +3)")
+text (10,105,12,"6) A string, fret 4 (note +4)")
+
+loadsound ("0440hz.wav",1):playsound (1,1)
+
+'- i'm coding blindly (not tested on sdlbasic.exe bugfixed yet)
+while key(27)=0
+    if key(49) then : playnotesound(1,1,-1,0):while inkey<>0:end while: end if
+    if key(50) then : playnotesound(1,1, 0,0):while inkey<>0:end while: end if
+    if key(51) then : playnotesound(1,1, 1,0):while inkey<>0:end while: end if
+    if key(52) then : playnotesound(1,1, 2,0):while inkey<>0:end while: end if
+    if key(53) then : playnotesound(1,1, 3,0):while inkey<>0:end while: end if
+    if key(54) then : playnotesound(1,1, 4,0):while inkey<>0:end while: end if
+end while
+
+'--------------------------------------
+'---- notes:
+'- soundfreq now work well!!!!
+'- value for freq looks nonsense
+'-  the value seems to be from increasing and decreasing delay in hz
+'-  like values used internally on .mod docs, or on texas-tms with i/o commands
+'-  (the value used seems to be *-1)
+'-  (fitting on large steps for grave and smaller for acute)
+'- on guitar strings (EADGBe) -
+'-   A string (2nd string thickest (A) ) is 440hz (afaik)
+'-   12 frets up (1 octave up - 2nd fret of 4th string (G) ) is 880hz
+'-   24 frets up (2 octaves up - 5th fret of 6th string (e) ) is 1760hz
+'- (i have no formula ready yet for converting between note, hz, and tick-delay (?) )
+'- is the ideal a floatpoint value for hz? when:
+'--   normal is 1  (*1)
+'--   octave up is 2 (*2)
+'--   octave down is .5 (*.5)
+'- or note? when:
+'--   normal is 0 (+0)
+'--   octave up is 12 (+12)
+'--   octave down is -12 (-12)

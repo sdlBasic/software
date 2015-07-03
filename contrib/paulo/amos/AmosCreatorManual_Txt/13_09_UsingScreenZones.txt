@@ -1,0 +1,75 @@
+Rem ***************************************  
+Rem *        AMOS Example 13.9            *  
+Rem *       Using screen zones            *
+Rem *    (c) Mandarin / Jawx 1990         *  
+Rem ***************************************  
+Rem
+Rem Initalisation
+Load "amos_data:sprites/octopus.abk"
+Rem Set hot spot 
+Hot Spot 1,$11
+Double Buffer : Flash Off : Get Sprite Palette 
+Curs Off : Cls 0 : Paper 0
+Locate 0,0 : Centre "Screen zone demo"
+Rem Dimension X,Y offset arrays
+Dim DX(16),DY(16)
+Rem Load offset arrays 
+INIT=True : CONTROL_BOB[INIT]
+Rem Make zones 
+MAKE_HOLES
+Rem Call bob control routine 
+CONTROL_BOB[0]
+End 
+Procedure CONTROL_BOB[INIT]
+   Rem Initalize object 
+   Shared DX(),DY(),FELL
+   If INIT
+      Rem SPEED holds the size of each movement step 
+      SPEED=2 : Rem reasonable values range from 1(slow) to 5(veryfast)  
+      Rem load offset arrays used to change coordinates of bob 
+      For I=1 To 15 : Read X,Y : DX(I)=X*SPEED : DY(I)=Y*SPEED : Next I
+   Else 
+      Rem Control a bob
+      Rem Works equally well for sprites 
+      X1=160 : Y1=100 : Rem sets the starting position of object   
+      IMAGE=1 : Rem Sets image used by object
+      Do 
+         Bob 1,X1,Y1,IMAGE : Rem move bob 
+         Rem read joystick and get new coordinates  
+         J=Joy(1) and 15 : Add X1,DX(J),10 To 300 : Add Y1,DY(J),10 To 190
+         Exit If Joy(1)>15 : Rem test fire buttton
+         Rem check whether the bob has entered a screen zone  
+         CHECK_HOLES : If FELL : Play 40,1 : End If 
+      Loop 
+   End If 
+   Rem offset data
+   Data 0,-1,0,1,0,0,-1,0,-1,-1,-1,1
+   Data 0,0,1,0,1,-1,1,1,0,0,0,0,0,0,0,0,0,0,0
+End Proc
+Procedure MAKE_HOLES
+   Rem makes some screen zones
+   Rem reserve some space for your zones
+   Reserve Zone 10
+   Reset Zone 
+   Ink 3,0
+   Rem generate five zones
+   For Z=1 To 9
+      Rem try to avoid overlapping zones 
+      Do 
+         TX=Rnd(300) : TY=Rnd(160) : W=20 : H=20
+         Exit If Zone(TX,TY)=0 and Zone(TX+W,TY+H)=0
+      Loop 
+      Screen Swap : Wait Vbl 
+      Box TX,TY To TX+W,TY+H : Text TX+6,TY+13,Str$(Z)-" "
+      Rem This example was written before AUTOBACK was implemented 
+      Rem so the screen swap stuff is not really needed  
+      Screen Swap : Wait Vbl 
+      Box TX,TY To TX+W,TY+H : Text TX+6,TY+13,Str$(Z)-" "
+      Set Zone Z,TX,TY To TX+W,TY+H
+   Next Z
+End Proc
+Procedure CHECK_HOLES
+   Shared FELL
+   Rem has ship entered a zone? 
+   If Zone(X Bob(1),Y Bob(1)) Then FELL=True Else FELL=False
+End Proc

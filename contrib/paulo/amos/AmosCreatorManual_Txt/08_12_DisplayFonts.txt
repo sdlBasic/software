@@ -1,0 +1,42 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.12         * 
+Rem *          Display fonts           * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load fonts from the disc 
+Get Fonts 
+Rem Count fonts
+COUNT_FONTS
+Rem display available fonts  
+Centre "Fonts Installed" : Print : Print String$("=",40)
+Print "Rom   Fonts:";ROM_FONTS
+Print "Disc  Fonts:";DISC_FONTS
+Print "Total Fonts:";FONT_COUNT
+Rem Print fonts
+Locate 0,22 : Centre "<Hit a key to continue>"
+Wait Key 
+Clw 
+Rem Display an example of each font on the screen
+For F=1 To FONT_COUNT
+   Cls 
+   Rem Print font name
+   Locate 0,0 : Print Font$(F)
+   Rem Set font type
+   Set Font F
+   Rem Print an example of the font 
+   Text 0,100,"FONT "+Str$(F)
+   Locate 0,22 : Centre "<Hit a key to continue>"
+   Wait Key 
+Next F
+End 
+Procedure COUNT_FONTS
+   Shared DISC_FONTS,ROM_FONTS,FONT_COUNT
+   F=1 : F$=Font$(F) : DISC_FONTS=0 : ROM_FONTS=0 : FONT_COUNT=0
+   While F$<>""
+      Inc FONT_COUNT
+      F$=Font$(F) : TYPE$=Mid$(F$,35,4)
+      If TYPE$="Disc" Then Inc DISC_FONTS Else Inc ROM_FONTS
+      Inc F
+   Wend 
+End Proc

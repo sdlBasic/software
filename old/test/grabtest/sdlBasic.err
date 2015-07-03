@@ -1,0 +1,3 @@
+Syntax error on line number 6 of C:\Devel\basic\sdlBasicDevel\esp\grabtest\grab.sdlbas
+function rnd expects at most 1 args, not 4
+    line(rnd(640,rnd(480),rnd(640),rnd(480))

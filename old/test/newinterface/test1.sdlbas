@@ -1,0 +1,33 @@
+
+'test1
+'----------------------------------------------------------------------------------------------------------------------------------
+include "interface.sdlblib"
+
+
+setnew(0,window,-1,10,10,150,100,"first window")
+setnew(1,button,0,140,10,12,12,"X")
+
+
+while getparam(0,_state<>0)
+    waitevent()
+    if getparam(1,_state)=3 then
+	setparam(0,_state,0)
+	'setparam(1,_state,0)
+    end if
+end while
+cls
+
+setnew(0,window,-1,10,10,150,100,"ok box")
+setnew(1,button,0,70,80,24,15,"OK")
+
+
+while getparam(0,_state<>0)
+    waitevent()
+    if getparam(1,_state)=3 then
+	setparam(0,_state,0)
+	setparam(1,_state,0)
+    end if
+end while
+cls
+prints ("press any key to exit")
+waitkey

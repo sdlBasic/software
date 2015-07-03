@@ -1,0 +1,21 @@
+For using this sdlBasic binary, you'll need to install SDL, SDL_mixer, SDL_image, SDL_ttf, SDL_net and smpeg.
+You can find these libraries in the NetBSD packages collection.
+Don't forget to copy the fonts in the ttf/ to /usr/share/fonts/ttf/dejavu
+A note: if you encounter an error and the missing dependencies are with the two letters "nb" , force the installation and go ahead. This to me works. I don't know the reason that one needs "nb" versions... all two are SDL 1.2.8!
+If when executing sdlBasic NetBSD doesn't found some libraries, be prepared to do some symlinks.
+Eg. if it says that doesn't find libogg do a symlink to your /usr/pkg/lib/<libogg> /usr/lib/<libogg library it says not found>. This works to me, too.
+Remember that precompiled NetBSD SDL libraries are broken (are linked with libraries with strange minor numbers)!
+
+
+I've maked some changes that you can find in changes/
+If you want to compile this:
+Copy these two files in changes/ to the sources of sdlBasic 01052005-RELEASE
+Do this: "gmake -f Makefile.NetBSD" (you'll need gmake to do this)
+
+I cannot test sound because my home computer's soundcard (CMEDIA-PCI CM8738) seems not supported by NetBSD.
+
+For sdlBasic versions newer than 01052005 NetBSD support will be probably in the standard distribution.
+
+Goodbye!
+-- Tails92
+  

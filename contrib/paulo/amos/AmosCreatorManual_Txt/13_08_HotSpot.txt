@@ -1,0 +1,29 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.8         * 
+Rem *            Hot Spot              * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Paper 0
+Rem Make a sprite image
+MAKE_OBJECT
+Rem Main loop
+Do 
+   Rem Enter new hotspot coordinates relative to the top corner of the object 
+   Rem coords can be negative 
+   Locate 0,0 : Cline : Input "Enter hot spot coordinates X,Y ?";X,Y
+   Rem Change hot spot of image 1 
+   Hot Spot 1,X,Y
+   Rem Move sprite with mouse until a mouse key is pressed
+   Repeat 
+      Rem Wait vbl smooths motion
+      Sprite 1,X Mouse,Y Mouse,1 : Wait Vbl 
+   Until Mouse Key
+Loop 
+Procedure MAKE_OBJECT
+   Rem Generate a simple box for our image
+   Cls 0
+   Box 1,1 To 31,31
+   Get Sprite 1,0,0 To 32,32
+   Cls 0
+End Proc

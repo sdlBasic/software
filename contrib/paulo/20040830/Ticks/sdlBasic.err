@@ -1,0 +1,3 @@
+Syntax error on line number 5 of ticks.sdlbas
+Parse error: expected Function name, but got bitwiseand
+function bitwiseand(a,b)

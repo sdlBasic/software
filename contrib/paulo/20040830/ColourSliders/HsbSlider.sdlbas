@@ -1,0 +1,72 @@
+
+
+xedge=200:yedge=80
+  setdisplay(xedge,yedge,32,1)
+  mouseshow
+  paper (0xffffff):ink (0x000000): pen (0x000000):cls
+
+include "interface_040514.sdlblib"
+
+ function rpufrhue(h)
+     tmpr0=0:tmpr1=h mod 60:tmpr2=int (h/60)
+     if ((h<=60) or (h>=300)) then: tmpr0=255 : end if
+     if ((h>60) and (h<120)) then: tmpr0=((120-h)*255)/60:end if
+     if ((h>240) and (h<300)) then: tmpr0=((h-240)*255)/60:end if
+     rpufrhue=tmpr0
+   end function
+ function gpufrhue(h)
+     tmpr0=0:tmpr1=h mod 60:tmpr2=int (h/60)
+     if ((h>=60) and (h<=180)) then: tmpr0=255:end if
+     if ((h>180) and (h<240)) then: tmpr0=((240-h)*255)/60:end if
+     if ((h>0) and (h<60)) then: tmpr0=(h*255)/60:end if
+     gpufrhue=tmpr0
+   end function
+ function bpufrhue(h)
+     tmpr0=0:tmpr1=h mod 60:tmpr2=int (h/60)
+     if ((h>=180) and (h<=300)) then: tmpr0=255:end if
+     if ((h>300) and (h<360)) then: tmpr0=((360-h)*255)/60:end if
+     if ((h>120) and (h<180)) then: tmpr0=((h-120)*255)/60:end if
+     bpufrhue=tmpr0
+   end function
+
+
+
+
+paper(0xAAAAAA):cls
+
+setnew(0,slider,14,40,8,100,10,50)
+setnew(1,slider,14,40,24,100,10,50)
+setnew(2,slider,14,40,40,100,10,50)
+
+'- this code is hugely dirty - please don't get scarry... ;)
+
+  ink (0x777777)
+  bar (8,8,72,72)
+
+
+draw
+while(0=0)
+  waitevent(0)
+
+  if key(27)=1 then:end:end if
+
+  setparam(17,_value,getparam(15,_value))
+  drawobject(17)
+
+  hue=(getparam(0,_value))*360/100
+  sat=(getparam(1,_value))*100/100
+  bri=(getparam(2,_value))*100/100
+
+r0=rpufrhue(hue):g0=gpufrhue(hue):b0=bpufrhue(hue)
+rv=(r0*bri)/100:gv=(g0*bri)/100:bv=(b0*bri)/100
+brioct=(bri*255)/100
+rs=((rv*sat)+(brioct*(100-sat)))/100
+gs=((gv*sat)+(brioct*(100-sat)))/100
+bs=((bv*sat)+(brioct*(100-sat)))/100
+r=int(rs):g=int(gs):b=int(bs)
+
+
+  ink (rgb(r,g,b))
+  bar (8,8,72,72)
+
+wend

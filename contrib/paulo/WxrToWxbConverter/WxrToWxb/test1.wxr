@@ -1,0 +1,32 @@
+static char *dialog1 = "dialog(name = 'dialog1',\
+  style = 'wxRAISED_BORDER | wxCAPTION | wxSYSTEM_MENU',\
+  title = 'dialog1',\
+  id = 100,\
+  x = 9, y = 10, width = 178, height = 83,\
+  background_colour = 'C0C0C0',\
+  use_dialog_units = 1,\
+  use_system_defaults = 1,\
+  font = [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif'],\
+  control = [104, wxRadioButton, 'TextVersion1', '0', 'radiobutton5', 84, 35, 81, 10, 0,\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [105, wxRadioButton, 'TextVersion2', '0', 'radiobutton6', 84, 45, 81, 10, 0,\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [106, wxStaticText, 'StaticText', '0', 'statictext7', 4, 59, 161, 6, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [107, wxStaticBox, '', '0', 'staticbox8', 4, 3, 57, 50,\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [108, wxButton, 'Button1', '0', 'button9', 4, 69, 50, 10, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [109, wxButton, 'Button2', '0', 'button10', 60, 69, 50, 10, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [110, wxButton, 'Button3', '0', 'button11', 116, 69, 51, 10, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [111, wxButton, '1', '0', 'button12', 66, 7, 17, 15, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [112, wxButton, '2', '0', 'button13', 88, 7, 16, 15, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [113, wxButton, '3', '0', 'button14', 109, 7, 16, 15, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']],\
+  control = [114, wxButton, '4', '0', 'button15', 132, 7, 16, 15, '',\
+      [8, 'wxSWISS', 'wxNORMAL', 'wxNORMAL', 0, 'MS Sans Serif']]).";
+

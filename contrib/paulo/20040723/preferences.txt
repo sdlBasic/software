@@ -1,0 +1,11 @@
+server:client_01
+me:client_03
+# please check and write here below your and neighbours TcpIp ID
+client_01:197.40.87.1
+client_02:197.40.87.2
+client_03:197.40.87.3
+client_04:197.40.87.4
+spritecolour:4
+# note: only server most know who are the other clients (am i right?)
+  
+

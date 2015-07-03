@@ -1,0 +1,38 @@
+  MX=0:MY=0:OX=0:OY=0:IMIN=32:IMAX=128:ICN=8:DISTX=8:DISTY=8
+  Dim POSX(ICN),POSY(ICN),SIZP(ICN)
+  XEDGE=640:YEDGE=480
+    Screen Open 0,XEDGE,YEDGE,16,32772
+Procedure SZ[X,Y,MX,MY,IMIN,IMAX]
+     TMPR=IMIN: DIFX=Abs(Abs(X)-Abs(MX)): DIFY=Abs(Abs(Y)-Abs(MY))
+   PITGD=Sqr(DIFX*DIFX+DIFY*DIFY)
+     If PITGD<(IMAX-IMIN)
+        TMPR=IMAX-PITGD
+      End If 
+ End Proc[TMPR]
+Procedure DISPICN[X,Y,S]
+    Draw X-2,Y To X+2,Y:Draw X,Y-2 To X,Y+2
+   Draw X-(S/2),Y-(S/2) To X+(S/2),Y-(S/2):Draw X-(S/2),Y+(S/2) To X+(S/2),Y+(S/2)
+    Draw X-(S/2),Y-(S/2) To X-(S/2),Y+(S/2):Draw X+(S/2),Y-(S/2) To X+(S/2),Y+(S/2)
+ End Proc
+   CNTX=0
+For I=0 To ICN-1
+   SIZP(I)=IMIN:CNTX=CNTX+DISTX+(IMIN/2):POSX(I)=CNTX:POSY(I)=YEDGE-(DISTY+(IMIN/2))
+     DISPICN[POSX(I),POSY(I),SIZP(I)]
+   CNTX=CNTX+IMIN/2
+ Next 
+Do 
+   MX=(X Mouse*2)-256:MY=(Y Mouse*2)-96
+   Plot MX,MY:Cls 
+   ' If OX<>MX and OY<>MY 
+   OX=MX: OY=MY
+    CNTX=0
+   For I=0 To ICN-1
+      SZ[POSX(I),POSY(I),MX,MY,IMIN,IMAX]:SIZP(I)=Param
+      CNTX=CNTX+DISTX+(SIZP(I)/2)
+      POSX(I)=CNTX:POSY(I)=YEDGE-(DISTY+(SIZP(I)/2))
+        DISPICN[POSX(I),POSY(I),SIZP(I)]
+      CNTX=CNTX+SIZP(I)/2
+    Next 
+       CNTX=CNTX-DISTX
+   ' End If 
+ Loop 

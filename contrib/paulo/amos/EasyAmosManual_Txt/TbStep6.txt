@@ -1,0 +1,809 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                        STEP SIX: Tidying up  
+'----------------------------------------------------------------------------
+'
+' Now that our game is nearly finished, we are ready to add some finishing 
+' touches. We need to create new routines for: 
+' goal detection, scoring, timer and handling the half-time.   
+'
+' Here we go!
+'
+'----------------------------------------------------------------------------  
+Close Editor 
+Hide On 
+PATH$="Easy_Examples:"
+'
+' We have already seen these variables   
+Dim XP(1),YP(1),XDP(15),YDP(15),DB(1),DP(1),SP(1),IP(15,1),FL(1)
+Dim XR(1),YR(1)
+Dim XH(15),YH(15)
+Dim XHH(15),YHH(15)
+Dim CP(1),CB(1),CC(1),XC(1),YC(1)
+Dim BOUNCE(8,15)
+Dim ROBOT(1)
+Dim ROBOT$(1),WHERE$(1),CHECK$(1),AFTER$(1)
+Dim GX(1),GY(1),ODX(1),ODY(1)
+Dim ROBGOAL(1),ROBHIT(1),ROBWAIT(1),RPAR(1),BUMP(1)
+Dim ROBSPEED(1),ROBSP(1),ROBD(1)
+Dim ROBDIR(20)
+' ***
+' These variables will handle the score and set it's position on the screen  
+Dim XSCR(1),SCRE(1)
+' ***
+' We also need a new array for to hold the maximum speed of the players trikes 
+Dim MXSP(1)
+'
+' As always, we'll make all our variables global 
+Global XP(),YP(),XDP(),YDP(),DB(),DP(),SP(),IP(),FL()
+Global XR(),YR()
+Global P2BOB,BBP,BBB,PSIZE
+Global PLA
+Global XC(),YC()
+Global XH(),YH(),XHH(),YHH(),CP(),CB(),CC()
+Global P2BOB,BBP,BBB,PSIZE
+Global XB,YB,ZB
+Global DB,SB
+Global SZB
+Global ZBALL
+Global BBALL
+Global CPT,BOUNCE()
+Global YTOP,YBOTTOM,XCENTER,YCENTER
+Global GX,GY,GX(),GY(),ROBDIR(),ODX(),ODY()
+Global ROBOT$(),WHERE$(),CHECK$(),AFTER$()
+Global ROBGOAL(),ROBHIT(),ROBWAIT(),ROBOT(),RPAR(),ROBSPEED()
+Global ROBSP(),ROBD(),BUMP()
+Global GOAL
+' ***
+' The score is also global 
+Global XSCR(),YSCR,SCRE()
+' ***
+' MARK will signal that a goal has been set
+Global MARK
+' ***
+' FINISH is a counter to mark the end of a game. 
+Global FINISH
+' ***
+' The timer definitions
+Global SEC,MNT
+' MXSP() is global 
+' FLAGCOL is a new flag for collision detection
+Global MXSP(),FLAGCOL
+'
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+Load PATH$+"Pictures/Tricycle_Screen.Abk",10
+Load PATH$+"Pictures/Tricycle_Playfield.Abk",11
+'
+GAME_INIT
+' ***
+' I've moved the initialisation procedure for the players into the GAME_INIT   
+' and NEW_BALL procedures! 
+' ***
+' The ball is set up in NEW_BALL 
+ROBOT(1)=1
+ROBWAIT(1)=10 : ROBHIT(1)=50 : ROBGOAL(1)=50
+ROBSPEED(1)=12
+ROBOT$(1)="THINK"
+' ***
+' Definition of time 
+SEC=0 : MNT=1
+'
+GAME
+'
+ALL_ERASE
+Edit 
+'
+Procedure GAME_INIT
+   '
+   BBP=1 : P2BOB=10 : BBB=4
+   PSIZE=10
+   BBALL=3
+   ZBALL=30
+   YTOP=64*32 : YBOTTOM=432*32
+   XCENTER=128*32 : YCENTER=263*32
+   ' ***
+   ' Defines the position of each players score on the screen 
+   XSCR(0)=18 : XSCR(1)=243 : YSCR=169
+   ' ***
+   ' Set the initial scores to zero 
+   SCRE(0)=0 : SCRE(1)=0
+   '
+   Restore _DIRECTIONS
+   ANGLE#=Pi#/2.0 : A=32 : B=3 : S=8
+   For D=0 To 15
+      XDP(D)=S*Cos(ANGLE#) : YDP(D)=-S*Sin(ANGLE#)
+      XH(D)=A*Cos(ANGLE#) : YH(D)=-A*Sin(ANGLE#)
+      XHH(D)=B*Cos(ANGLE#-Pi#/2) : YHH(D)=-B*Sin(ANGLE#-Pi#/2)
+      ANGLE#=ANGLE#-Pi#/8.0
+      Read IP(D,0),IP(D,1)
+   Next 
+   '
+   Restore _BOUNCE
+   For Z=1 To 8
+      For B=0 To 15
+         Read BOUNCE(Z,B)
+      Next 
+   Next 
+   '
+   Restore _ROBOT
+   For D=0 To 19
+      Read ROBDIR(D)
+   Next 
+   '
+   Unpack 11 To 1
+   Reserve Zone 10
+   Set Zone 1,21,0 To 223,24 : Set Zone 2,21,487 To 220,511
+   Set Zone 3,0,21 To 25,487 : Set Zone 4,220,24 To 256,487
+   Set Zone 5,0,0 To 21,24 : Set Zone 6,220,0 To 256,24
+   Set Zone 7,0,486 To 24,511 : Set Zone 8,220,487 To 256,511
+   ' ***
+   ' Let's limit the bob display so that the players seem to MOVE INTO  
+   ' the playfield... 
+   Limit Bob 16,8 To 240,504
+   ' ***  
+   ' Set pen to 15 for the flashing timer   
+   Pen 15 : Paper 0
+   '
+   Unpack 10 To 0
+   Get Palette 1
+   Screen Display 0,,,,200
+   Double Buffer 
+   Bob Update Off 
+   Autoback 1
+   '
+   CLR_DISPLAY
+   DISPLAY_SCORE
+   ' ***
+   ' Choose the initial positions of player 
+   D=16*32
+   P=GOAL : YP(P)=YCENTER-D : DP(P)=8
+   P=1-GOAL : YP(P)=YCENTER+D : DP(P)=0
+   For P=0 To 1
+      DB(P)=4 : DP(P)=4 : SP(P)=0
+      XP(P)=-64*32
+   Next 
+   '
+   Screen 1
+   '
+   Pop Proc
+   '
+   _DIRECTIONS:
+   Data 1,2
+   Data 3,4
+   Data 5,6
+   Data 7,8
+   Data 9,10
+   Data Vrev(7),Vrev(8)
+   Data Vrev(5),Vrev(6)
+   Data Vrev(3),Vrev(4)
+   Data Vrev(1),Vrev(2)
+   Data Rev(3),Rev(4)
+   Data Rev(5),Rev(6)
+   Data Rev(7),Rev(8)
+   Data Hrev(9),Hrev(10)
+   Data Hrev(7),Hrev(8)
+   Data Hrev(5),Hrev(6)
+   Data Hrev(3),Hrev(4)
+   '
+   _BOUNCE:
+   Data 8,7,6,5,5,5,6,7,8,9,10,11,11,11,10,9
+   Data 0,1,2,3,3,3,2,1,0,15,14,13,13,13,14,15
+   Data 1,1,2,3,4,5,6,7,7,7,6,5,4,3,2,1
+   Data 15,15,14,13,12,11,10,9,9,9,10,11,12,13,14,15
+   Data 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
+   Data 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
+   Data 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+   Data 14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14
+   '
+   _ROBOT:
+   Data 8,7,6,5,4
+   Data 0,1,2,3,4
+   Data 8,9,10,11,12
+   Data 0,15,14,13,12
+   '
+End Proc
+Procedure GAME
+   ' ***
+   ' As a game will be split into two halves, we'll memorise the current time.
+   ' At the end of the first half, we will now have the starting time   
+   ' the next half.     
+   TIM=51 : OSEC=SEC : OMIN=MNT
+   '
+   ' Main loop
+   Do 
+      ' ***
+      ' Handles each half in turn: The players start by entering the pitch 
+      NEW_BALL
+      Do 
+         ' ***
+         ' Wait for a goal
+         Repeat 
+            '
+            CPT=CPT+1
+            '  
+            Bob Clear 
+            '  
+            BALL_ANIM
+            MOVE_PLAYER[0]
+            MOVE_PLAYER[1]
+            '  
+            Bob Draw 
+            '  
+            DISPLAY_FIELD
+            Screen Swap 
+            '
+            ' Game interrupted?
+            A$=Inkey$
+            If A$=Chr$(27) : Exit 3 : End If 
+            If DMESS>0 : If Joy(1) : Exit 3 : End If : End If 
+            ' ***
+            ' Now, we can replace our PLA system with a normal PAUSE 
+            ' when you press SPACE...  
+            If A$=" " : Wait Key : Timer=0 : End If 
+            ' ***
+            ' Here we create the timer.  
+            '
+            ' When we are writing a game, it's vital to ensure that the speed
+            ' is as constant as possible. But the speed of each animation step 
+            ' can vary: If, for example, the robot is choosing a new direction,  
+            ' it may take a little longer, and generate a small delay in the 
+            ' animation sequence.  
+            ' The next line stabilizes the speed to 3 Vbls per frame, whatever   
+            ' the speed of the procedures... 
+            While Timer<3 : Wend 
+            ' ***  
+            ' Update the timer,    
+            TIME=TIME+Timer : Timer=0
+            ' Has it been more than 1 second since last update?
+            If TIME>50
+               ' YES: calculate the new time
+               TIME=TIME-50 : SEC=SEC-1
+               If SEC<0
+                  SEC=59 : MNT=MNT-1
+                  ' ***
+                  ' If time has run out: signal the end of the game! 
+                  If MNT<0 : MNT=0 : SEC=0 : FINISH=2 : End If 
+               End If 
+               ' Now, we'll display the new timer value 
+               DISPLAY_TIMER
+            End If 
+            ' ***
+            FINISH=FINISH-1
+            ' ***
+            ' If FINISH=0, then all the time has run out.  
+         Until FINISH=0
+         ' ***
+         ' If MARK<0 then we are still waiting for a goal, so we'll exit. 
+         If MARK<0 : Exit : End If 
+         ' ***
+         ' Handle scoring 
+         If GOAL=0
+            P=1 : If MARK=2 : P=0 : End If 
+         Else 
+            P=0 : If MARK=2 : P=1 : End If 
+         End If 
+         SCRE(P)=SCRE(P)+1
+         ' ***
+         ' Now, start the trikes again from the center of the pitch 
+         NEW_BALL
+         ' ***
+         ' If the robot has been beaten too much, let's accelerate him. Ha! 
+         D=SCRE(0)-SCRE(1)
+         If D>0 : ROBSPEED=Min(ROBSPEED+D,18) : End If 
+         '
+      Loop 
+      ' ***
+      ' End of half-time,
+      ' The players go back to the showers 
+      COME_BACK
+      ' ***
+      ' Clear the display
+      CLR_DISPLAY
+      ' If we're in the second half-time, the game is now over!! 
+      If GOAL : Exit : End If 
+      ' A new half-time is about to begin  
+      GOAL=1 : SEC=OSEC : MNT=OMIN
+      MESS=0
+      ' Lets do it!
+   Loop 
+   '
+End Proc
+Procedure NEW_BALL
+   ' ***
+   ' This new procedure starts a ... new ... ball 
+   '
+   ' First, let's display the current information on the screen 
+   DISPLAY_SCORE
+   DISPLAY_TIMER
+   ' ***
+   ' Now we've created some terrific ROBOT procedures, we can use them  
+   ' to make the players rush to the center  of the playing area
+   ' at the beginning of our game.  
+   '
+   ' ***
+   ' First, we'll save the original robot flags 
+   O0=ROBOT(0) : O1=ROBOT(1)
+   S0=ROBSPEED(0) : S1=ROBSPEED(1)
+   ' ***
+   ' Next we'll make both the two players into robots, and give them some   
+   ' commands.
+   For P=0 To 1
+      ROBOT(P)=1
+      ' Go to the center!
+      ROBOT$(P)="GO_CENTER" : AFTER$(P)=ROBOT$(P)
+      ' Faster than that!
+      ROBSPEED(P)=24
+   Next 
+   ' ***
+   ' Here's a small loop, that waits for the robots 
+   ' to arrive at the center of the pitch!  
+   XB=-1 : Bob Off BBALL
+   ' ***
+   ' Prevent players collision detection. This is VERY important
+   ' if we do not want the robots to get stuck halfway to their destination 
+   FLAGCOL=0
+   ' ***
+   ' The movement loop: It's just like the main one, only smaller.  
+   Repeat 
+      Bob Clear : MOVE_PLAYER[0] : MOVE_PLAYER[1] : Bob Draw : DISPLAY_FIELD : Screen Swap 
+      While Timer<3 : Wend : Timer=0
+   Until(ROBOT$(0)="HERE") and(ROBOT$(1)="HERE")
+   ' ***
+   ' Set the system back to normal to enable collisions 
+   MESS=DMESS : FLAGCOL=-1
+   Limit Bob 
+   ' ***
+   ' Set the default speed of players 
+   For P=0 To 1 : DB(P)=DP(P) : SP(P)=0 : MXSP(P)=20 : Next 
+   ' ***
+   ' Put the ball at the center, with a random kick 
+   XB=XCENTER : YB=YCENTER : ZB=0 : DB=0 : SB=0 : SZB=Rnd(15)+16
+   ROBOT$="THINK"
+   ' ***
+   ' Display the ball 
+   Bob Clear : MOVE_PLAYER[0] : MOVE_PLAYER[1] : Bob Draw : DISPLAY_FIELD : Screen Swap 
+   ' ***
+   ' And start the game 
+   FINISH=0 : MARK=-1
+   ' ***
+   ' Return the players back to their original status 
+   ROBOT(0)=O0 : ROBOT(1)=O1
+   ROBOT$(0)="THINK" : ROBOT$(1)="THINK"
+   ROBSPEED(0)=S0 : ROBSPEED(1)=S1
+   '
+End Proc
+Procedure COME_BACK
+   ' ***
+   ' This procedure is just like NEW_BALL 
+   ' It just moves the players out of the field, at half-time   
+   '
+   ' Have a look to NEW_BALL before coming here!  
+   '
+   DISPLAY_SCORE
+   DISPLAY_TIMER
+   ' ***
+   ' Initialise the two players as robots 
+   O0=ROBOT(0) : O1=ROBOT(1)
+   S0=ROBSPEED(0) : S1=ROBSPEED(1)
+   For P=0 To 1
+      ROBOT(P)=1 : ROBOT$(P)="GO_BACK" : AFTER$(P)=ROBOT$(P) : ROBSPEED(P)=24
+   Next 
+   ' ***
+   ' Limit the bob display
+   Limit Bob 16,8 To 240,504
+   '
+   ' *** Make players come back home! 
+   XB=-1 : Bob Off BBALL : FLAGCOL=0
+   Repeat 
+      Bob Clear : MOVE_PLAYER[0] : MOVE_PLAYER[1] : Bob Draw : DISPLAY_FIELD : Screen Swap 
+      While Timer<3 : Wend : Timer=0
+   Until(ROBOT$(0)="HERE") and(ROBOT$(1)="HERE")
+   Limit Bob : FLAGCOL=-1
+   ' ***
+   ' Set the players back to normal 
+   ROBOT(0)=O0 : ROBOT(1)=O1
+   ROBSPEED(0)=S0 : ROBSPEED(1)=S1
+   '
+End Proc
+Procedure DISPLAY_SCORE
+   '*** 
+   ' As its name indicates, this procedure displays the score of  
+   ' each player  
+   Screen 0
+   '
+   ' For each player, 
+   For P=0 To 1
+      '
+      ' First, clear the score 
+      DIGIT_PRINT[XSCR(P),YSCR,"   "]
+      '
+      ' Then display the score,  
+      A$=Mid$(Str$(SCRE(P)),2)
+      '
+      ' On the right.
+      A$=String$(" ",3-Len(A$))+A$
+      DIGIT_PRINT[XSCR(P),YSCR,A$]
+   Next 
+   '
+   ' Back to screen 1 
+   Screen 1
+   '  
+End Proc
+Procedure DIGIT_PRINT[XX,Y,S$]
+   ' ***
+   ' A simple loop to display a number using bobs at the given  
+   ' screen position. There's one bob image for each digit. 
+   '
+   For D=0 To Len(S$)-1
+      ' Get the X coordinate of our digit  
+      X=XX+D*16
+      A$=Mid$(S$,D+1,1)
+      ' If A$=space, we put an empty digit 
+      If A$=" "
+         Paste Bob X,Y,34
+      Else 
+         ' If not, we just paste the required digit!
+         Paste Bob X,Y,35+Asc(A$)-48
+      End If 
+   Next 
+End Proc
+Procedure DISPLAY_TIMER
+   ' ***
+   ' The "SCREEN" instruction is very slow! It takes half of a VBL  
+   ' to execute. So it's wise to avoid using it in the middle of our main   
+   ' program loop. Unfortunately, we want to update the timer on the screen 
+   ' once every second. We must therefore find a way to write to a screen,  
+   ' without using the SCREEN command.
+   ' The solution is to print the timer in a corner of screen 1 (playfield),  
+   ' We can now copy this corner straight into screen 0 using the 
+   ' DISPLAY_FIELD procedure. 
+    Locate 0,66
+    Print Using "Time: #";MNT;":"; Using "##";SEC;
+End Proc
+Procedure C0LLIDE[P,C]
+   '
+   On C Goto CYCLE,CYCLE,BALL
+   Pop Proc
+   '
+   ' Collision with other player    
+   CYCLE:
+   Q=1-P
+   CP(Q)=1 : SP(Q)=SP(P)+4*Sgn(SP(P)) : DP(Q)=DP(P) : Bob Off BBB+Q
+   CB(P)=B : CP(P)=1 : CC(P)=CC(P)+1 : SP(P)=-Min(SP(P),8)
+   Pop Proc
+   '
+   ' Collision with the ball  
+   BALL:
+   '
+   If ZB<32
+      If SP(P)>2
+         DB=DP(P)
+         SB=SP(P)+6
+         SZB=SP(P)/2+Rnd(SP(P)/2)
+      End If 
+      If SP(P)<2
+         DB=(DP(P)+8+1-Rnd(2)) mod 16
+         SB=-(SP(P)*3)/2+4
+         SZB=-SP(P)/2+Rnd(SP(P)/2)
+      End If 
+      If Abs(SP(P))<=2
+         SB=Max(SB,8)
+         DB=(DB-1+Rnd(2)) mod 16 : SZB=Rnd(8)
+      End If 
+      '
+      BUMP(P)=1 : CB(P)=0 : CC(P)=CC(P)+1
+   '
+   End If 
+End Proc
+Procedure BALL_ANIM
+   ' ***
+   ' This procedure has been modified to detect the GOAL POSTS! 
+   '
+   ' ***
+   ' No ball movement if the game is over 
+   If FINISH<0
+      '
+      XB=XB+XDP(DB)*SB : YB=YB+YDP(DB)*SB
+      '
+      If ZB=0
+         SB=Max(SB-3,0)
+      Else 
+         SB=Max(SB-1,0)
+      End If 
+      '
+      ZB=ZB+SZB
+      '
+      If ZB<=0 : SZB=-SZB/2 : ZB=SZB : If ZB : End If : End If 
+      If ZB : SZB=SZB-2 : End If 
+      '
+      X=XB/32 : Y=YB/32
+      '
+      Z=Max(Zone(X,Y-4),Max(Zone(X-4,Y+4),Zone(X+4,Y+4)))
+      '
+      If Z
+         ' ***
+         ' If the ball bounces against zones 1 and 2, the TOP and BOTTOM
+         ' zones, THEN it is a GOAL! YEEAAAAHHHH
+         If Z=<2
+            ' Finish the game, and score the goal  
+            FINISH=2 : MARK=Z
+         Else 
+            ' Well, sorry, it is just a normal bounce
+            DB=BOUNCE(Z,DB)
+         End If 
+      End If 
+   End If 
+   '
+   If SB+SZB
+      I=Min(22+ZB/ZBALL*2+(CPT mod 2),31+(CPT mod 2))
+   Else 
+      I=22
+   End If 
+   '
+   Bob BBALL,XB/32,YB/32,I
+   '
+End Proc
+Procedure MOVE_PLAYER[P]
+   '
+   FL(P)=FL(P)+1
+   '
+   If CP(P)
+      If SP(P)
+         SP(P)=SP(P)-Sgn(SP(P))
+      Else 
+         CP(P)=CP(P)-1 : DP(P)=DB(P)
+      End If 
+   End If 
+   '  
+   If ROBOT(P)=1 : ROBOT_PLAYER[P] : End If 
+   '  
+   If ROBOT(P)=0
+      '
+      If CP(P)=0
+         '  
+         If P=PLA : J=Joy(1) : End If 
+         '  
+         CB(P)=0 : CC(P)=0
+         ' Go faster? 
+         If J and 1 : If SP(P)<16 : SP(P)=SP(P)+3 : End If : End If 
+         ' Go slower? 
+         If J and 2 : If SP(P)>-16 : SP(P)=SP(P)-3 : End If : End If 
+         ' Turn left? 
+         If J and 4 : DP(P)=DP(P)-1 : If DP(P)<0 : DP(P)=15 : End If : DB(P)=DP(P) : End If 
+         ' Turn right?
+         If J and 8 : DP(P)=DP(P)+1 : If DP(P)>15 : DP(P)=0 : End If : DB(P)=DP(P) : End If 
+         ' Brake? 
+         If J and 16 : SP(P)=0 : End If 
+         '  
+      End If 
+   End If 
+   '
+   XP(P)=XP(P)+XDP(DP(P))*SP(P)
+   YP(P)=YP(P)+YDP(DP(P))*SP(P)
+   '
+   XR(P)=XP(P)/32 : YR(P)=YP(P)/32
+   '
+   S=Sgn(SP(P))
+   I=IP(DB(P),Abs(S)*(FL(P) mod 2))
+   Bob BBP+P,XR(P),YR(P),I+P2BOB*P
+   '
+   XD=XR(P)+S*(XH(DP(P))*PSIZE)/32 : YD=YR(P)+S*(YH(DP(P))*PSIZE)/32
+   ' ***
+   ' Now, we only check for the collision when the FLAGCOL is set 
+   ' We set it to 0 when players are entering or leaving the playfield. 
+   '  
+   If FLAGCOL
+      C=Bob Col(BBP+P,BBP To BBALL)
+      A=Max(Zone(XD,YD),Max(Zone(XD+XHH(DP(P)),YD+YHH(DP(P))),Zone(XD-XHH(DP(P)),YD-YHH(DP(P)))))
+   End If 
+   '
+   ' If we are bouncing too much, we'll stop! 
+   If CC(P)>3
+      SP(P)=0 : CP(P)=0 : CC(P)=1
+      A=0 : C=0 : Bob Off BBB+P
+   End If 
+   '  
+   If A
+      ' Collision with a border
+      CP(P)=3 : XC(P)=XD : YC(P)=YD : CC(P)=CC(P)+1
+      SP(P)=-S*Min(Max(Abs(SP(P)+6),4),8)
+   Else 
+      If C
+         ' Collision with a bob 
+         B=Col(-1) : If B<>CB(P) : C0LLIDE[P,B] : End If 
+      End If 
+   End If 
+   '
+   If CP(P)=3 : Bob BBB+P,XC(P)+Rnd(4),YC(P)+Rnd(4),21 : End If 
+   If CP(P)=2 : Bob Off BBB+P : End If 
+   '
+End Proc
+Procedure ROBOT_PLAYER[P]
+   ' ***
+   ' I have added a few new lines to this procedure which automatically 
+   ' centres the player in the middle of the ground.  
+   If CP(P)
+      ROBOT$(P)=AFTER$(P) : BUMP(P)=1 : Pop Proc
+   Else 
+      CB(P)=0 : CC(P)=0
+      SP(P)=SP(P)+Sgn(ROBSP(P)-SP(P))
+   End If 
+   '
+   Goto ROBOT$(P)
+   '
+   THINK:
+   BUMP(P)=0 : ROBSP(P)=0
+   W=Rnd(ROBWAIT(P)) : H=Rnd(ROBHIT(P)) : G=Rnd(ROBGOAL(P))
+   M=Max(W,Max(H,G))
+   '
+   If G=M
+      ROBOT$(P)="GO_THERE" : WHERE$(P)="UBALL1" : CHECK$(P)="CHECK_POSITION" : AFTER$(P)="GO_GOAL1"
+      Pop Proc
+   End If 
+   '
+   If H=M
+      Gosub GPLAY
+      If GX>64*32 and GY>64*32
+         ROBOT$(P)="GO_THERE" : WHERE$(P)="GPLAY" : CHECK$(P)="CHECK_POSITION" : AFTER$(P)="THINK"
+         ROBHIT(P)=Max(1,ROBHIT(P)-5)
+         Pop Proc
+      End If 
+   End If 
+   '  
+   If W=M
+      ROBOT$(P)="GO_NOWHERE" : AFTER$(P)="THINK" : RPAR(P)=Rnd(ROBWAIT(P)+50)
+      Pop Proc
+   End If 
+   Pop Proc
+   '
+   '----------------------------------------------------------------------- 
+   ' ***
+   ' The first of the new routines: It just turns the player to the center  
+   ' of the screen, ready to play!
+   ' This routine is initialised by NEW_BALL  
+   GO_CENTER:
+   ' Well, goto the center! 
+   ROBOT$(P)="GO_THERE"
+   WHERE$(P)="CFIXED"
+   CHECK$(P)="CHECK_POSITION"
+   AFTER$(P)="HERE"
+   '
+   ' These are starting coordinates for the players.  
+   GX(P)=XCENTER : GY(P)=YCENTER+((P=GOAL)-(P<>GOAL))*48*32
+   Pop Proc
+   ' ***
+   ' The robots have arrived at the center. They will simply wait!
+   HERE:
+   ' Turn the player in a good direction: facing the ball 
+   If YP(P)<YCENTER : DB(P)=8 Else DB(P)=0 : End If 
+   DP(P)=DB(P)
+   ' Stop him 
+   ROBSP(P)=0 : SP(P)=0
+   Pop Proc
+   '----------------------------------------------------------------------- 
+   ' ***
+   ' This one is initialised by the COME_BACK procedure. It's just the  
+   ' same as before, but the players are now leaving the ground!  
+   GO_BACK:
+   ROBOT$(P)="GO_THERE"
+   WHERE$(P)="CFIXED"
+   CHECK$(P)="CHECK_POSITION"
+   AFTER$(P)="HERE"
+   GX(P)=-64*32 : GY(P)=YCENTER+((P<>GOAL)-(P=GOAL))*16*32
+   Pop Proc
+   '
+   GO_NOWHERE:
+   ROBSP(P)=0
+   RPAR(P)=RPAR(P)-1 : If RPAR(P)<0 : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   '
+   GO_GOAL1:
+   ROBOT$(P)="GO_THERE" : WHERE$(P)="GBALL" : CHECK$(P)="CHECK_BALL" : AFTER$(P)="THINK"
+   Pop Proc
+   '
+   GO_THERE:
+   Gosub WHERE$(P)
+   If GX=0 : ROBOT$(P)=AFTER$(P) : Pop Proc : End If 
+   DX=GX-XP(P) : DY=GY-YP(P)
+   If DX<0 : D1=10 : DX=-DX : End If 
+   If DY<0 : D1=D1+5 : DY=-DY : End If 
+   D=(DY*32)/Max(DX,1)
+   If D>160 Then D2=0 : Goto SKIP
+   If D>47 Then D2=1 : Goto SKIP
+   If D>21 Then D2=2 : Goto SKIP
+   If D>6 Then D2=3 : Goto SKIP
+   If D<=6 Then D2=4
+   SKIP:
+   ROBSP(P)=ROBSPEED(P)
+   DB(P)=ROBDIR(D1+D2) : DP(P)=DB(P)
+   ODX(P)=DX : ODY(P)=DY : BUMP(P)=0
+   ROBOT$(P)=CHECK$(P)
+   Pop Proc
+   '
+   CHECK_BALL:
+   Gosub WHERE$(P) : DX=Abs(GX-XP(P)) : DY=Abs(GY-YP(P))
+   If DX>ODX(P)+32 or DY>ODY(P)+32 : ROBOT$(P)="GO_THERE" : End If : ODX(P)=DX : ODY(P)=DY
+   If BUMP(P) : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   '
+   CHECK_POSITION:
+   Gosub WHERE$(P) : DX=Abs(GX-XP(P)) : DY=Abs(GY-YP(P))
+   If DX>ODX(P) or DY>ODY(P) : ROBOT$(P)="GO_THERE" : End If : ODX(P)=DX : ODY(P)=DY
+   If BUMP(P) : ROBOT$(P)=AFTER$(P) : End If 
+   If DX<4*32 and DY<4*32 : ROBOT$(P)=AFTER$(P) : End If 
+   Pop Proc
+   '
+   GPLAY: GX=XP(1-P) : GY=YP(1-P) : Return 
+   '
+   UBALL1:
+   If P<>GOAL
+      If YP(P)>YB+32*32 : GX=0 : Return : End If 
+      If YP(P)>YB
+         GX=XB+Sgn(128*32-XB)*Rnd(16)*32
+      Else 
+         GX=XB+Sgn(128*32-XB)*(Rnd(32)+16)*32
+      End If 
+      GY=YB+24*32 : If GY>YBOTTOM : GY=YBOTTOM+16*32 : End If 
+   Else 
+      If YP(P)<YB-32*32 : GX=0 : Return : End If 
+      If YP(P)<YB
+         GX=XB+Sgn(128*32-XB)*Rnd(16)*32
+      Else 
+         GX=XB+Sgn(128*32-XB)*(Rnd(32)+16)*32
+      End If 
+      GY=YB-24*32 : If GY<YTOP : GY=YTOP-16*32 : End If 
+   End If 
+   Return 
+   '
+   GBALL: GX=XB : GY=YB : Return 
+   '
+   CFIXED: GX=GX(P) : GY=GY(P) : Return 
+   '
+End Proc
+Procedure DISPLAY_FIELD
+   '  
+   ' ***
+   ' Notice the use of MIN to avoid copying the timer   
+   X=XR(0)-78 : Y=YR(0)-67
+   Screen Copy 1,X,Y,X+156,Min(Y+135,528) To Logic(0),2,2
+   ' ***
+   ' Same remark
+   X=XR(1)-78 : Y=YR(1)-67
+   Screen Copy 1,X,Y,X+156,Min(Y+135,528) To Logic(0),162,2
+   '
+   ' ***
+   ' Now, we only copy the ball when it is displayed (XB>0)!  
+   If XB>0
+      X=XB/32-58 : Y=YB/32-29
+   Else 
+      X=XCENTER/32-58 : Y=YCENTER/32-29
+   End If 
+   ' Note the Min, which avoids copying the area containing the timer 
+   Screen Copy 1,X,Y,X+117,Min(Y+59,528) To Logic(0),102,139
+   ' ***
+   ' The timer has already been printed along the bottom of screen 1  
+   ' So we'll need to copy it onto the main display (screen 0)  
+   ' See how we're using the MINTERM (%11100000): 
+   ' This copies the timer over the display using a logical OR  
+   ' operation. As a result, our timer is displayed in colour 15, and the   
+   ' paper is TRANSPARENT. Use this method for YOUR own scoring!
+   ' Transparent scoring is very classy!
+   Screen Copy 1,0,528,80,539 To Logic(0),120,186,%11100000
+   '
+End Proc
+Procedure CLR_DISPLAY
+   '
+   Screen 0
+   For S=0 To 1
+      Cls 0,2,2 To 158,137
+      Cls 0,162,2 To 318,137
+      Cls 0,102,139 To 102+117,139+59
+      Screen Swap : Wait Vbl 
+   Next 
+   Screen 1
+   '
+End Proc
+Procedure ALL_ERASE
+   For B=1 To 15 : Erase B : Next 
+End Proc

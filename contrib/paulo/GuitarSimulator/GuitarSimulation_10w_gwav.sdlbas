@@ -1,0 +1,48 @@
+'------------------------------------------------------------------------
+' Paulo Silva - february '00 - GPL licence
+' (sdlBasic conversion and help from Vroby)
+' This is an example would be an idea for a guitar melody (not chords)
+'   composing interface
+' Goal would be, for example, composing .mod documents (or germanic notation
+'   txt files) with it
+'Screen Open 0,320,512,32,4: Screen 0 : Curs Off : Hide
+'------------------------------------------------------------------------
+
+
+
+setdisplay(640,240,32,1):paper (0xffffff):ink(0):pen(0):cls:mousehide
+loadimage("GuitarArm2.png",1):pasteicon(0,0,1)
+grab(1,0,0,16,16):grab(2,16,0,16,16):grab(3,32,0,32,8):grab(4,32,8,32,8)
+
+   xof=-8:yof=118:vflg=0
+
+while(key(27)=0)
+   xmt=xmouse:ymt=ymouse:bmt=bmouse:ymt2=(ymt\6)*6
+   xf1=(xmt-xof)/32: yf1=5-((ymt-yof)/6)
+     If xf1<0 Then :xf1=0:end if
+     If yf1<0 Then :yf1=0:end if
+     If yf1>5 Then :yf1=5:end if
+     If xf1>15 Then :xf1=15:end if
+     nte=int((yf1*5)+xf1+16)
+   Locate(0,0)
+     Prints(right$("00"+str$(int(xf1)),2)+":"+str$(int(yf1))+":"+str$(bmt)+":"+str$(nte)+":")
+     If bmt=1 then
+
+        Bob (1,xmt,ymt2,2): Bob (2,600,ymt2+6,4)
+
+        if vflg=0 then
+
+' nte2a=nte  -> the original value
+
+nte2a=nte-5
+
+          gwav$="wav/"+right$("00"+str$(nte2a),2)+".wav"
+          loadmusic (gwav$)
+          playmusic(1):vflg=1:end if
+
+     Else
+        Bob (1,xmt,ymt2,1):Bob (2,600,ymt2+7,3)
+        vflg=0
+      End If
+ end while
+

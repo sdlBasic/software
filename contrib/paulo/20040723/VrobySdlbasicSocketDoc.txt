@@ -1,0 +1,21 @@
+sock=getfreesock()                        : return the first free sock in sdlSocket array
+sock=OpenSock(port)                 : Server side socket sock is the stream. in sdlBasic 
+                                                there are 256 stream and
+                                          sintax is very similar of file open close.
+clientsock=AcceptSock(serversock)        : Accept the client connection
+IsServerReady(Sock)                        : True/False if server is sending data    
+sock=ConnectSock(ServerName,port)        : client side socket connection
+*ConnectionReadySock(sock)                : the server have accepted the connection
+IsClientReady(Sock)                        : True/False if client is sending data
+CloseSock(sock)                                : Close the socket connection. Works for client and server
+*PeekSock(Sock, NumBytes)                : Peek information coming from socket, but do not 
+clear.
+ReadSock(Sock, NumBytes)                : Read NumBytes
+ReadByteSock(Sock)                        : Read a single byte      
+ReadLineSock(Sock)                        : Read complete line
+WriteSock(Sock, Message, NumBytes)        : Sends NumBytes from Message
+WriteByteSock(Sock, Byte)                : Sends a single byte
+WriteLineSock(Sock, Message)                : Send Message
+getremoteip(sock)                        : return the ip address of remote client connetted
+getremoteport(sock)                        : return the port address of remote client connetted
+getlocalip()                                : return the local 

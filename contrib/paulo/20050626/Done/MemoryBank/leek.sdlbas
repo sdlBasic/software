@@ -1,0 +1,6 @@
+setdisplay(320,200,32,1):paper(8^8-1):ink(0):pen(0):cls
+reservebank(1,512)
+prints("leek(1,41)="+str$(leek(1,41)))
+prints("loke(1,41,12345678)"):loke(1,41,12345678)
+prints("leek(1,41)="+str$(leek(1,41)))
+waitkey

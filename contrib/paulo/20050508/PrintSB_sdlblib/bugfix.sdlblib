@@ -1,0 +1,5 @@
+function asc_b(a$)
+   tmpr=asc(a$)
+   if tmpr<0 then:tmpr=256+tmpr:end if
+   asc_b=tmpr
+ end function

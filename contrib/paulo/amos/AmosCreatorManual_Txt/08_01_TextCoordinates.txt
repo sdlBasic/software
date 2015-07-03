@@ -1,0 +1,15 @@
+Rem ************************************ 
+Rem *        AMOS Example 8.1          * 
+Rem *       Text cooordinates          * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem initialise screen
+Curs Off : Cls 0 : Paper 0
+Locate 0,0 : Centre "<Press the left mouse button>"
+Repeat 
+   Rem convert hardware coordinates into screen coords
+   XS=X Screen(X Mouse) : YS=Y Screen(Y Mouse)
+   Rem print an asterix at the current mouse position 
+   If Mouse Key=1 Then Locate X Text(XS),Y Text(YS) : Print "*";
+Until Mouse Key=2

@@ -1,0 +1,35 @@
+windowed=0
+ setdisplay(320,200,16,windowed)
+ autoback(0):mousehide()
+ paper (0xCCDDEE):ink(0):pen(0):cls
+
+  ScreenOpen (1,320,200,0,0,0,0,0)
+ Loadimage("Sprites.png",1): pasteicon(0,0,1): Screen(1)
+    For y=0 To 0: For x=0 To 9
+       k=(y*16)+x: grab(1+k,x*24,y*24,24,24)
+     Next : Next 
+
+screen(0)
+ oxsp=16:oysp=100: xdrc=0
+
+while(0=0)
+     tikcr=ticks:y=(tikcr/4)mod 200
+     if key(K_right) then :oxsp=oxsp+1:end if
+     if key(K_left) then :oxsp=oxsp-1:end if
+     if key(K_up) then :xdrc=xdrc+4:oysp=oysp-1:end if
+     if key(K_down) then :xdrc=xdrc-4:oysp=oysp+1:end if
+    if xdrc<0 then: xdrc=xdrc+2: end if
+     if xdrc>0 then: xdrc=xdrc-2: end if
+     if xdrc<-64 then: xdrc=-64: end if
+     if xdrc>64 then: xdrc=64: end if
+    if oxsp<0 then: oxsp=0: end if
+     if oxsp>256 then: oxsp=256: end if
+     if oysp<0 then: oysp=0: end if
+     if oysp>192 then: oysp=192: end if
+    sprnum=(xdrc+64)*7/128
+     if sprnum<0 then:sprnum=0: end if
+     if sprnum>6 then:sprnum=6: end if
+    bob(10,oxsp,oysp,sprnum+1)
+     screenswap():if key(27) then : end :end if
+ end while
+

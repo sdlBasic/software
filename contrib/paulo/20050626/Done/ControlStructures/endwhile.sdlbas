@@ -1,0 +1,7 @@
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls:mousehide
+a=1
+while a<=10
+prints(a)
+a=a+1
+end while
+waitkey

@@ -1,0 +1,288 @@
+'-- TTX Font Reader 
+'-- Paulo Silva -(GPL) - 040812
+'---   Bugs: some paths appears straight instead of curved (???)
+'- converting .ttf typefaces to .ttx:
+'- WinTtx2 (Just van Rossum - Letterror - http://fonttools.sourceforge.net/)
+'- (.ttx - ttf typeface document parsed into a xml document (human readable as .txt))
+
+
+'finp$="VeraMono_G_ttx.txt"
+finp$="VeraMono.ttx"
+
+fout$="log.txt"
+
+
+'--- in the glfsk$ variable you can choose your desired character
+'---  (as seen from 'glyph unicode="s"' for example)
+'glfsk$="H"
+'--- or randomly
+randomize
+whlgsk$="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+u=rnd(len(whlgsk$)):glfsk$=mid$(whlgsk$,u,1)
+
+
+'-bug: i still don't know the reason of these offset values yet...
+xoff=165:yoff=-2200
+
+
+
+
+'--- functions
+
+function lstinf$(a$,b$,c$)
+    adra=1:adrb=1:blngt=len(b$):d$=""
+  while adrb<=blngt
+     if mid$ (a$,adra,1)=mid$ (b$,adrb,1) then:adrb+=1:end if
+     adra=adra+1
+   end while
+  while mid$(a$,adra,1)<>left$(c$,1)
+     d$=d$+mid$(a$,adra,1):adra+=1
+   end while
+     lstinf$=d$
+ end function
+
+sub DrawBezierF(x0,y0,x1,y1,x2,y2,x3,y3,fc,xo,yo)
+    For i=0 To 100 step 10
+         t=i/100
+       xa=(x3)-(3*x2)+(3*x1)-(x0):ya=(y3)-(3*y2)+(3*y1)-(y0)
+       xb=(3*x2)-(6*x1)+(3*x0):yb=(3*y2)-(6*y1)+(3*y0)
+       xc=(3*x1)-(3*x0): yc=(3*y1)-(3*y0)
+       xi=(((((xa*t)+xb)*t)+xc)*t)+x0:yi=(((((ya*t)+yb)*t)+yc)*t)+y0
+   if i=0 then:xold=xi:yold=yi:end if
+    ink (0x000000)
+      line ((xold+xo)*fc,sqsiz-((yold+yo)*fc),(xi+xo)*fc,sqsiz-((yi+yo)*fc))
+   xold=xi:yold=yi:next
+ end sub
+
+sub DrawCubicF(x0,y0,x1,y1,x2,y2,fc,xo,yo)
+    xr1=x1-x0:yr1=y2-y1:x3=x0+x2-x1:y3=y0+y2-y1:xr2=x2-x1:yr2=y3-y2:stepv=10
+  for i=0 to stepv
+     ir=i*(1.570796/stepv):xsn=(xr1*sin(ir))-(xr2*cos(ir))
+       ycs=(yr1*(cos(ir)*-1))-(yr2*sin(ir)):xi=x3+xsn:yi=y3+ycs
+     if i=0 then:xold=xi:yold=yi:end if
+    ink (0x000000)
+     line ((xold+xo)*fc,sqsiz-((yold+yo)*fc),(xi+xo)*fc,sqsiz-((yi+yo)*fc))
+   xold=xi:yold=yi:next
+ end sub
+
+sub DrawLineF(x0,y0,x1,y1,fc,xo,yo)
+     line ((x0+xo)*fc,sqsiz-((y0+yo)*fc),(x1+xo)*fc,sqsiz-((y1+yo)*fc))
+ end sub
+
+
+
+
+
+'----
+
+open finp$ for input as #1
+open fout$ for output as #2
+
+
+vq_eof=0
+
+   print #2,"- Ascent and Descent"
+
+
+while vq_eof=0
+
+file input #1,text$:text$=ltrim$(text$)+"   "
+
+'cmdl$=left$(text$,2)
+
+if left$(text$,8)="</ttFont" then
+   vq_eof=1
+   print #2,"eof"
+ end if
+
+if left$(text$,12)="<usWinAscent" then
+   ascnd=val(lstinf$(text$,chr$(34),chr$(34)))
+   print #2,"ascent:"+str$(ascnd)
+ end if
+
+if left$(text$,12)="<usWinDescen" then
+   dscnd=val(lstinf$(text$,chr$(34),chr$(34)))
+   print #2,"descent:"+str$(dscnd)
+ end if
+
+wend
+
+close #1
+
+'--- the window size (=400 is 400x400)
+sqsiz=400
+
+   tfbod=ascnd+dscnd
+   bordr=tfbod/8
+   wldsp=(bordr*2)+tfbod
+   fctrv=sqsiz/wldsp
+
+
+setdisplay(sqsiz,sqsiz,32,1):setcaption(".ttx Font Reader (sdlBasic)")
+paper(8^8-1):ink(0):pen(0):cls
+
+
+yg1=sqsiz-(bordr*fctrv):yg2=sqsiz-((bordr+dscnd)*fctrv)
+ yg3=sqsiz-((bordr+tfbod)*fctrv)
+xg1=sqsiz-(bordr*fctrv):xg2=sqsiz-((bordr+dscnd)*fctrv)
+ xg3=sqsiz-((bordr+tfbod)*fctrv)
+ink(0x3333FF):line(0,yg1,sqsiz,yg1)
+ line(0,yg2,sqsiz,yg2):line(0,yg3,sqsiz,yg3)
+ line(xg1,0,xg1,sqsiz):line(xg3,0,xg3,sqsiz)
+ink(0)
+
+'waitkey
+              
+
+  print #2,"fctrv:"+str$(fctrv)
+
+  print #2,"-"
+
+
+
+' _________________________________________________________________
+'[::: This part should seek for glyph                              ]
+' ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+'- code not ready yet
+'- only will start when reading whole .ttx typeface
+'- command to seek: "<TTGlyph"
+setcaption(".ttx Font Reader - seeking glyph")
+
+ open finp$ for input as #1
+
+   fndglf=0
+while fndglf=0 
+  file input #1,text$:text$=ltrim$(text$)+"   "
+    if left$(text$,8)="<TTGlyph" then
+         zfz$=lstinf$(text$,"name="+chr$(34),chr$(34))
+       if (zfz$=glfsk$) then:fndglf=1
+           setcaption("found glyph: "+glfsk$)
+        else
+           setcaption("skip glyph: "+zfz$)
+        end if
+     end if
+ wend
+
+
+
+
+
+
+
+
+
+'-- path read start
+
+
+vq_eof=0
+
+   print #2,"- Character Vectors"
+
+
+while vq_eof=0
+
+file input #1,text$:text$=ltrim$(text$)+"   "
+
+'cmdl$=left$(text$,2)
+
+if left$(text$,8)="</TTGlyp" then
+   vq_eof=1
+   print #2,"eof"
+ end if
+
+'if left$(text$,8)="<TTGlyph" then
+'   vl_char$=lstinf$(text$,chr$(34),chr$(34))
+'   print #2,"character:"+vl_char$
+' end if
+
+if left$(text$,8)="<contour" then
+   print #2,"contour_start"
+   va_id=1
+ end if
+
+if left$(text$,3)="<pt" then
+   va_vx=val(lstinf$(text$,"x="+chr$(34),chr$(34)))
+   va_vy=val(lstinf$(text$,"y="+chr$(34),chr$(34)))
+   va_on=val(lstinf$(text$,"on="+chr$(34),chr$(34)))
+
+      gcmcl=0
+   if va_id=1 and gcmcl=0 then
+      if va_on=1 then
+         rt_comd$="move"
+         jx0=va_vx:jy0=va_vy
+         va_id=2:gcmcl=1
+       end if
+    end if
+   if va_id=2 and gcmcl=0 then
+      if va_on=0 then
+         rt_comd$="bzval_1"
+         jx1=va_vx:jy1=va_vy
+         va_id=3:gcmcl=1
+      else
+         rt_comd$="line"
+         jx1=va_vx:jy1=va_vy
+         va_id=2:gcmcl=1
+       end if
+    end if
+   if va_id=3 and gcmcl=0 then
+      if va_on=0 then
+         rt_comd$="bzval_2"
+         jx2=va_vx:jy2=va_vy
+         va_id=4:gcmcl=1
+      else
+         rt_comd$="cubic"
+         jx2=va_vx:jy2=va_vy
+         va_id=2:gcmcl=1
+       end if
+    end if
+   if va_id=4 and gcmcl=0 then
+      if va_on=1 then
+         rt_comd$="bezier"
+         jx3=va_vx:jy3=va_vy
+         va_id=2:gcmcl=1
+       end if
+    end if
+   if rt_comd$="move" then
+      jxf=jx0:jyf=jy0
+      print #2,"MOVE:"+str$(jx0)+","+str$(jy0)
+    end if
+   if rt_comd$="bzval_1" then
+      print #2,"bzval_1"
+    end if
+   if rt_comd$="line" then
+      print #2,"LINE:"+str$(jx0)+","+str$(jy0)+":"+str$(jx1)+","+str$(jy1)
+       DrawLineF(jx0,jy0,jx1,jy1,fctrv,xoff,yoff)
+      jx0=jx1:jy0=jy1
+    end if
+   if rt_comd$="bzval_2" then
+      print #2,"bzval_2"
+    end if
+   if rt_comd$="cubic" then
+      print #2,"CUBIC:"+str$(jx0)+","+str$(jy0)+":"+str$(jx1)+","+str$(jy1)+":"+str$(jx2)+","+str$(jy2)
+       DrawCubicF(jx0,jy0,jx1,jy1,jx2,jy2,fctrv,xoff,yoff)
+      jx0=jx2:jy0=jy2
+    end if
+   if rt_comd$="bezier" then
+      print #2,"BEZIER:"+str$(jx0)+","+str$(jy0)+":"+str$(jx1)+","+str$(jy1)+":"+str$(jx2)+","+str$(jy2)+":"+str$(jx3)+","+str$(jy3)
+       DrawBezierF(jx0,jy0,jx1,jy1,jx2,jy2,jx3,jy3,fctrv,xoff,yoff)
+      jx0=jx3:jy0=jy3
+    end if
+ end if
+
+if left$(text$,8)="</contou" then
+   print #2,"contour_end:LINE:"+str$(jx0)+","+str$(jy0)+":"+str$(jxf)+","+str$(jyf)
+    DrawLineF(jx0,jy0,jxf,jyf,fctrv,xoff,yoff)
+   va_id=0
+ end if
+
+wend
+
+close #1
+close #2
+
+
+setcaption(".ttx Font Reader - ...")
+
+while(0=0)
+    if key(27) then : end :end if
+ wend

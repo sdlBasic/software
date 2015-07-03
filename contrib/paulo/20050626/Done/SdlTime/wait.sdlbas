@@ -1,0 +1,7 @@
+setdisplay(320,200,32,1):paper(0xFFFFFF):ink(0x000000):pen(0x000000):cls
+while 0=0
+prints("wait(1000)"):wait(1000)
+prints("wait(2500)"):wait(2500)
+prints("wait(500)"):wait(500)
+prints("wait(5000)"):wait(5000)
+wend

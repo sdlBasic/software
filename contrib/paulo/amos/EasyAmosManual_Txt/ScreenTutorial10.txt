@@ -1,0 +1,21 @@
+'
+'      Screen tutorial #10 - Zone detection  
+'
+Flash Off : Curs Off : Cls 0
+Paper 0
+Locate 0,0 : Centre "Try and make all the boxes RED!"
+Reserve Zone 5
+Z=1
+For X=30 To 230 Step 50
+   Set Zone Z,X,50 To X+40,90
+   Bar X,50 To X+40,90
+Z=Z+1
+Next X
+Do 
+   M=Mouse Zone
+   If M<>0
+      Ink Rnd(10)+3
+      Bar M*50-20,50 To M*50+20,90
+      Wait Vbl 
+End If 
+Loop 

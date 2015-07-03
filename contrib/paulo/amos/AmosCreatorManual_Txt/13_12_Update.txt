@@ -1,0 +1,24 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.12        *   
+Rem *             Update               * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem Load some sprite images
+Load "AMOS_DATA:Sprites/Octopus.abk"
+Rem Set up screen
+Curs Off : Cls 0 : Paper 0
+Double Buffer : Flash Off : Fade 4 To -1
+Locate 0,0 : Centre "<Mouse buttons update position>"
+Sprite 9,X Mouse,Y Mouse,1
+Bob 1,X Screen(X Mouse)+32,Y Screen(Y Mouse)+32,10 : Update 
+Rem Turn off sprite and bob updates
+Update Off 
+Rem Main loop
+Do 
+   Rem Move sprite along with mouse 
+   Sprite 9,X Mouse,Y Mouse,1
+   Rem Move bob 
+   Bob 1,X Screen(X Mouse)+32,Y Screen(Y Mouse)+32,10
+   If Mouse Key Then Update 
+   Wait Vbl 
+Loop 

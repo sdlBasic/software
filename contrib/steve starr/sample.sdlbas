@@ -1,0 +1,7 @@
+setdisplay(800,600,32,1)
+cls
+loadimage( "images/back.png",100)
+loadimage( "images/Akida1.png",101)
+pasteicon(-200,-200,101)
+pastebob(0,0,100)
+waitKey

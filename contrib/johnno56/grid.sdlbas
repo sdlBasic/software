@@ -1,0 +1,129 @@
+'
+'		VARIABLE GRID
+'
+
+setDisplay(800,500,32,1)
+
+gcol = rgb(128,128,128)
+red = rgb(255,0,0)
+green = rgb(0,255,0)
+blue = rgb(0,0,255)
+white = rgb(255,255,255)
+black = rgb(0,0,0)
+yellow = rgb(255,255,0)
+
+fillcol = white
+
+'gsize = 7.5 ' 64x64
+gsize = 15 ' 32x32	-	blue
+'gsize = 20 ' 24x24	-	green
+'gsize = 30 ' 16x16	-	red
+'gsize = 60 ' 8x8
+
+ink(red): text(500,5,20,"16")
+rectangle(500,5,25,25.1)
+ink(green): text(540,5,20,"24")
+rectangle(540,5,25,25.1)
+ink(blue): text(580,5,20,"32")
+rectangle(580,5,25,25.1)
+ink(white): text(620,5,20,"Grid Size")
+
+patch = loadImage("colourpatch.png")
+
+sub cleargrid
+	for x = 0 to 480 step gsize
+		ink(black)
+		line(x,0,x,480)
+	end for
+	for y = 0 to 480 step gsize
+		ink(black)
+		line(0,y,480,y)
+	end for
+end sub
+
+sub update
+	for x = 0 to 480 step gsize
+		for y = 0 to 480 step gsize
+			ink(point(x+(int(gsize/2)),y+(int(gsize/2))))
+			dot(600+(int(x/gsize)),200+(int(y/gsize)))
+		end for
+	end for
+	'for x2 = 0 to gsize
+	'	for y2 = 0 to gsize
+	'		ink(g[x2,y2])
+	'		dot(600+x2,200+y2)
+	'	end for
+	'end for
+end sub
+
+pasteIcon(512,445,patch)
+
+while key(27) = 0
+
+	for x = 0 to 480 step gsize
+		ink(gcol)
+		line(x,0,x,480)
+	end for
+	for y = 0 to 480 step gsize
+		ink(gcol)
+		line(0,y,480,y)
+	end for
+
+	'colourpatch
+	'ink(red)
+	'paint(530,455)
+
+	'		16 x 16  Grid
+	'
+	if mouseZone(500,5,25,25) and mouseButton = 1 then
+		cleargrid
+		ink(gcol)
+		gsize = 30
+	end if
+
+	'		24 x 24  Grid
+	'
+	if mouseZone(540,5,25,25) and mouseButton = 1 then
+		cleargrid
+		ink(gcol)
+		gsize = 20
+	end if
+
+	'		32 x 32  Grid
+	'
+	if mouseZone(580,5,25,25) and mouseButton = 1 then
+		cleargrid
+		ink(gcol)
+		gsize = 15
+	end if
+
+	'		Select  Colour
+	'
+	if mouseZone(525,450,240,300) and point(mouseX,mouseY)<>gcol and mouseButton = 1 then
+		fillcol = point(mouseX,mouseY)
+	end if
+
+	'		Draw on grid
+	'
+	if mouseZone(0,0,480,480) and point(mouseX,MouseY)<>gcol and mouseButton = 1 then
+		ink(fillcol)
+		'paint(mouseX,mouseY)
+		xp=int(mouseX/gsize)*gsize
+		yp=int(mouseY/gsize)*gsize
+		bar(xp,yp,xp+gsize,yp+gsize)
+	end if
+
+	'		Erase
+	'
+	if mouseZone(0,0,480,480) and point(mouseX,mouseY)<>gcol and mouseButton = 3 then
+		ink(black)
+		xp=int(mouseX/gsize)*gsize
+		yp=int(mouseY/gsize)*gsize
+		bar(xp,yp,xp+gsize,yp+gsize)
+
+		'paint(mouseX,mouseY)
+	end if
+
+	update
+
+end while

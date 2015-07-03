@@ -1,0 +1,38 @@
+'
+'      Bob tutorial #10 - Hot Spots  
+'
+Dim BX(3),BY(3),BXD(3),BYD(3),BIMAGE(3)
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Double Buffer 
+Cls 0 : Pen 1 : Paper 0 : Hide 
+'
+Bob 1,100,100,3
+Bob 2,100,100,2
+For A=1 To 9
+   Read HOT
+   '
+   'Set the Hot Spot for Bob 2
+   '
+   Hot Spot 2,HOT
+   '
+   'Note, the Bob will not be updated until another Bob command is called 
+   '
+   Bob 2,100,100,2
+   Wait 10
+Next A
+Data $0,$10,$20,$1,$11,$21,$2,$12,$22
+'
+' We'll now 'move' a Bob by changing it's Hot Spot 
+'
+Bob Off 2
+For HOTX=100 To 0 Step -1
+   '
+   'The X hot spot is decreased by 1 each loop. This has the effect of moving 
+   'the Bob right.  
+   '
+   Hot Spot 2,HOTX,0
+   Bob 1,100,100,2
+   Wait Vbl 
+Next HOTX

@@ -1,0 +1,36 @@
+Rem ************************************ 
+Rem *        AMOS Example 22.1         * 
+Rem *         FAST ZOOM DEMO!          * 
+Rem * Any screen, any resolution,fast! * 
+Rem *                                  * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem Open screen
+Screen Open 0,320,200,64,Lowres
+Curs Off : Flash Off 
+Rem Load zoom routine from the disc
+Pload "df0:manual/chapter_22/Zoom",10
+Rem Draw box 
+ZDX=16 : ZDY=1 : ZTX=192 : ZTY=192
+SDX=216 : SDY=1 : STX=96 : STY=96
+Polyline ZDX-1,ZDY-1 To ZDX+ZTX,ZDY-1 To ZDX+ZTX,ZDY+ZTY To ZDX-1,ZDY+ZTY To ZDX-1,ZDY-1
+Polyline SDX-1,SDY-1 To SDX+STX,SDY-1 To SDX+STX,SDY+STY To SDX-1,SDY+STY To SDX-1,SDY-1
+Rem Set dimensions of zoom box 
+Dreg(2)=SDX : Dreg(3)=SDY
+Dreg(4)=ZDX : Dreg(5)=ZDY
+Rem Clip graphics to fit into box
+Clip SDX,SDY To SDX+STX,SDY+STY
+Rem zoom 
+Repeat 
+   Add I,1,0 To 63
+   Ink I
+   Rem Display a circle at the current mouse position 
+   Circle X Screen(X Mouse),Y Screen(Y Mouse),10
+   Rem Set magnification
+   Dreg(1)=2 : If Mouse Key Then Dreg(1)=4
+   Rem Set size of each pixel 
+   Dreg(6)=ZTX/Dreg(1)
+   Dreg(7)=ZTY/Dreg(1)
+   Rem Call machine code
+   Call 10
+Until Inkey$<>""

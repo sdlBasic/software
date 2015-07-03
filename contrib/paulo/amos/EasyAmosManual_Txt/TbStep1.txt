@@ -1,0 +1,284 @@
+'----------------------------------------------------------------------------  
+'               Tricycle Ball programming tutorial, by F.Lionet  
+'
+'                         STEP ONE: The first moves  
+'----------------------------------------------------------------------------
+'
+' Welcome to the Tricycle Ball programming tutorial. 
+'  
+' This provides a step by step demonstration of the art of games creation. 
+' We've split the development of the program into eight separate stages.   
+' The others can be found in the files TB_STEP_2.AMOS through TB_STEP_8.AMOS 
+'  
+' But first, we'll need to do a bit of vital research! 
+'  
+' Load the TRICYCLE_BALL.AMOS program from the Examples Disc 
+' and have a play. As you can see, the idea's similar to American Football 
+' or Rugby. Except for the trikes, that is!    
+'
+'
+' Once you've familarised yourself with the game, you'll be able to see  
+' the relationship between the way the program works and the way we  
+' have programmed it.
+'
+' What's the next step?
+'
+'    - Start with the program TB_STEP_1.AMOS (this one)  
+'
+'    - Using the CONTROL-F option (FIND) from the editor,
+'      look for the characters ***. These highlight all the important points 
+'      you'll need to watch out for, and list any new lines in the program.
+'
+'    - Once you've found the first of these comments,  
+'      you'll be able to jump straight to the next with CONTROL-N, or    
+'      the FIND NEXT option from the SEARCH MENU.
+'
+'    
+'  
+' This is the very first program in the series.  
+' So we've a LOT of setting up to do. Before we started programming, 
+' we created some simple mock-ups of our graphics to provide us with   
+' something to work on. When we've made some progress, we can redraw     
+' these images at our leisure. 
+'
+' Ok, let's get to work!   
+'
+'
+'----------------------------------------------------------------------------  
+' ***
+' Free some extra memory for our program!  
+Close Editor 
+' ***
+' Since we're not using the mouse, we'll remove the pointer from the screen
+Hide On 
+' ***
+' This tells our program where to load our image files on the disc...  
+' Don't forget to insert the Examples disc into your drive before use
+'  
+PATH$="Easy_Examples:"
+' ***
+' We'll now set up several small arrays to hold the status of players 1 and 2  
+'
+' XP() and YP() hold the players coordinates.    
+'  
+' All the coordinates will be multiplied by 32 for extra precision.  
+' This allows us to simulate a floating point calculation using integers 
+' and saves us oodles of precious time!    
+' The real coordinates are calculated by dividing XP and YP by 32.   
+' Supposing for example, we were to add 1 to XP at the end of each loop. 
+' XP() would smoothly increase in 1 pixel steps.       
+' But since the coordinates in XP() and YP() are divided by 32 before use, 
+' our trikes will only move by a fraction of this value. (every 32 frames) 
+' So although we are using integers, the effects are as smooth as silk!      
+Dim XP(1),YP(1)
+' ***
+' XR() and YR() contain the REAL coordinates of the players (divided by 32)  
+Dim XR(1),YR(1)
+' ***
+' DB() holds the direction that the player's trike is currently facing.
+' If you inspect the bob bank, you can see that there are 5 directions 
+' for each quarter turn of the trike.  
+' This will generate a delightfully clean rotation effect. 
+' Here are the different directions used by the player:  
+'  
+'  14 15  0  1  2  
+'  13     |     3  
+'  12  --   --  4  
+'  11     |     5  
+'  10 9   8  7  6    
+'    
+' So, the direction of the player is just symbolised by a number in DB(),  
+' from 0 to 15.
+'
+' ***
+Dim DB(1),DP(1)
+' ***
+' SP() contains the SPEED of the player, from 0 (stationary) to 20, maximum  
+' speed. 
+Dim SP(1)
+' ***
+' XDP() and YDP() store a value which will be added to X and Y coordinates 
+' to move the player in each of the 15 possible directions. So the movement  
+' calculation can be done very rapidly with the formula: 
+' XP(p)=XP(p)+SP(p)*XDP(DP(p)) 
+' YP(p)=YP(p)+SP(p)*YDP(DP(p)) 
+Dim XDP(15),YDP(15)
+' ***
+' IP(,) stores a set of trike images for each direction and
+' for each of the two animation steps. 
+Dim IP(15,1)
+' ***
+' FL() is just a small flag for the animation. (see later) 
+Dim FL(1)
+' ***
+' Since we'll be using these arrays from inside our procedures,  
+' we'll need to make them global   
+Global XP(),YP(),XDP(),YDP(),DB(),DP(),SP(),IP(),FL()
+Global XR(),YR()
+Global P2BOB,BBP,BBB,PSIZE
+Global PLA
+' ***
+' We now load up the memory banks from the disk. 
+' Load the Tricycles 
+Load PATH$+"Bobs/Tricycle_Bobs.Abk"
+' Load the game screen   
+Load PATH$+"Pictures/Tricycle_Screen.Abk",10
+' Load the playing area
+Load PATH$+"Pictures/Tricycle_Playfield.Abk",11
+' ***
+' All the initialisation is performed by a single GAME_INIT  procedure.
+GAME_INIT
+' ***
+' This temporarily sets up the players' positions  
+' We'll be changing it in a later tutorial 
+For P=0 To 1
+   XP(P)=160*32 : YP(P)=50*32+P*25*32
+Next 
+' ***
+' GAME is a small procedure which holds the actual game loop 
+GAME
+' ***
+' Before returning back to the editor, we'll erase the memory banks  
+' and save some memory.
+ALL_ERASE
+Edit 
+'
+Procedure GAME_INIT
+   ' ***
+   ' Ok, let's initialise some variables. 
+   ' First, we'll set up the bobs used to draw the players tricycles    
+   ' BBP stands for BoB Player  
+   BBP=1
+   ' ***
+   ' P2BOB is the number of the image used by the first of player 
+   ' two's bobs.  
+   P2BOB=10
+   ' ***
+   ' This loop calculates the vertical and horizontal distances moved 
+   ' by the trike in each direction, and loads them into the XDP and YDP      
+   ' arrays. It works out the values using the sine and cosine functions.   
+   ' At the same time, it reads the image numbers for each direction into IP()  
+   Restore _DIRECTIONS
+   ANGLE#=Pi#/2.0 : S=8
+   For D=0 To 15
+      XDP(D)=S*Cos(ANGLE#) : YDP(D)=-S*Sin(ANGLE#)
+      ANGLE#=ANGLE#-Pi#/8.0
+      Read IP(D,0),IP(D,1)
+   Next 
+   ' ***
+   ' Now, we unpack the playfield into screen 1 
+   Unpack 11 To 1
+   ' ***
+   ' Finished!
+   Pop Proc
+   ' ***
+   ' This table contains the list of images we'll be using to display the   
+   ' player's tricycle. See how we've included the HREV,REV,and VREV functions  
+   ' INSIDE our Data statements.  This is very useful, as it allows us to use 
+   ' the same images for  several directions. The HREV functions just reverse 
+   ' the bob images before they are displayed on the screen.  
+   '
+   ' There's one line for each direction. 
+   _DIRECTIONS:
+   Data 1,2
+   Data 3,4
+   Data 5,6
+   Data 7,8
+   Data 9,10
+   Data Vrev(7),Vrev(8)
+   Data Vrev(5),Vrev(6)
+   Data Vrev(3),Vrev(4)
+   Data Vrev(1),Vrev(2)
+   Data Rev(3),Rev(4)
+   Data Rev(5),Rev(6)
+   Data Rev(7),Rev(8)
+   Data Hrev(9),Hrev(10)
+   Data Hrev(7),Hrev(8)
+   Data Hrev(5),Hrev(6)
+   Data Hrev(3),Hrev(4)
+   '
+End Proc
+Procedure GAME
+   ' ***
+   ' Plays the game 
+   '
+   ' Repeat forever!
+   Repeat 
+      ' ***
+      ' Animates the players tricyles  
+      MOVE_PLAYER[0]
+      MOVE_PLAYER[1]
+      ' ***
+      ' Checks for a keypress from the user
+      A$=Inkey$
+      ' ESC aborts back to the editor  
+      If A$=Chr$(27) : Exit : End If 
+      ' SPACE  changes the number of the current player (used for debugging) 
+      If A$=" " : PLA=1-PLA : End If 
+      ' ***
+      ' Synchronise the game with the display  
+      ' We need to use 3 separate waits, otherwise it goes too fast!!! 
+      Wait Vbl : Wait Vbl : Wait Vbl 
+   Until 0
+   '
+End Proc
+Procedure MOVE_PLAYER[P]
+   ' ***
+   ' Increment the player flag. As we'll see later, it's used for animation   
+   FL(P)=FL(P)+1
+   ' ***
+   ' Read the joystick for the selected player  
+   ' For debugging purposes, you can press SPACE to control the other player. 
+   If P=PLA : J=Joy(1) : End If 
+   ' ***
+   ' Test for a Joystick UP   
+   ' If so, we'll increase the speed in SP()
+   If J and 1 : If SP(P)<20 : SP(P)=SP(P)+3 : End If : End If 
+   ' ***
+   ' Test for a DOWN
+   ' If so, we'll reduce the speed held in SP() 
+   If J and 2 : If SP(P)>-20 : SP(P)=SP(P)-3 : End If : End If 
+   ' ***
+   ' Joystick LEFT? 
+   ' Decrease the direction value in DP() to turn the trike.  
+   ' This holds the direction as a number from 0 to 15  
+   If J and 4 : DP(P)=DP(P)-1 : If DP(P)<0 : DP(P)=15 : End If : DB(P)=DP(P) : End If 
+   ' ***
+   ' Joystick RIGHT?
+   ' Increase the direction value in DP()   
+   If J and 8 : DP(P)=DP(P)+1 : If DP(P)>15 : DP(P)=0 : End If : DB(P)=DP(P) : End If 
+   ' ***
+   ' FIRE?  
+   ' We'll put the brakes on by setting the speed in SP() to 0!   
+   If J and 16 : SP(P)=0 : End If 
+   ' ***
+   ' Now we'll move the player's trike to it's new screen position
+   ' The general equation is: 
+   ' NEW POSITION=OLD POSITION+DISTANCE(CURRENT DIRECTION)*SPEED  
+   ' X(P),Y(P) hold the positions 
+   ' XDP(),YDP() hold the distance moved across or down   
+   ' D(P) contains the direction number and SP(P) the speed 
+   XP(P)=XP(P)+XDP(DP(P))*SP(P)
+   YP(P)=YP(P)+YDP(DP(P))*SP(P)
+   ' ***
+   ' Calculate the real position of our trike on the playfield  
+   XR(P)=XP(P)/32 : YR(P)=YP(P)/32
+   ' ***
+   ' Display the bob and animate if the player moves  
+   ' S=-1 if the speed is negative, 0 if it's zero, or 1 if it's positive 
+   S=Sgn(SP(P))
+   ' I holds the number of the image used by the trike  
+   ' IP() stores a list of image numbers for each direction 
+   ' DB(P) stores the direction of player P 
+   ' and the (FL(P) Mod 2) bit just animates the trike through two images 
+   ' As FL(P) increases, (FL(P) Mod 2) repeatedly cycles from 0 to 1  
+   I=IP(DB(P),Abs(S)*(FL(P) mod 2))
+   ' Finally, we can move the bob used by player P's trike  
+   Bob BBP+P,XR(P),YR(P),I+P2BOB*P
+   '
+End Proc
+Procedure ALL_ERASE
+   ' ***
+   ' A small procedure to erase all the current memory banks
+   For B=1 To 15 : Erase B : Next 
+End Proc

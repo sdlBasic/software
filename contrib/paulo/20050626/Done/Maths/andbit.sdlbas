@@ -1,0 +1,7 @@
+  setdisplay(240,320,32,1):paper(0xFFFFFF):ink(0):pen(0):cls
+for a=0 to 3
+  for b=0 to 3
+     prints("andbit("+str$(a)+","+str$(b)+")="+str$(andbit(a,b)))
+   next
+ next
+waitkey

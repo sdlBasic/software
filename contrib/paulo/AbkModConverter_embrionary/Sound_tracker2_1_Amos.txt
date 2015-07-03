@@ -1,0 +1,377 @@
+'--- SoundTracker/NoiseTracker/OtherTracker Module converter V 2.0      
+'--- By François Lionet - October 13th, 1990 
+' This program converts any module from any Soundtracker (all versions)    
+' and NoiseTracker (tested up to 1.1) to AMOS music bank format.   
+'--- AMOS 1.2 Music player supports all NoiseTracker 1.1 Labels.
+'   IMPORTANT NOTE: due to the new labels, music banks created by this 
+' program will crash the old music player (V1.1). You are therefore
+' encouraged to spread the new music player to all AMOS users! 
+'   We would like to thank the many users who contacted us when the first
+' converter was released. With their test data and help we were able to  
+' update this program quickly. 
+
+'Opens a very small screen to save memory  
+Screen Open 0,640,48,2,Hires : Colour 1,$FFF
+Curs Off 
+
+Dim IREAL(32)
+Global TST,AMAX,ABASE
+
+IMAX=14 : Dim APAT(5)
+SONGDATA=4
+I$="Not named       "
+I_END=$8000:   I_SVOL=$8300:   I_STOP=$8400:  I_REP=$8500
+I_LEDM=$8600:  I_LEDA=$8700:   I_TEMPO=$8800: I_INST=$8900
+I_ARP=$8A00:   I_PORT=$8B00:   I_VIB=$8C00:   I_VSL=$8D00
+I_SLUP=$8E00:  I_SLDOWN=$8F00: I_DEL=$9000:   I_PJMP=$9100
+
+'- banco 10: .mod
+'- banco 12: .abk
+
+AGAIN:
+ST$=Fsel$("**","","Sound-NoiseTracker converter V2.1","Please enter module to convert")
+If ST$="" Then Default : Edit 
+Open In 1,ST$ : BMAX=Lof(1) : Close 
+Erase 10 : Reserve As Work 10,BMAX
+Bload ST$,Start(10)
+'---> What version of Soundtracker?
+CODE$="M.K."
+
+If Leek(Start(10)+$438)=Leek(Varptr(CODE$))
+   OF_MUSIC=$43C: OF_PATTERN=$3B8: OF_NUMBER=$3B6: MXINST=30
+Else 
+   OF_MUSIC=600:  OF_PATTERN=472:  OF_NUMBER=470:  MXINST=15
+End If 
+
+'---> Gets size of instruments and song
+TST=-1 : Gosub I_CONV
+TST=-1 : Gosub S_CONV
+Print "Number of instruments:";NI
+
+'---> Converts patterns
+LWORK=(((BMAX-LINST-LSONG)*3)/3+1) and $FFFFFFFE
+N=0
+Repeat 
+   If N=0
+      Print "Converting song..."
+   Else 
+      Print : Print "One more try: my buffer estimation was too small!"
+   End If 
+   Gosub P_CONV : Print 
+   LWORK=LWORK+4000
+   Inc N
+Until LPATTERN
+
+'---> Converts song
+Print "Converting song..."
+TST=0 : Gosub S_CONV
+
+'---> Converts instruments 
+Print "Converting instruments..."
+TST=0 : Gosub I_CONV
+
+' Creates header 
+AD=Start(10)
+A$="AmBk" : Gosub 10100
+Doke AD,3 : Doke AD+2,0 : AD=AD+4
+TL=8+16+LINST+LSONG+LPATTERN : Loke AD,$80000000 or TL : AD=AD+4
+A$="Music   " : Gosub 10100
+Loke AD,16 
+Loke AD+4,16+LINST 
+Loke AD+8,16+LINST+LSONG 
+Loke AD+12,0 
+AD=AD+16
+
+' Copy instrument
+SAMCOPY[SCOPY,ECOPY,AD+NI*32+2+4]
+Copy Start(11),Start(11)+NI*32+2 To AD
+Loke AD+2+NI*32,0
+
+' Copy Song
+Copy Start(12),Start(12)+LSONG To AD+LINST
+
+' Copy Patterns
+Copy Start(13),Start(13)+LPATTERN To AD+LINST+LSONG
+
+
+'----------------------------
+'--- saves the tune
+Clw : ABK$=Fsel$("*.abk","","Save as Amos Music Bank .abk") : If ABK$="" Then Goto AGAIN
+Print : Print "Saving AMOS music bank..."
+Bsave ABK$,Start(10) To AD+LINST+LSONG+LPATTERN
+
+' Play the music!
+Clw : Centre "Loading the new bank to play it!"
+For N=10 To 13
+   Erase N
+Next 
+Load ABK$ : Volume 63 : Music 1
+Clw : Centre "Press a key to end..."
+Wait Key 
+For V=63 To 0 Step -1
+   Volume V: Wait Vbl 
+Next 
+Erase 3
+Clw 
+
+'-----------------------------------
+
+
+' And now, happy structured people, a nice GOTO! Arghhh, kill him! 
+Goto AGAIN
+
+
+'- !!!!!!!!!!!!!!!!!!
+'----------------------------------------------------------------------------  
+' Instrument conversion
+'----------------------------------------------------------------------------
+I_CONV:
+AD=Start(10)
+NPAT=0
+For A=AD+OF_PATTERN To AD+OF_PATTERN+127
+   NPAT=Max(NPAT,Peek(A))
+Next A
+Inc NPAT : LMAX=NPAT*1024
+ADI=AD+LMAX+OF_MUSIC
+NI=0
+For A=AD+20 To AD+20+$1E*MXINST Step $1E
+   If Deek(A+22) Then Inc NI
+Next 
+
+Erase 11 : Reserve As Work 11,NI*32+2+4 : APOK=Start(11)
+AOFF=APOK : SDOKE[AOFF,NI] : AOFF=AOFF+2 : AINST=AOFF+NI*32
+INUL=AINST : SLOKE[AINST,0] : AINST=AINST+4 : SCOPY=ADI
+I=0 : IR=0
+For A=AD+20 To AD+20+$1E*MXINST Step $1E
+   If Deek(A+22)
+      IREAL(I)=IR : Inc IR
+      SLOKE[AOFF,AINST-APOK] : L=Deek(A+22) : SDOKE[AOFF+14,L]
+      I2=Deek(A+26) : L2=Deek(A+28)
+      If L2<=2
+         SDOKE[AOFF+8,L]
+         SLOKE[AOFF+4,INUL-APOK] : SDOKE[AOFF+10,2]
+      Else 
+         SDOKE[AOFF+8,Max(I2/2,1)]
+         SLOKE[AOFF+4,AINST-APOK+I2] : SDOKE[AOFF+10,L2]
+      End If 
+      SDOKE[AOFF+12,Deek(A+24)]
+      L=L*2 : ECOPY=ADI+L
+      ADI=ADI+L : AINST=AINST+L
+      For P=0 To 15 : SPOKE[AOFF+16+P,Peek(A+P)] : Next 
+      Add AOFF,32
+   End If 
+   Inc I
+Next 
+If Btst(0,AINST) Then Inc AINST
+LINST=AINST-APOK
+Return 
+
+'----------------------------------------------------------------------------  
+' Song conversion
+'----------------------------------------------------------------------------
+S_CONV:
+APOK=0
+If TST=0
+   Erase 12 : Reserve As Work 12,LSONG : APOK=Start(12)
+   T=17
+End If 
+AD=Start(10) : AMU=APOK
+SDOKE[AMU,1] : Add AMU,2
+SLOKE[AMU,6] : Add AMU,4
+If T<=0 or T>100 Then T=17
+SDOKE[AMU+8,T]
+LLIST=Peek(AD+OF_NUMBER)
+LPAT=(LLIST+1)*2 : APAT=8+SONGDATA+16
+For N=0 To 3 : APAT(N)=AMU+APAT : SDOKE[AMU+N*2,APAT] : APAT=APAT+LPAT : Next N
+AMU=AMU+8+SONGDATA
+For A=0 To 15 : SPOKE[AMU+A,Peek(AD+A)] : Next : Add AMU,16
+AMU=AMU+LPAT*4
+For A=AD+OF_PATTERN To AD+OF_PATTERN+LLIST-1
+   P=Peek(A)
+   For V=0 To 3
+      SDOKE[APAT(V),P] : APAT(V)=APAT(V)+2
+   Next V
+Next A
+For V=0 To 3
+   SDOKE[APAT(V),-2]
+Next V
+If Btst(0,AMU) Then Inc AMU
+LSONG=AMU-APOK
+Return 
+
+'----------------------------------------------------------------------------
+' Pattern conversion 
+'----------------------------------------------------------------------------
+P_CONV:
+Erase 13 : Reserve As Work 13,LWORK : AMAX=Start(13)+LWORK-512 : Fill Start(13) To Start(13)+Length(13),0
+AD=Start(10) : AOFF=Start(13)
+Print "Number of different patterns:";NPAT
+APAT=AOFF+2+NPAT*8
+Doke AOFF,NPAT
+For NP=0 To NPAT-1 : PATMAX=64 : NBESS=0 : AAPAT=APAT : PJMP=0
+   O_AGAIN:
+   For V=0 To 3 : Locate 0,Y Curs : Print "Computing pattern";NP;" - voice";V;
+      AP=AD+OF_MUSIC+NP*1024
+      Doke AOFF+2+NP*8+V*2,APAT-AOFF
+      Gosub PP_CONV : If APAT>AMAX Then LPATTERN=0 : Return 
+   Next V
+   If PATMAX<>64 and NBESS=0 Then NBESS=1 : APAT=AAPAT : Goto O_AGAIN
+Next NP
+LPATTERN=APAT-Start(13)
+Return 
+
+PP_CONV:
+OI=-1 : VIT=1 : NN=0 : DEL=0 : OLDEFF=-1 : OPRAM=-1 : VOL=-1
+PP_LOOP:
+Do 
+   Inc NN : Exit If NN>PATMAX
+   D1=Deek(AP+V*4) : D2=Deek(AP+V*4+2) : AP=AP+16
+   I=(D2/$1000)+((D1 and $1000)/$1000)*16-1
+   If I>=0
+      If OI<>I or VOL<>63
+         Gosub POK_DELAY
+         Doke APAT,I_SVOL+63 : Add APAT,2 : VOL=63
+         Doke APAT,I_INST+IREAL(I) : Add APAT,2
+         OI=I
+      End If 
+   End If 
+   EFF=(D2 and $F00)/$100 : PRAM=D2 and $FF
+   If EFF<>OLDEFF or PRAM<>OPRAM
+      On OLDEFF+1 Gosub EST,EST,EST,EST,EST,NST,NST,NST,NST,NST,EST,NST,NST,NST,NST,NST
+      On EFF+1 Gosub EF0,EF1,EF2,EF3,EF4,EF5,EF6,EF7,EF8,EF9,EF10,EF11,EF12,EF13,EF14,EF15
+      OLDEFF=EFF : OPRAM=PRAM
+   End If 
+   If D1 and $FFF
+      Gosub POK_DELAY
+      Doke APAT,$3000+(D1 and $FFF) : Add APAT,2
+   End If 
+   Add DEL,VIT
+Loop 
+
+PP_END:
+Gosub POK_DELAY
+If PATMAX<>64 and PJMP<>0
+   Doke APAT,PJMP : Add APAT,2
+Else 
+   Doke APAT,I_END : Add APAT,2
+End If 
+Return 
+
+POK_DELAY:
+If DEL
+   Doke APAT,I_DEL+DEL : Add APAT,2: DEL=0
+End If 
+Return 
+
+' Stop old effect    
+EST:
+On EFF+1 Goto STA,NST,NST,NST,NST,SST,SST,SST,SST,SST,NST,SST,SST,SST,SST,SST
+STA: If PRAM=0 Then Goto SST
+NST: Return 
+SST: Gosub POK_DELAY : Doke APAT,I_STOP : Add APAT,2 : Return 
+
+' 0-> Arpeggio 
+EF0:
+If PRAM
+   Gosub POK_DELAY
+   Doke APAT,I_ARP+PRAM : Add APAT,2
+End If 
+Return 
+' 1-> Slide up 
+EF1:
+Gosub POK_DELAY
+Doke APAT,I_SLUP+PRAM : Add APAT,2 : Return 
+' 2-> Slide down 
+EF2:
+Gosub POK_DELAY
+Doke APAT,I_SLDOWN+PRAM : Add APAT,2 : Return 
+' 3-> Portamento 
+EF3:
+Gosub POK_DELAY
+Doke APAT,I_PORT+PRAM : Add APAT,2 : Return 
+' 4-> Vibrato  
+EF4:
+Gosub POK_DELAY
+Doke APAT,I_VIB+PRAM : Add APAT,2 : Return 
+' 5-> Future expansion 
+EF5: Return 
+' 6-> Future expansion 
+EF6: Return 
+' 7-> Future expansion 
+EF7: Return 
+' 8-> Future expansion 
+EF8: Return 
+' 9-> Future expansion 
+EF9: Return 
+' A Volume slide 
+EF10:
+Gosub POK_DELAY
+Doke APAT,I_VSL+PRAM : Add APAT,2 : VOL=-1 : Return 
+' B Position jump
+EF11:
+Gosub POK_DELAY
+PJMP=I_PJMP+PRAM : PATMAX=NN-1 : Return 
+' C Set volume 
+EF12:
+Gosub POK_DELAY
+If VOL<>PRAM and OI>=0
+   Doke APAT,I_SVOL+PRAM : VOL=PRAM : Add APAT,2
+End If 
+Return 
+
+' D Pattern break
+EF13:
+Gosub POK_DELAY
+PATMAX=NN-1 : Return 
+
+' E Led on / off 
+EF14:
+Gosub POK_DELAY
+If Btst(1,PRAM) Then Doke APAT,I_LEDM Else Doke APAT,I_LEDA
+Add APAT,2 : Return 
+
+' F Set tempo
+EF15:
+Gosub POK_DELAY
+Doke APAT,I_TEMPO+(100/PRAM) : Add APAT,2 : Return 
+
+10000 For X=0 To Len(A$)-1
+   10005 SPOKE[A+X,Asc(Mid$(A$,X+1,1))]
+10010 Next 
+10015 Return 
+10100 A=AD : Gosub 10000 : AD=AD+Len(A$) : Return 
+'
+
+Procedure SPOKE[A,B]
+   If TST=0
+      Poke A,B
+   End If 
+End Proc
+
+Procedure SDOKE[A,B]
+   If TST=0
+      Doke A,B
+   End If 
+End Proc
+
+Procedure SLOKE[A,B]
+   If TST=0
+      Loke A,B
+   End If 
+End Proc
+
+Procedure SAMCOPY[S,E,D]
+   If TST=0
+      If S mod 2=0 and E mod 2=0 and D mod 2=0
+         Copy S,E To D
+      Else 
+         Print "Slow Copying Sample"
+         A=0
+         While A+S<E
+            Poke D+A,Peek(S+A)
+            Inc A
+         Wend 
+         Print "Done."
+      End If 
+   End If 
+End Proc

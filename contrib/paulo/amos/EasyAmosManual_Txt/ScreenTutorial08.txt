@@ -1,0 +1,66 @@
+'
+'      Screen tutorial #08 - The great Fade demo!  
+'
+S=2
+Dim CALS$(20) : Hide 
+Screen Open 0,320,200,16,Lowres
+Curs Off : Flash Off : Cls 0
+For A=1 To 15
+   Ink A
+   Bar(A-1)*22,0 To(A-1)*22+22,200
+Next A
+Paper 0 : Locate 0,10 : Centre "THE FADE COMMAND!"
+A=1
+Restore LIST
+LP:
+Read FD$
+If FD$="END" Then Goto CONT
+CALS$(A)=FD$
+A=A+1 : Goto LP
+CONT:
+Do 
+   REDO:
+   C=Rnd(A-2)+1
+   If C=OC Then Goto REDO
+   OC=C
+S=Rnd(3)+2
+   Gosub CALS$(C)
+   Wait S*15
+Loop 
+End 
+LIST:
+Data "RED_PURPLE","GREEN_BLUE","OTHER_HALF","BLUE","RED","GREEN","WHITE","TWO_TONE"
+Data "HALF","OTHER_HALF","BLACK","HALF","GREY","OTHER_HALF"
+Data "END"
+RED_PURPLE:
+Fade S,,$F00,$E00,$D00,$C00,$B00,$A00,$901,$802,$703,$604,$505,$406,$307,$208,$109
+Return 
+GREEN_BLUE:
+Fade S,,$F0,$E0,$D0,$C0,$B0,$A0,$91,$82,$73,$64,$55,$46,$37,$28,$19
+Return 
+BLUE:
+Fade S,,$F,$F,$F,$F,$F,$F,$F,$F,$F,$F,$F,$F,$F,$F,$F
+Return 
+GREEN:
+Fade S,,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0
+Return 
+RED:
+Fade S,,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00,$F00
+Return 
+WHITE:
+Fade S,,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF,$FFF
+Return 
+BLACK:
+Fade S
+Return 
+GREY:
+Fade S,,$FFF,$EEE,$DDD,$CCC,$BBB,$AAA,$999,$888,$777,$666,$555,$444,$333,$222,$111
+Return 
+TWO_TONE:
+Fade S,,$FFF,$0,$FFF,$0,$FFF,$0,$FFF,$0,$FFF,$0,$FFF,$0,$FFF,$0,$FFF
+HALF:
+Fade S,,0,,0,,0,,0,,0,,0,,0,,0
+Return 
+OTHER_HALF:
+Fade S,,,0,,0,,0,,0,,0,,0,,0,
+Return 

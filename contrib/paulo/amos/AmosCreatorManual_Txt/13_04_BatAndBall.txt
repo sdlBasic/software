@@ -1,0 +1,77 @@
+Rem ************************************ 
+Rem *        AMOS Example 13.4         * 
+Rem *          Bat and Ball            * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Hide : Curs Off 
+Rem Generate sprite images 
+MAKE_OBJECTS
+Locate 0,0 : Paper 0 : Centre "<Bat-n-Ball>"
+Rem Make a mask for the bat image (essential)
+Make Mask 
+Rem Set hot spot to middle of bat
+Hot Spot 1,$11
+Rem Define AMAL program to control the bat 
+S$="Loop: Let X=XM; Let Y=YM; Pause; Jump Loop"
+Rem position bat 
+Sprite 9,X Mouse,Y Mouse,1
+Rem Start amal program 
+Amal 9,S$ : Amal On 
+Rem Throw the first ball 
+THROW_BALL
+Rem Main loop
+Do 
+   Rem check for collisions between bat and ball
+   If Sprite Col(9) Then REBOUND
+   Rem see if ball has reached the top of the screen
+   If Y Sprite(8)<Y Then THROW_BALL
+   Rem check if ball has passed outside the screen
+   If Y Sprite(8)>245 or X Sprite(8)<128 or X Sprite(8)>128+320
+      Boom 
+      Rem throw a new ball 
+      THROW_BALL
+   End If 
+Loop 
+Procedure MAKE_OBJECTS
+   Rem Make bat and ball
+   Cls 0
+   Rem Bat
+   Cls 0,0,0 To 17,17
+   Ellipse 16,4,16,2
+   Paint 17,5
+   Get Sprite 1,0,2 To 32,8
+   Rem Ball 
+   Cls 0,0,0 To 33,32
+   Ink 1
+   Circle 8,3,3
+   Paint 9,4
+   Get Sprite 2,0,0 To 16,8
+   Cls 0,0,0 To 33,32
+End Proc
+Procedure THROW_BALL
+   Rem Throw a ball iin a random direction
+   Shared X,Y,MX,M$
+   Rem movement string
+   M$="Move RA,RB,60"
+   Rem Calculate direction
+   X=Rnd(320)+128 : Y=Rnd(30)+45 : MX=Rnd(600)-X
+   Rem set direction
+   Amreg(0)=MX : Amreg(1)=260-Y
+   Rem Start movement 
+   Sprite 8,X,Y,2
+   Amal 8,M$
+   Amal On 
+End Proc
+Procedure REBOUND
+   Shared X,Y,MX,M$
+   Rem Handle rebound between bat and ball
+   Amal Off 8
+   Sprite 8,,Y Mouse-1,
+   Rem get new direction
+   Amreg(1)=Amreg(1)*-1
+   Rem Start movement 
+   Amal 8,M$ : Amal On 8
+   Rem Add a delay to stop the collision being detected twice 
+   Play 40,8
+End Proc

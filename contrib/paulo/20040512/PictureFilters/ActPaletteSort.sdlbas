@@ -1,0 +1,46 @@
+
+finp$="pic4.act":fout$=finp$+".act"
+
+function rrgb(c)
+   rrgb=bitwiseand(int(c/65536),0xFF)
+ end function
+function grgb(c)
+   grgb=bitwiseand(int(c/256),0xFF)
+ end function
+function brgb(c)
+   brgb=bitwiseand(c,0xFF)
+ end function
+
+function lum(c)
+'- thanks to Rumiko Takahashi ;)))
+   r1=rrgb(c):g1=grgb(c):b1=brgb(c)
+   lum=((r1*30)+(g1*59)+(b1*11))/100
+ end function
+
+dim pal[256]
+'--- loading palette document
+
+   open finp$ for input as #1
+for i=0 to 255
+   rz=readbyte(1):gz=readbyte(1):bz=readbyte(1)
+   pal[i]=rgb(rz,gz,bz)
+ next
+   close #1
+
+'-- sort
+for z1=0 to 255
+  for z2=0 to 254
+   if lum(pal[z2])>lum(pal[z2+1]) then
+      tmpr=pal[z2]:pal[z2]=pal[z2+1]:pal[z2+1]=tmpr
+    end if
+ next:next
+
+'--- save palette
+   open fout$ for output as #2
+for i=0 to 255
+     writebyte(1,rrgb(pal[i]))
+     writebyte(1,grgb(pal[i]))
+     writebyte(1,brgb(pal[i]))
+ next
+   close #2
+

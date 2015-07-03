@@ -1,0 +1,17 @@
+'
+' sdlBasic game: IO
+' 
+'   Name:      player.sdlbas
+'   Purpose:   simple clone of cult c64 shotem'up  
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+' Bugs:
+'
+' Todo:
+'  ALL!!!
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+sub player_init
+end sub

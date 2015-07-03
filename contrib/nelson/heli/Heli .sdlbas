@@ -1,0 +1,310 @@
+setdisplay(640,480,32,1)
+setcaption("HeliAttack V 0.1")
+randomize()
+setautoback(-3)
+'hide the mouse in the screen
+hidemouse()
+'load fonts
+setfont("fonts/6809char.ttf")
+
+
+'load images
+loadimage("Images/back.png",0)
+loadimage("Images/sun.png",1)
+loadimage("Images/clouds.png",2)
+loadimage("Images/heli.png",3)
+loadimage("Images/Sub.png",5)
+loadimage("Images/plant.png",11)
+loadimage("Images/bullet.png",12)
+loadimage("Images/sharks.png",13)
+
+'virtual screen for the heli
+screenopen (1,imagewidth(3),imageheight(3),0,0,0,0,0)
+pasteicon(0,0,3)
+screen(1)
+k=0
+for y=0 to 0
+	for x =0 to 1
+		k=k+1
+		grab(2+k,x*92,y*82,92,82)
+	next
+next
+
+common player_x = int((screenwidth()/2)+imagewidth(3))
+common player_y = int((screenheight()/2)+imageheight(3))
+
+common leftd=0, playerspeed = 2
+common rightd=1
+common side = leftd
+screenclose(1)
+screen(0)
+
+
+'global vars
+common enemyspeed[20], enemyvisible[20], enemy[20,2], enemyslot[20], bulletslot[9], playerbullets[9,2],shot =0
+common sharkslot[20], sharks[20,2], sharksvisible[20], sharkspeed[20], enemies = 6
+common total_enemies=enemies
+dim clouds=0, score=0, lives = 3
+
+------------------------------------------------------------
+function collision(img0,x0,y0,img1,x1,y1)
+	if x0 + bobwidth(img0) < x1 then :return false :end if
+	if y0 + bobwidth(img0) < y1 then :return false :end if
+	if x1 + bobwidth(img1) < x0 then :return false :end if
+	if y1 + bobwidth(img1) < y0 then :return false :end if
+	return true
+end function
+------------------------------------------------------------
+'init sharks slots
+sub sharkslots()
+	for i = 1 to enemies/2
+		sharkslot[i] = 24 + i
+	end for
+end sub
+' init sharks arrays
+sub initsharks()
+	for i = 1 to total_enemies/2
+		sharks[i,1] = 640
+		sharks[i,2] = 480/2+rnd(480/2) + BobWidth(13) + 32
+		sharkspeed[i] = int(rnd(3)+2)
+	next
+end sub
+' move the sharks on the screen
+sub movesharks()
+	for s = 1 to total_enemies/2
+		if sharks[s,1] <= 0 - bobwidth(13) then
+			sharks[s,1]=640
+			sharks[s,2]=480/2+rnd(480/2) + BobWidth(13) + 32
+			sharkspeed[s]=int(rnd(3)+2)
+		else
+			sharks[s,1] = sharks[s,1] - sharkspeed[s]
+		end if
+		if sharks[s,2] > 480 - 64 then
+			sharks[s,2] = 480 + 64
+		end if
+	next
+end sub
+
+' display sharks
+sub displaysharks()
+	for v = 1 to total_enemies/2
+		bob(sharkslot[v],sharks[v,1],sharks[v,2],13)
+	next
+end sub
+' init bullet slots
+sub initbulletslots()
+	for b = 0 to 9
+		bulletslot[b]=14+b
+	next
+end sub
+--------------bullets----------------------
+'sub bullets init
+sub initbullets()
+	for i = 0 to 9
+		playerbullets[i,0] = false
+	next
+end sub
+
+'sub add bullets to the player
+sub addplayerbullet(x,y)
+	dim index = -1
+	for i = 0 to 9
+		if playerbullets[i,0] = false then
+			index = i
+			exit for
+		end if
+	next
+	if index >= 0 then
+		playerbullets[i,0] = true
+		playerbullets[i,1] = x - imagewidth(12)/2
+		playerbullets[i,2] = y
+	end if
+end sub
+
+'sub update player bullets
+sub updateplayerbullets()
+	for i = 0 to 9
+		if playerbullets[i,0] = true then
+			playerbullets[i,2] = playerbullets[i,2] + 3
+			if playerbullets[i,2] >= 480 then
+				playerbullets[i,0] = false
+				//deletebob(bulletslot[i])
+			end if
+		end if
+	next
+end sub
+
+'sub display bullets
+sub displaybullets()
+	for i = 0 to 9
+		if playerbullets[i,0] = true  then
+			bob(bulletslot[i], playerbullets[i,1], playerbullets[i,2],12)
+		end if
+	next
+end sub
+
+
+--------------------------end bullets------------------------------------------------
+
+'Upadate Player sub
+sub updateplayer()
+	if key(k_up) then
+		player_y = player_y - playerspeed
+	end if
+	if key(k_down) then
+		player_y = player_y + playerspeed
+	end if
+	if key(k_left) then
+		side = leftd
+		player_x = player_x - playerspeed
+	end if
+	if key(k_right) then
+		side = rightd
+		player_x = player_x + playerspeed
+	end if
+	if key(k_space) and shot = 0 then
+		shot = 1
+		addplayerbullet(player_x + 32 ,player_y + 60 )
+	end if
+	if not key(k_space) then
+		shot = 0
+	end if
+End Sub
+' helli doesn't go out of the screen
+Sub bounderies()
+	player_x = max(player_x,0)
+	player_x = min(player_x,640-BobWidth(3))
+	player_y = max(player_y,0)
+	if player_y > 220 then
+		player_y = 220
+	end if
+end sub
+'initialize slots for the enemies
+sub initenemyslots()
+	for x = 1 to enemies
+		enemyslot[x] = 4+x
+    next
+end sub
+
+' init the enemies for moving them
+sub initenemies()
+	for i = 1 to total_enemies
+		enemy[i,1] = 640
+		enemy[i,2] = 480/2+rnd(480/2) + BobWidth(5) + 32
+		enemyspeed[i] = int(rnd(3)+2)
+		enemyvisible[i] = true
+	next
+end sub
+' move the enemies on the screen
+sub movenemies()
+	for s = 1 to total_enemies
+		if enemyvisible[s] = true then
+			if enemy[s,1] < 0 - 92 then
+				enemy[s,1]=640
+				enemy[s,2]=480/2+rnd(480/2) + BobWidth(5) + 32
+				enemyspeed[s]=int(rnd(3)+2)
+				enemyvisible[s] = true
+			else
+				enemy[s,1] = enemy[s,1] - enemyspeed[s]
+			end if
+		end if
+		if enemy[s,2] > 480 - 64 then
+			enemy[s,2] = 480 + 64
+		end if
+	next
+end sub
+
+' display enemies
+sub displayenemies()
+	for m = 1 to total_enemies
+		if enemyvisible[m]=true  then
+			bob(enemyslot[m],enemy[m,1],enemy[m,2],5)
+		end if
+	next
+end sub
+
+'init subs
+initenemyslots()
+initenemies()
+initbulletslots()
+initbullets()
+sharkslots()
+initsharks()
+'main loop
+while not key(K_ESC)
+	cls()
+	'update player sub
+	updateplayer()
+	' dont get off the screen
+	bounderies()
+	' mobe the subs
+	movenemies()
+	'display enemies
+	displayenemies()
+	'update bullets
+	updateplayerbullets()
+	' display bullets
+	displaybullets()
+	'move the sharks
+	movesharks()
+	'display the sharks
+	displaysharks()
+
+	'for i = 1 to total_enemies
+	'	if enemyvisible[i] = true then
+	'		for j = 0 to 9
+	'			if playerbullets[j,0] = true then
+	'				if collision(bulletslot[j], playerbullets[j,1],playerbullets[j,2],enemyslot[i],enemy[i,1],enemy[i,2]) then
+	'					playerbullets[j,0] = false
+	'					enemyvisible[i]=false
+	'					deletebob(bulletslot[j])
+	'					deletebob(enemyslot[i])
+	'					score = score + 100
+	'					enemies = enemies - 1
+	'					exit for
+	'				end if
+	'			end if
+	'		next
+	'	end if
+	'next
+	for i = 1 to total_enemies
+		if enemyvisible[i] = true then
+			for j = 0 to 9
+				if playerbullets[j,0] = true then
+					if bobhit(enemyslot[i],bulletslot[j]) then
+						enemyvisible[i] = false
+						playerbullets[j,0] = false
+ 						deletebob(enemyslot[i])
+						deletebob(bulletslot[j])
+						score = score + 100
+						enemies = enemies - 1
+						exit for
+					end if
+				end if
+			next
+		end if
+	end for
+
+	pasteicon(0,0,0)
+	bob(0,540,40,1)
+	bob(1,0-clouds,0,2)
+	bob(2,640-clouds,0,2)
+	bob(3,player_x,player_y,3+side)
+	bob(11,10,355,11)
+	bob(12,280,355,11)
+	bob(13,560,355,11)
+
+	clouds = clouds + 1
+	if clouds > 640 then
+		clouds = 0
+	end if
+	Ink(rgb(255,0,0))
+	text(0,0,20,"Score: " & score )
+	text(200,0,20,"Lives: "& lives)
+	text(400,0,20,"Enemies: "+str$(enemies))
+	screenswap()
+	wait(10)
+wend
+'update the screen
+screenswap()
+

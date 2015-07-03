@@ -1,0 +1,39 @@
+Rem ************************************ 
+Rem *        AMOS Example 16.1         * 
+Rem *           AMOS MENUS             * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Rem
+Rem Load some sprites from the amos data disc
+Load "amos_data:sprites/magic_sprites.abk"
+Rem intialize screen 
+Curs Off : Cls 0 : Ink 2 : Paper 0
+Flash Off : Get Sprite Palette 
+Locate 0,22 : Centre "Initializing menu..."
+Rem set up menu style
+Menu Separate 1
+Menu Bar 1
+Menu Line 2
+Rem define menu
+MN3$="(INk 1,0:BAr 32,32:LOcate 0,0:"
+MN4$="(INk 1,5:BAr 32,32:LOcate 0,0:"
+MN5$=":Locate 32,32)"
+Menu$(1)="(INk 0,4:INk 2,8)Players "
+  Set Menu(1) To 50,10
+  Menu$(2)="(INk 0,6:INk 2,9) Monsters "
+  Set Menu(2) To 50,10
+  Menu$(3)="(INk 0,8:INk 2,11) Objects"
+  Set Menu(3) To 50,10
+For L1=1 To 3
+   For L2=1 To 3
+      Rem load menu
+      Menu$(L1,L2)=MN3$+"Bob"+Str$(L1*5+L2)+MN5$,MN4$+" Bob "+Str$(L1*5+L2)+MN5$
+   Next 
+Next 
+Menu Base 50,10
+Locate 0,15 : Centre "Hold down the RIGHT mouse button"
+Locate 0,16 : Centre "Move the mouse to select an item"
+Locate 0,22 : Centre " Press a key to end..."
+Menu On 
+Wait Key 
+Edit 

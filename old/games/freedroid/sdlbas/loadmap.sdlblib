@@ -1,0 +1,23 @@
+'
+' sdlBasic game: paradroid
+' 
+'   Name:       loadmap.sdlbas
+'   Purpose:   rutin for loading map directory file's config 
+'  Author:     __vroby__    ( __vroby__@libero.it )
+'  Licence:    LGPL
+'
+' Bugs:
+'
+' Todo:
+'  
+'
+'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+' 
+sub loadmap
+	
+
+
+
+
+end sub

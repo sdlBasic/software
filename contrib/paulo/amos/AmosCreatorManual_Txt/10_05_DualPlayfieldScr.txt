@@ -1,0 +1,41 @@
+Rem ************************************ 
+Rem *        AMOS Example 10.5         * 
+Rem *    Dual Playfield scrolling      * 
+Rem *    (c) Mandarin / Jawx 1990      * 
+Rem ************************************ 
+Default Palette 0,$111,$222,$333,$444,$555,$666,$777,$F00,$FF0,$F0F,$F,$FF,$F0,$FFF,0
+Screen Open 0,960,100,8,Lowres
+Screen Open 1,960,100,8,Lowres
+Screen Display 0,128,150,320,100
+Screen Display 1,128,150,320,200
+Wait Vbl 
+Dual Playfield 0,1
+Cls 0
+Screen 0
+LAND[640,0,50,0]
+Flash Off 
+Rem generate a landscape for screen 1
+Screen 1
+LAND[640,0,50,0]
+Rem Load the last section of the landscape with a copy of the first bit
+Screen Copy 1,0,0,319,100 To 1,639,0
+Rem generate a landscape for screen 0
+Screen 0
+Rem Load the last section of the landscape with a copy of the first bit
+Screen Copy 0,0,0,319,100 To 0,639,0
+Rem hardware scrolling 
+Do 
+   For I=0 To 159
+      Screen Offset 1,640-I*4,0
+      Screen Offset 0,I*4,0 : Wait Vbl 
+   Next I
+Loop 
+Rem generate a landscape 
+Procedure LAND[W,X,N,C]
+   Ink 0 : Bar X,0 To W+X,99
+   For T=0 To N
+      Ink Rnd(6)+C+1
+      TX=Rnd(W)+X : TW=Rnd(W/8)+4 : TH=Rnd(50)
+      Polygon TX,99 To TX+TW/2,99-TH To TX+TW,99
+   Next T
+End Proc

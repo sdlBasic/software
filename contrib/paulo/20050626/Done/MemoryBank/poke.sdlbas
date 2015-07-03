@@ -1,0 +1,7 @@
+setdisplay(320,200,32,1)
+   screenopen(1,320,200,0,0,320,200,0):paper(8^8-1):ink(0):pen(0):cls
+   basescreen(2,1)
+for i=(4*320*40)+(4*20) to (4*320*42)+(4*54)
+   poke(2,i,0x88)
+ next
+   waitkey

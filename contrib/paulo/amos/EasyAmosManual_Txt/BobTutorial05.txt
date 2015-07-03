@@ -1,0 +1,22 @@
+'
+'      Bob tutorial #05 - Finding a Bobs X,Y screen co-ordinates     
+'
+Load "Easy_Tutorial:Bobs/Baby_AMOS.Abk"
+Curs Off : Flash Off 
+Get Sprite Palette 
+Cls 0 : Paper 0 : Pen 1
+Double Buffer 
+Autoback 1
+Do 
+   '
+   ' Position the Bob where the mouse pointer is
+   '
+   Bob 1,X Screen(X Mouse),Y Screen(Y Mouse),8
+   '
+   'Make X and Y equal the Bob's co-ordinates 
+   '
+   X=X Bob(1)
+   Y=Y Bob(1)
+   Print At(2,2);"AMOS's X=";X;"  "
+   Print At(2,4);"AMOS's Y=";Y;"  "
+Loop 

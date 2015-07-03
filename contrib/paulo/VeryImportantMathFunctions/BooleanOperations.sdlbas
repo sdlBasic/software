@@ -1,0 +1,14 @@
+'
+' math test
+'
+'
+
+include "math.sdlblib"
+
+setdisplay(320,240,32,1):paper(8^8-1):ink(0):pen(0):cls
+
+a1=240:b1=63
+  prints (bitwiseand(a1,b1))
+  prints (bitwiseor(a1,b1))
+  prints (bitwisexor(a1,b1))
+waitkey

@@ -1,0 +1,3 @@
+Runtime error on line number 5 of /home/devel_linux/basic/sdlBasic/sdlBasicDevel/paulo/040512/PictureFilters/ActPaletteSort.sdlbas
+file #1 is not open
+   rrgb=bitwiseand(int(c/65536),0xFF)

@@ -1,0 +1,11 @@
+'
+'      Sound tutorial #03 - How to load a SoundTracker module and play it  
+'
+'
+' Simply load the module with TRACK LOAD 
+'
+Track Load "Easy_Examples:Songs/mod.laugh",6
+'
+' and play it! 
+'
+Track Play 
